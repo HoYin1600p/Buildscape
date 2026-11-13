@@ -12,7 +12,7 @@ public final class LoaderWandererTrades {
 
     public static void register(WandererTradesEvent event) {
         for (var trade : WandererTradeTable.generic()) {
-            // The shared table uses vanilla names for content restored by v118x.
+            // The shared table uses vanilla names for content restored by minecraft1182.
             var id = CommonId.parse(trade.item().contains(":") ? trade.item() : "buildscape:" + trade.item());
             var item = Services.PLATFORM.getItem(id);
             if (item == null || item == Items.AIR) throw new IllegalStateException("Missing wandering trade item: " + id);

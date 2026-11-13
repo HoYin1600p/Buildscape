@@ -9,11 +9,11 @@ tasks.withType(JavaCompile).configureEach { options.release.set(21) }
 // Keep dev runs on the same cluster-only resources as the release jar. The common
 // source set also processes main's 26.2 resources, so expose only its class output.
 sourceSets {
-    sharedV121x {
+    sharedMinecraft1211 {
         java.srcDirs = []
         resources.srcDirs = []
-        output.dir([builtBy: project(':common').tasks.named('compileV121xJava')],
-                project(':common').sourceSets.v121x.output.classesDirs.singleFile)
+        output.dir([builtBy: project(':common').tasks.named('compileMinecraft1211Java')],
+                project(':common').sourceSets.minecraft1211.output.classesDirs.singleFile)
     }
 }
 
@@ -23,7 +23,7 @@ neoForge {
     mods {
         buildscape {
             sourceSet sourceSets.main
-            sourceSet sourceSets.sharedV121x
+            sourceSet sourceSets.sharedMinecraft1211
         }
     }
     runs {
@@ -51,8 +51,8 @@ sourceSets {
 
 configurations { commonVariant }
 dependencies {
-    commonVariant project(path: ':common', configuration: 'v121xElements')
-    implementation project(path: ':common', configuration: 'v121xElements')
+    commonVariant project(path: ':common', configuration: 'minecraft1211Elements')
+    implementation project(path: ':common', configuration: 'minecraft1211Elements')
 }
 
 tasks.named('processResources', ProcessResources) {

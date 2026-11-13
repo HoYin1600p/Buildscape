@@ -62,9 +62,9 @@ public abstract class BaseRegistryAdapter implements IRegistryAdapter {
 
     @Override
     public <T> RegistrySupplier<T> registerBlockEntity(String name, Supplier<T> blockEntitySupplier) {
-        if (Services.isVersionCluster("v118x") || Services.isVersionCluster("v121x")) {
+        if (Services.isVersionCluster("minecraft1182") || Services.isVersionCluster("minecraft1211")) {
             if (name.equals("pillar_block_entity")) {
-                if (Services.isVersionCluster("v118x")) {
+                if (Services.isVersionCluster("minecraft1182")) {
                     registerClusterBlockEntity("mangrove_sign_block_entity");
                     registerClusterBlockEntity("bamboo_sign_block_entity");
                 }
@@ -213,7 +213,7 @@ public abstract class BaseRegistryAdapter implements IRegistryAdapter {
                 modItems.put(id, item);
             } else if (obj instanceof ItemDefinition def) {
                 Block matchingBlock = modBlocks.get(id);
-                modItems.put(id, (Services.isVersionCluster("v118x") || Services.isVersionCluster("v121x"))
+                modItems.put(id, (Services.isVersionCluster("minecraft1182") || Services.isVersionCluster("minecraft1211"))
                         ? Services.PLATFORM.createRegisteredItem(def, matchingBlock)
                         : matchingBlock != null ? ItemFactory.createBlockItem(id, matchingBlock, def.getProperties())
                         : ItemFactory.createItem(def));
@@ -222,9 +222,9 @@ public abstract class BaseRegistryAdapter implements IRegistryAdapter {
     }
 
     protected void initBlockEntities() {
-        Map<String, BlockEntityType<?>> clusterTypes = (Services.isVersionCluster("v118x") || Services.isVersionCluster("v121x"))
+        Map<String, BlockEntityType<?>> clusterTypes = (Services.isVersionCluster("minecraft1182") || Services.isVersionCluster("minecraft1211"))
                 ? Services.PLATFORM.createClusterBlockEntityTypes(modBlocks) : Map.of();
-        if (Services.isVersionCluster("v118x") && !clusterTypes.isEmpty()) {
+        if (Services.isVersionCluster("minecraft1182") && !clusterTypes.isEmpty()) {
             modBlockEntities.put("mangrove_sign_block_entity", clusterTypes.get("mangrove_sign_block_entity"));
             modBlockEntities.put("bamboo_sign_block_entity", clusterTypes.get("bamboo_sign_block_entity"));
         }
@@ -257,7 +257,7 @@ public abstract class BaseRegistryAdapter implements IRegistryAdapter {
     protected void initEntities() {
         modEntities.put("falling_icicle", Services.PLATFORM.getFallingIcicleEntityType());
         modEntities.put("festive_stocking", Services.PLATFORM.getFestiveStockingEntityType());
-        if (Services.isVersionCluster("v118x")) modEntities.putAll(Services.PLATFORM.createClusterEntityTypes());
+        if (Services.isVersionCluster("minecraft1182")) modEntities.putAll(Services.PLATFORM.createClusterEntityTypes());
         modEntities.put("colored_item_frame", Services.PLATFORM.getColoredItemFrameEntityType());
         modEntities.put("seat", Services.PLATFORM.getSeatEntityType());
         modEntities.put("poplar_boat", Services.PLATFORM.getPoplarBoatEntityType());

@@ -20,7 +20,7 @@ public final class RemovedIdAliases {
             throw new IllegalArgumentException("Replacement aliases require the block, item or entity type registry");
         }
         Services.PLATFORM.wrapRegistryAction(() -> {
-            for (var alias : VanillaReplacementAliases.forCluster("v121x")) {
+            for (var alias : VanillaReplacementAliases.forCluster("minecraft1211")) {
                 if (!(blocks ? alias.block() : items ? alias.item() : alias.entity())) continue;
                 ResourceLocation source = ResourceLocation.parse(alias.source());
                 if (registry.containsKey(source)) continue;

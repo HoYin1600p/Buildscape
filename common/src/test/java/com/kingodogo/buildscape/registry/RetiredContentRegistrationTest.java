@@ -48,12 +48,12 @@ class RetiredContentRegistrationTest {
             String className = kind.equals("block") ? "ModBlocks" : "ModItems";
             String sourcePath = "java/com/kingodogo/buildscape/" + kind + "/" + className + ".java";
             String source = Files.readString(root.resolve("common/src/main/" + sourcePath));
-            String gate = kind.equals("block") ? "regV118x" : "registerV118x";
+            String gate = kind.equals("block") ? "registerLegacyBlock" : "registerLegacy";
             List<String> actual = ids(source, "\\b" + gate + "\\(\\\"([^\\\"]+)\\\"");
             assertEquals(expected, new LinkedHashSet<>(actual), kind + " registrations differ from the removal policy");
             assertEquals(expected.size(), actual.size(), kind + " registrations contain duplicates");
-            assertTrue(source.contains("if (!Services.isVersionCluster(\"v118x\") && (!Services.isVersionCluster(\"v121x\")"));
-            assertTrue(source.contains("ContentRemovalPolicy.removes(\"v121x\", " + (kind.equals("block") ? "id" : "name") + ")"));
+            assertTrue(source.contains("if (!Services.isVersionCluster(\"minecraft1182\") && (!Services.isVersionCluster(\"minecraft1211\")"));
+            assertTrue(source.contains("ContentRemovalPolicy.removes(\"minecraft1211\", " + (kind.equals("block") ? "id" : "name") + ")"));
         }
     }
 
@@ -68,23 +68,23 @@ class RetiredContentRegistrationTest {
 
         String entities = Files.readString(root.resolve(
                 "common/src/main/java/com/kingodogo/buildscape/entity/ModEntities.java"));
-        assertEquals(List.of("mangrove_boat"), ids(entities, "registerV118x\\(\\\"([^\\\"]+)\\\""));
-        assertTrue(entities.indexOf("registerV118x(\"mangrove_boat\")")
+        assertEquals(List.of("mangrove_boat"), ids(entities, "registerLegacy\\(\\\"([^\\\"]+)\\\""));
+        assertTrue(entities.indexOf("registerLegacy(\"mangrove_boat\")")
                 < entities.indexOf("register(\"colored_item_frame\")"));
 
         String tabs = Files.readString(root.resolve(
                 "common/src/main/java/com/kingodogo/buildscape/item/ModCreativeTabs.java"));
-        String orderMethod = tabs.substring(tabs.indexOf("private static List<String> v118xItemOrder()"),
+        String orderMethod = tabs.substring(tabs.indexOf("private static List<String> legacyItemOrder()"),
                 tabs.indexOf("private static List<String> loadOrderedItemIds()"));
         List<String> order = ids(orderMethod, "\\\"([a-z0-9_]+)\\\"");
-        assertFalse(order.isEmpty(), "v118xItemOrder should not be empty");
-        assertEquals(new LinkedHashSet<>(order).size(), order.size(), "v118xItemOrder contains duplicates");
-        assertTrue(tabs.contains("if (Services.isVersionCluster(\"v118x\")) return v118xItemOrder();"));
+        assertFalse(order.isEmpty(), "legacyItemOrder should not be empty");
+        assertEquals(new LinkedHashSet<>(order).size(), order.size(), "legacyItemOrder contains duplicates");
+        assertTrue(tabs.contains("if (Services.isVersionCluster(\"minecraft1182\")) return legacyItemOrder();"));
     }
 
     @Test
     void retiredIdsAreAbsentFromThe26xRegistrationQueues() throws Exception {
-        assertFalse(Services.isVersionCluster("v118x"));
+        assertFalse(Services.isVersionCluster("minecraft1182"));
         ModBlocks.init();
         ModItems.init();
         ModEntities.init();
@@ -96,7 +96,7 @@ class RetiredContentRegistrationTest {
         Services.REGISTERED_ITEMS.forEach(entry -> registered.add(entry.getId().toString()));
         for (var entry : manifest) {
             String id = entry.getAsJsonObject().get("id").getAsString();
-            assertFalse(registered.contains(id), id + " must stay retired on v26x");
+            assertFalse(registered.contains(id), id + " must stay retired on minecraft262");
         }
         assertTrue(Services.REGISTERED_ENTITIES.stream().noneMatch(entry -> entry.getId().equals("buildscape:mangrove_boat")));
     }

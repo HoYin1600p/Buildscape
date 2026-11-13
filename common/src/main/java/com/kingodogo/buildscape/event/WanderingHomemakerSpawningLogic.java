@@ -44,7 +44,7 @@ public final class WanderingHomemakerSpawningLogic {
     // 1.21.1 and 26.x drop Buildscape's plain decorated pot in favour of the vanilla one (ContentRemovalPolicy), so the
     // vanilla pot has to keep counting for the Wandering Homemaker square as main's plain pot does.
     private static boolean isVanillaPotReplacement(Block block) {
-        return (Services.isVersionCluster("v121x") || Services.isVersionCluster("v26x"))
+        return (Services.isVersionCluster("minecraft1211") || Services.isVersionCluster("minecraft262"))
                 && "block.minecraft.decorated_pot".equals(block.getDescriptionId());
     }
 

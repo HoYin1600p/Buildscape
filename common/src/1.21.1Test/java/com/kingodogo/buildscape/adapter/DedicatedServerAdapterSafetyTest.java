@@ -30,7 +30,7 @@ class DedicatedServerAdapterSafetyTest {
         for (String name : List.of("PlatformAdapterBase", "BlockFactory", "PacketFactory",
                 "RecipeFactory", "WorldGenFactory", "MixinFactory")) {
             try (InputStream bytes = getClass().getClassLoader().getResourceAsStream(ADAPTER + name + ".class")) {
-                assertNotNull(bytes, "Missing compiled v121x adapter: " + name);
+                assertNotNull(bytes, "Missing compiled minecraft1211 adapter: " + name);
                 inspect(read(bytes), problems);
             }
         }

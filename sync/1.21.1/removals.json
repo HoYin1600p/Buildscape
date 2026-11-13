@@ -10,13 +10,13 @@
                             "vanilla_equivalent":  "minecraft:bamboo_block"
                         },
                         {
-                            "request":  "v121x",
+                            "request":  "minecraft1211",
                             "id":  "buildscape:bamboo_button",
                             "kind":  "block+item",
                             "vanilla_equivalent":  "minecraft:bamboo_button"
                         },
                         {
-                            "request":  "v121x",
+                            "request":  "minecraft1211",
                             "id":  "buildscape:bamboo_chest_raft",
                             "kind":  "item",
                             "vanilla_equivalent":  "minecraft:bamboo_chest_raft"
@@ -28,55 +28,55 @@
                             "vanilla_equivalent":  "minecraft:bamboo_door"
                         },
                         {
-                            "request":  "v121x",
+                            "request":  "minecraft1211",
                             "id":  "buildscape:bamboo_fence",
                             "kind":  "block+item",
                             "vanilla_equivalent":  "minecraft:bamboo_fence"
                         },
                         {
-                            "request":  "v121x",
+                            "request":  "minecraft1211",
                             "id":  "buildscape:bamboo_fence_gate",
                             "kind":  "block+item",
                             "vanilla_equivalent":  "minecraft:bamboo_fence_gate"
                         },
                         {
-                            "request":  "v121x",
+                            "request":  "minecraft1211",
                             "id":  "buildscape:bamboo_hanging_sign",
                             "kind":  "block+item",
                             "vanilla_equivalent":  "minecraft:bamboo_hanging_sign"
                         },
                         {
-                            "request":  "v121x",
+                            "request":  "minecraft1211",
                             "id":  "buildscape:bamboo_mosaic",
                             "kind":  "block+item",
                             "vanilla_equivalent":  "minecraft:bamboo_mosaic"
                         },
                         {
-                            "request":  "v121x",
+                            "request":  "minecraft1211",
                             "id":  "buildscape:bamboo_mosaic_slab",
                             "kind":  "block+item",
                             "vanilla_equivalent":  "minecraft:bamboo_mosaic_slab"
                         },
                         {
-                            "request":  "v121x",
+                            "request":  "minecraft1211",
                             "id":  "buildscape:bamboo_mosaic_stairs",
                             "kind":  "block+item",
                             "vanilla_equivalent":  "minecraft:bamboo_mosaic_stairs"
                         },
                         {
-                            "request":  "v121x",
+                            "request":  "minecraft1211",
                             "id":  "buildscape:bamboo_planks",
                             "kind":  "block+item",
                             "vanilla_equivalent":  "minecraft:bamboo_planks"
                         },
                         {
-                            "request":  "v121x",
+                            "request":  "minecraft1211",
                             "id":  "buildscape:bamboo_pressure_plate",
                             "kind":  "block+item",
                             "vanilla_equivalent":  "minecraft:bamboo_pressure_plate"
                         },
                         {
-                            "request":  "v121x",
+                            "request":  "minecraft1211",
                             "id":  "buildscape:bamboo_raft",
                             "kind":  "item",
                             "vanilla_equivalent":  "minecraft:bamboo_raft"
@@ -88,13 +88,13 @@
                             "vanilla_equivalent":  "minecraft:bamboo_sign"
                         },
                         {
-                            "request":  "v121x",
+                            "request":  "minecraft1211",
                             "id":  "buildscape:bamboo_slab",
                             "kind":  "block+item",
                             "vanilla_equivalent":  "minecraft:bamboo_slab"
                         },
                         {
-                            "request":  "v121x",
+                            "request":  "minecraft1211",
                             "id":  "buildscape:bamboo_stairs",
                             "kind":  "block+item",
                             "vanilla_equivalent":  "minecraft:bamboo_stairs"
@@ -106,7 +106,7 @@
                             "vanilla_equivalent":  "minecraft:bamboo_trapdoor"
                         },
                         {
-                            "request":  "v121x",
+                            "request":  "minecraft1211",
                             "id":  "buildscape:bamboo_wall_hanging_sign",
                             "kind":  "block",
                             "vanilla_equivalent":  "minecraft:bamboo_wall_hanging_sign"
@@ -118,7 +118,7 @@
                             "vanilla_equivalent":  "minecraft:bamboo_wall_sign"
                         },
                         {
-                            "request":  "v121x",
+                            "request":  "minecraft1211",
                             "id":  "buildscape:cherry_boat",
                             "kind":  "item",
                             "vanilla_equivalent":  "minecraft:cherry_boat"
@@ -130,7 +130,7 @@
                             "vanilla_equivalent":  "minecraft:cherry_button"
                         },
                         {
-                            "request":  "v121x",
+                            "request":  "minecraft1211",
                             "id":  "buildscape:cherry_chest_boat",
                             "kind":  "item",
                             "vanilla_equivalent":  "minecraft:cherry_chest_boat"
@@ -154,7 +154,7 @@
                             "vanilla_equivalent":  "minecraft:cherry_fence_gate"
                         },
                         {
-                            "request":  "v121x",
+                            "request":  "minecraft1211",
                             "id":  "buildscape:cherry_hanging_sign",
                             "kind":  "block+item",
                             "vanilla_equivalent":  "minecraft:cherry_hanging_sign"
@@ -190,7 +190,7 @@
                             "vanilla_equivalent":  "minecraft:cherry_sapling"
                         },
                         {
-                            "request":  "v121x",
+                            "request":  "minecraft1211",
                             "id":  "buildscape:cherry_sign",
                             "kind":  "block+item",
                             "vanilla_equivalent":  "minecraft:cherry_sign"
@@ -214,13 +214,13 @@
                             "vanilla_equivalent":  "minecraft:cherry_trapdoor"
                         },
                         {
-                            "request":  "v121x",
+                            "request":  "minecraft1211",
                             "id":  "buildscape:cherry_wall_hanging_sign",
                             "kind":  "block",
                             "vanilla_equivalent":  "minecraft:cherry_wall_hanging_sign"
                         },
                         {
-                            "request":  "v121x",
+                            "request":  "minecraft1211",
                             "id":  "buildscape:cherry_wall_sign",
                             "kind":  "block",
                             "vanilla_equivalent":  "minecraft:cherry_wall_sign"
@@ -328,7 +328,7 @@
                             "vanilla_equivalent":  "minecraft:mangrove_button"
                         },
                         {
-                            "request":  "v121x",
+                            "request":  "minecraft1211",
                             "id":  "buildscape:mangrove_chest_boat",
                             "kind":  "item",
                             "vanilla_equivalent":  "minecraft:mangrove_chest_boat"
@@ -352,7 +352,7 @@
                             "vanilla_equivalent":  "minecraft:mangrove_fence_gate"
                         },
                         {
-                            "request":  "v121x",
+                            "request":  "minecraft1211",
                             "id":  "buildscape:mangrove_hanging_sign",
                             "kind":  "block+item",
                             "vanilla_equivalent":  "minecraft:mangrove_hanging_sign"
@@ -418,7 +418,7 @@
                             "vanilla_equivalent":  "minecraft:mangrove_trapdoor"
                         },
                         {
-                            "request":  "v121x",
+                            "request":  "minecraft1211",
                             "id":  "buildscape:mangrove_wall_hanging_sign",
                             "kind":  "block",
                             "vanilla_equivalent":  "minecraft:mangrove_wall_hanging_sign"

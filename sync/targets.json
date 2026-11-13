@@ -31,7 +31,7 @@
         "common",
         "forge/1.18.2"
       ],
-      "version_cluster": "v26x",
+      "version_cluster": "minecraft262",
       "base_commit": "8a5c587c45eec5473b092446d33f5851af9c8467",
       "base_note": "The frozen ref/forge/1.18.2 snapshot matches this source commit except for four files. The first successful apply replaces the declared snapshot scope with exact source bytes; review those four historical differences before the first real run.",
       "reference_snapshot": "ref/forge/1.18.2",
@@ -65,7 +65,7 @@
         ],
         [
           "{gradle}",
-          ":common:compileV118xJava",
+          ":common:compileMinecraft1182Java",
           ":fabric:26.2:build",
           ":neoforge:26.2:build",
           "--parallel",
@@ -76,8 +76,8 @@
         ]
       ],
       "version_clusters": [
-        "v26x",
-        "v118x"
+        "minecraft262",
+        "minecraft1182"
       ],
       "java_roots": [
         "common/src/main/java",
@@ -94,8 +94,8 @@
             "{gradle}",
             ":forge:1.18.2:build",
             ":forge:1.18.2:check",
-            "-Pbuildscape.v118x=true",
-            "-Pbuildscape.v118xSource=common",
+            "-Pbuildscape.minecraft1182=true",
+            "-Pbuildscape.minecraft1182Source=common",
             "--no-daemon",
             "--parallel",
             "--max-workers=2",
@@ -120,7 +120,7 @@
         "neoforge/26.3",
         "common"
       ],
-      "version_cluster": "v263",
+      "version_cluster": "minecraft263",
       "base_commit": null,
       "note": "Inactive until the 26.3 port is accepted. It shares ref/forge/1.18.2, the ledger and common/src/main with mc26.2, so activate it only after mc26.2 syncs are accepted, with base_commit set to the same reviewed source snapshot.",
       "reference_snapshot": "ref/forge/1.18.2",
@@ -166,7 +166,7 @@
         [
           "{gradle}",
           "build263",
-          "-Pbuildscape.v263=true",
+          "-Pbuildscape.minecraft263=true",
           "--parallel",
           "--max-workers=2",
           "--offline",
@@ -175,7 +175,7 @@
         ]
       ],
       "version_clusters": [
-        "v263"
+        "minecraft263"
       ],
       "java_roots": [
         "common/src/main/java",
@@ -197,7 +197,7 @@
         "fabric/1.18.2",
         "common"
       ],
-      "version_cluster": "v118x",
+      "version_cluster": "minecraft1182",
       "base_commit": null
     },
     {
@@ -212,7 +212,7 @@
         "forge/1.21.1",
         "common"
       ],
-      "version_cluster": "v121x",
+      "version_cluster": "minecraft1211",
       "base_commit": null
     },
     {
@@ -227,7 +227,7 @@
         "fabric/1.21.1",
         "common"
       ],
-      "version_cluster": "v121x",
+      "version_cluster": "minecraft1211",
       "base_commit": null
     },
     {
@@ -242,7 +242,7 @@
         "neoforge/1.21.1",
         "common"
       ],
-      "version_cluster": "v121x",
+      "version_cluster": "minecraft1211",
       "base_commit": null
     },
     {
@@ -257,7 +257,7 @@
         "forge/26.2",
         "common"
       ],
-      "version_cluster": "v26x",
+      "version_cluster": "minecraft262",
       "base_commit": null
     },
     {
@@ -272,7 +272,7 @@
         "forge/26.3",
         "common"
       ],
-      "version_cluster": "v26x",
+      "version_cluster": "minecraft262",
       "base_commit": null,
       "note": "Paused by owner; activate only after the earlier target is accepted."
     },
@@ -288,7 +288,7 @@
         "fabric/26.3",
         "common"
       ],
-      "version_cluster": "v26x",
+      "version_cluster": "minecraft262",
       "base_commit": null,
       "note": "Paused by owner; activate only after the earlier target is accepted."
     },
@@ -304,7 +304,7 @@
         "neoforge/26.3",
         "common"
       ],
-      "version_cluster": "v26x",
+      "version_cluster": "minecraft262",
       "base_commit": null,
       "note": "Paused by owner; activate only after the earlier target is accepted."
     }

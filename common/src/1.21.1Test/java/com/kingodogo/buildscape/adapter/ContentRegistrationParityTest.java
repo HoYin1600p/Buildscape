@@ -36,7 +36,7 @@ class ContentRegistrationParityTest {
             var expected = new TreeSet<String>();
             reference.stream().filter(line -> line.startsWith(kind + " ")).forEach(line -> expected.add(line.substring(kind.length() + 1)));
             assertFalse(expected.isEmpty(), "Missing reference registration ids");
-            for (var removal : ContentRemovalPolicy.V121X) {
+            for (var removal : ContentRemovalPolicy.MINECRAFT_1211) {
                 if (kind.equals("block") ? removal.block() : removal.item()) expected.remove(removal.id());
             }
             Collection<RegistrySupplier<?>> queue = kind.equals("block")

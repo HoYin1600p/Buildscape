@@ -19,7 +19,7 @@ public class BuildScapeRecipeCompiler {
     private final Predicate<String> modLoaded;
 
     public BuildScapeRecipeCompiler() {
-        this(modid -> Services.PLATFORM.isModLoaded(modid), Services.isVersionCluster("v118x"));
+        this(modid -> Services.PLATFORM.isModLoaded(modid), Services.isVersionCluster("minecraft1182"));
     }
 
     BuildScapeRecipeCompiler(Predicate<String> modLoaded) {

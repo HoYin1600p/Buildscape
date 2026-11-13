@@ -14,8 +14,8 @@ unimined.minecraft {
 
 configurations { commonVariant }
 dependencies {
-    commonVariant project(path: ':common', configuration: 'v26xElements')
-    implementation project(path: ':common', configuration: 'v26xElements')
+    commonVariant project(path: ':common', configuration: 'minecraft262Elements')
+    implementation project(path: ':common', configuration: 'minecraft262Elements')
 }
 
 tasks.named('processResources') {

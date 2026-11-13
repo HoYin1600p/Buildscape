@@ -126,7 +126,7 @@ if (activeTarget == 'neoforge:26.2') {
         include ':fabric:1.18.2'
         project(':fabric:1.18.2').projectDir = file('fabric/1.18.2')
     }
-    if (isEnabled('buildscape.v118x') || isEnabled('buildscape.forge118')) {
+    if (isEnabled('buildscape.minecraft1182') || isEnabled('buildscape.forge118')) {
         include ':forge', ':forge:1.18.2'
         project(':forge').projectDir = file('forge')
         project(':forge:1.18.2').projectDir = file('forge/1.18.2')
@@ -147,8 +147,8 @@ if (activeTarget == 'neoforge:26.2') {
         project(':forge:1.21.1').projectDir = file('forge/1.21.1')
     }
 
-    // 26.3 targets (experimental / migration, opt-in via -Pbuildscape.v263=true)
-    if (isEnabled('buildscape.v263', false)) {
+    // 26.3 targets (experimental / migration, opt-in via -Pbuildscape.minecraft263=true)
+    if (isEnabled('buildscape.minecraft263', false)) {
         include ':fabric:26.3', ':neoforge:26.3'
         project(':fabric:26.3').projectDir = file('fabric/26.3')
         project(':neoforge:26.3').projectDir = file('neoforge/26.3')

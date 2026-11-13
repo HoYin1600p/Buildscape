@@ -18,7 +18,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 //  4. Then both runs stop in ImmediateWindowHandler$DummyProvider.updateModuleReads (NoSuchElementException):
 //     Class.forName(forge module, "net.minecraftforge.client.loading.NoVizFallback") returns null.
 // So test this module with the release jar in the Prism instance "CMA 26.3 - Forge":
-//   gradlew :forge:26.3:build -Pbuildscape.v263=true -Pbuildscape.forge263=true
+//   gradlew :forge:26.3:build -Pbuildscape.minecraft263=true -Pbuildscape.forge263=true
 //   then copy forge/26.3/build/libs/buildscape-forge-26.3-<version>.jar into the instance's mods folder.
 unimined.minecraft {
     version '26.3'
@@ -32,37 +32,37 @@ unimined.minecraft {
 
 configurations { commonVariant }
 dependencies {
-    commonVariant project(path: ':common', configuration: 'v263Elements')
+    commonVariant project(path: ':common', configuration: 'minecraft263Elements')
     // FML must see shared packages inside this mod rather than a second module.
-    compileOnly files(commonProject.sourceSets.v263.output.classesDirs)
+    compileOnly files(commonProject.sourceSets.minecraft263.output.classesDirs)
 }
 
 // common/src/26.3/resources overlays the 26.2 resources: copy only the main files it leaves alone.
 apply from: rootProject.file('gradle/26.3/resources.gradle')
 
 tasks.named('compileJava', JavaCompile) {
-    dependsOn ':common:compileV263Java'
-    inputs.files(commonProject.sourceSets.v263.output.classesDirs)
+    dependsOn ':common:compileMinecraft263Java'
+    inputs.files(commonProject.sourceSets.minecraft263.output.classesDirs)
             .withPathSensitivity(PathSensitivity.RELATIVE)
     // Both dev runs and the release jar must expose one FML module for shared packages.
     doLast {
         project.copy {
-            from commonProject.sourceSets.v263.output.classesDirs
+            from commonProject.sourceSets.minecraft263.output.classesDirs
             into destinationDirectory
         }
     }
 }
 tasks.named('processResources') {
-    v263MainResources(delegate)
+    minecraft263MainResources(delegate)
     // The dev run reads the mixin config and the other overlay files from this module's own resources.
-    from(v263OverlayDir) {
+    from(minecraft263OverlayDir) {
         // Forge's Mixin 0.8.7 only knows compatibility levels up to JAVA_21; an unknown level throws
         // MixinInitialisationError and the client exits silently while the config is registered.
         filesMatching('buildscape.mixins.json') {
             filter { line -> line.replace('"JAVA_25"', '"JAVA_21"') }
         }
     }
-    inputs.dir(v263OverlayDir)
+    inputs.dir(minecraft263OverlayDir)
     duplicatesStrategy = DuplicatesStrategy.FAIL
 }
 tasks.named('jar', Jar) {
@@ -70,7 +70,7 @@ tasks.named('jar', Jar) {
     // processResources, so drop their copies carried by the common variant.
     from(configurations.commonVariant) {
         exclude '**/*.class'
-        exclude v263ReplacedByOverlay
+        exclude minecraft263ReplacedByOverlay
     }
     duplicatesStrategy = DuplicatesStrategy.FAIL
     manifest { attributes 'MixinConfigs': 'buildscape.mixins.json,buildscape.forge.mixins.json' }

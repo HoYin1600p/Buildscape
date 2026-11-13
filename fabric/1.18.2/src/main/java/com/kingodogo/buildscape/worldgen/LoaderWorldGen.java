@@ -21,7 +21,7 @@ public final class LoaderWorldGen {
         com.kingodogo.buildscape.platform.Services.PLATFORM.wrapRegistryAction(() -> com.kingodogo.buildscape.platform.Services.PLATFORM.registerConfiguredFeature(new CommonId("buildscape", path), factory.get()));
     }
     public static void register(FabricRegistryAdapter registry) {
-        // 1.18.2 keeps its own mangrove trees (26.2 uses vanilla's), shaped by the v118x adapter.
+        // 1.18.2 keeps its own mangrove trees (26.2 uses vanilla's), shaped by the minecraft1182 adapter.
         queue(registry, "mangrove", () -> com.kingodogo.buildscape.adapter.WorldGenFactory.createMangroveTreeFeature(false));
         queue(registry, "tall_mangrove", () -> com.kingodogo.buildscape.adapter.WorldGenFactory.createMangroveTreeFeature(true));
         queue(registry, "poplar", ModConfiguredFeatures.POPLAR_TREE::get);

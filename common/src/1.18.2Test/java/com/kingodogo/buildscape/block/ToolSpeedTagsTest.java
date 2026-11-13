@@ -96,7 +96,7 @@ class ToolSpeedTagsTest {
     }
 
     private static Path common() {
-        return Path.of(System.getProperty("buildscape.v118xMixinConfig", "src/1.18.2/resources/buildscape.mixins.json"))
+        return Path.of(System.getProperty("buildscape.minecraft1182MixinConfig", "src/1.18.2/resources/buildscape.mixins.json"))
                 .toAbsolutePath().getParent().getParent().getParent().getParent();
     }
 }

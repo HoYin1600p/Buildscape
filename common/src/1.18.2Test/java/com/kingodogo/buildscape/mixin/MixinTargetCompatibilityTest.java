@@ -56,7 +56,7 @@ class MixinTargetCompatibilityTest {
 
     @Test
     void allConfiguredTargetsMatchMinecraft1182() throws IOException {
-        Path configPath = Path.of(System.getProperty("buildscape.v118xMixinConfig"));
+        Path configPath = Path.of(System.getProperty("buildscape.minecraft1182MixinConfig"));
         JsonObject config;
         try (var reader = Files.newBufferedReader(configPath)) {
             config = JsonParser.parseReader(reader).getAsJsonObject();
@@ -328,7 +328,7 @@ class MixinTargetCompatibilityTest {
                     for (MethodInsnNode site : sites) {
                         String expected = site.getOpcode() == Opcodes.INVOKESTATIC ? site.desc
                                 : "(L" + site.owner + ";" + site.desc.substring(1);
-                        if (!handlerDescriptorMatches(handler, expected)) problem(optional, context + "redirect descriptor must match " + expected);
+                        if (!handlerDescriptorMatches(handler, expected, method)) problem(optional, context + "redirect descriptor must match " + expected);
                     }
                 } else if (kind.equals("ModifyArg")) {
                     Type[] arguments = Type.getArgumentTypes(descriptor);
@@ -371,11 +371,16 @@ class MixinTargetCompatibilityTest {
             return isStatic(handler.access) == isStatic(target.access);
         }
 
-        boolean handlerDescriptorMatches(MethodNode handler, String expectedDescriptor) throws IOException {
+        boolean handlerDescriptorMatches(MethodNode handler, String expectedDescriptor, MethodNode target) throws IOException {
             Type[] actual = Type.getArgumentTypes(handler.desc);
             Type[] expected = Type.getArgumentTypes(expectedDescriptor);
-            if (actual.length != expected.length || !Type.getReturnType(handler.desc).equals(Type.getReturnType(expectedDescriptor))) return false;
-            for (int i = 0; i < actual.length; i++) if (!parameterMatches(handler, i, actual[i], expected[i])) return false;
+            Type[] targetArguments = Type.getArgumentTypes(target.desc);
+            if ((actual.length != expected.length && actual.length != expected.length + targetArguments.length)
+                    || !Type.getReturnType(handler.desc).equals(Type.getReturnType(expectedDescriptor))) return false;
+            for (int i = 0; i < expected.length; i++) if (!parameterMatches(handler, i, actual[i], expected[i])) return false;
+            for (int i = expected.length; i < actual.length; i++) {
+                if (!parameterMatches(handler, i, actual[i], targetArguments[i - expected.length])) return false;
+            }
             return true;
         }
 

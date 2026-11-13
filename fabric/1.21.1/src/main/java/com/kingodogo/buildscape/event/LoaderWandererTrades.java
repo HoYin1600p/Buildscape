@@ -16,7 +16,7 @@ public final class LoaderWandererTrades {
                 var id = CommonId.parse(trade.item().contains(":") ? trade.item() : "buildscape:" + trade.item());
                 var item = Services.PLATFORM.getItem(id);
                 if (item == null || item == Items.AIR) {
-                    com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Skipping unavailable v121x wandering trade item: {}", id);
+                    com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Skipping unavailable minecraft1211 wandering trade item: {}", id);
                     continue;
                 }
                 offers.add((trader, random) -> new MerchantOffer(new ItemCost(Items.EMERALD, trade.emeralds()),

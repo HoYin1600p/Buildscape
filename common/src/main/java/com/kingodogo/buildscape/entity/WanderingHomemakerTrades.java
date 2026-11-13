@@ -74,7 +74,7 @@ public final class WanderingHomemakerTrades {
     }
 
     public static List<MerchantOffer> getFestiveTrades(Random random) {
-        return getFestiveTrades(random, Services.isVersionCluster("v118x"));
+        return getFestiveTrades(random, Services.isVersionCluster("minecraft1182"));
     }
 
     public static List<MerchantOffer> getFestiveTrades(Random random, boolean includeLegacySnowyLeaves) {

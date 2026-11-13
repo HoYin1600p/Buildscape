@@ -15,11 +15,11 @@ if (findProject(':fabric:26.3') != null) {
     }
 }
 
-// Enabling the 1.21.1 loader also enables shared v121x verification, even when
-// buildscape.v121x was not supplied separately on the command line.
+// Enabling the 1.21.1 loader also enables shared minecraft1211 verification, even when
+// buildscape.minecraft1211 was not supplied separately on the command line.
 if (findProject(':neoforge:1.21.1') != null || findProject(':fabric:1.21.1') != null || findProject(':forge:1.21.1') != null) {
     project(':common').tasks.matching { it.name == 'check' }.configureEach {
-        dependsOn ':common:compileV121xJava'
+        dependsOn ':common:compileMinecraft1211Java'
     }
 }
 
@@ -90,6 +90,6 @@ tasks.named('build') {
 
 if (findProject(':forge:1.21.1') != null) {
     project(':common').tasks.matching { it.name == 'check' }.configureEach {
-        dependsOn ':common:compileV121xJava', ':common:v121xTest'
+        dependsOn ':common:compileMinecraft1211Java', ':common:minecraft1211Test'
     }
 }

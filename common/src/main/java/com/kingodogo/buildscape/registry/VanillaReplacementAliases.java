@@ -13,8 +13,8 @@ public final class VanillaReplacementAliases {
     private VanillaReplacementAliases() {}
 
     public static List<Alias> forCluster(String cluster) {
-        if ("v118x".equals(cluster)) return List.of();
-        if ("v26x".equals(cluster)) return ALL;
+        if ("minecraft1182".equals(cluster)) return List.of();
+        if ("minecraft262".equals(cluster)) return ALL;
         var aliases = new java.util.ArrayList<>(ContentRemovalPolicy.removals(cluster).stream()
                 .filter(removal -> removal.vanillaEquivalent() != null)
                 .map(removal -> new Alias(removal.id(), removal.vanillaEquivalent(),

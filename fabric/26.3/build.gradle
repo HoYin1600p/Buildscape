@@ -56,8 +56,8 @@ unimined.minecraft {
 
 configurations { commonVariant }
 dependencies {
-    commonVariant project(path: ':common', configuration: 'v263Elements')
-    implementation project(path: ':common', configuration: 'v263Elements')
+    commonVariant project(path: ':common', configuration: 'minecraft263Elements')
+    implementation project(path: ':common', configuration: 'minecraft263Elements')
     modImplementation 'net.fabricmc.fabric-api:fabric-api:0.160.5+26.3'
 }
 
@@ -67,14 +67,14 @@ apply from: rootProject.file('gradle/26.3/resources.gradle')
 // outputs on the classpath as plain folders that Fabric does not treat as part of the mod, so the
 // overlay data would otherwise be missing from the mod's resources.
 tasks.named('processResources') {
-    v263MainResources(delegate)
-    from(v263OverlayDir)
-    inputs.dir(v263OverlayDir)
+    minecraft263MainResources(delegate)
+    from(minecraft263OverlayDir)
+    inputs.dir(minecraft263OverlayDir)
     duplicatesStrategy = DuplicatesStrategy.FAIL
 }
 tasks.named('jar', Jar) {
     from(configurations.commonVariant) {
-        exclude { element -> new File(v263OverlayDir, element.relativePath.pathString).isFile() }
+        exclude { element -> new File(minecraft263OverlayDir, element.relativePath.pathString).isFile() }
     }
     duplicatesStrategy = DuplicatesStrategy.FAIL
 }

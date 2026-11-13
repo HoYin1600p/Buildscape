@@ -146,8 +146,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         return IPlatformAdapter.super.createRegisteredItem(definition, block);
     }
     // Cache keys stay opaque here; only client helpers interpret baked models.
-    private final Map<Object, AABB> v121xModelBoundsCache = new java.util.WeakHashMap<>();
-    private final Map<String, double[]> v121xSpriteCache = new java.util.concurrent.ConcurrentHashMap<>();
+    private final Map<Object, AABB> modelBoundsCache = new java.util.WeakHashMap<>();
+    private final Map<String, double[]> spriteCache = new java.util.concurrent.ConcurrentHashMap<>();
     // Loader implementations construct these types through access-widened vanilla APIs.
     public abstract <T extends net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider>
             net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProviderType<T> createBlockStateProviderType(com.mojang.serialization.MapCodec<T> codec);
@@ -401,7 +401,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     private static <T> T getClusterContent(Registry<T> registry, CommonId id) {
         ResourceLocation requested = ResourceLocation.fromNamespaceAndPath(id.getNamespace(), id.getPath());
         if (registry.containsKey(requested)) return registry.get(requested);
-        for (var alias : com.kingodogo.buildscape.registry.VanillaReplacementAliases.forCluster("v121x")) {
+        for (var alias : com.kingodogo.buildscape.registry.VanillaReplacementAliases.forCluster("minecraft1211")) {
             if (alias.source().equals(id.toString())) {
                 ResourceLocation replacement = ResourceLocation.parse(alias.target());
                 if (registry.containsKey(replacement)) return registry.get(replacement);
@@ -844,7 +844,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
 @Override
     public net.minecraft.world.phys.AABB getModelBounds(Object model) {
-        return ClientAccess.getModelBounds(v121xModelBoundsCache, model);
+        return ClientAccess.getModelBounds(modelBoundsCache, model);
     }
 
     @Override
@@ -1761,19 +1761,19 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         level.playSound(null, pos, SoundEvents.NOTE_BLOCK_CHIME.value(), SoundSource.PLAYERS, 1.0f, pitch);
     }
 
-    private static final java.util.Map<java.util.UUID, CompoundTag> V121X_ENTITY_DATA = new java.util.concurrent.ConcurrentHashMap<>();
-    private static final java.util.Map<net.minecraft.world.level.block.entity.BlockEntity, CompoundTag> V121X_BLOCK_ENTITY_DATA = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.Map<java.util.UUID, CompoundTag> MINECRAFT_1211_ENTITY_DATA = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.Map<net.minecraft.world.level.block.entity.BlockEntity, CompoundTag> MINECRAFT_1211_BLOCK_ENTITY_DATA = new java.util.concurrent.ConcurrentHashMap<>();
 
     @Override
     public CompoundTag getEntityData(Entity entity) {
         if (entity == null) return new CompoundTag();
-        return V121X_ENTITY_DATA.computeIfAbsent(entity.getUUID(), k -> new CompoundTag());
+        return MINECRAFT_1211_ENTITY_DATA.computeIfAbsent(entity.getUUID(), k -> new CompoundTag());
     }
 
     @Override
     public CompoundTag getBlockEntityData(net.minecraft.world.level.block.entity.BlockEntity be) {
         if (be == null) return new CompoundTag();
-        return V121X_BLOCK_ENTITY_DATA.computeIfAbsent(be, k -> new CompoundTag());
+        return MINECRAFT_1211_BLOCK_ENTITY_DATA.computeIfAbsent(be, k -> new CompoundTag());
     }
 
     @Override
@@ -2858,7 +2858,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
 @Override
     public BlockColorSample sampleBlockColor(net.minecraft.world.level.block.state.BlockState state) {
-        return ClientAccess.sampleBlockColor(v121xSpriteCache, this::getSpriteImage, state);
+        return ClientAccess.sampleBlockColor(spriteCache, this::getSpriteImage, state);
     }
 
 public static class ColoredItemFrameEntityImpl extends HangingEntity implements ColoredItemFrameEntity {
@@ -3771,7 +3771,7 @@ public static class ColoredItemFrameEntityImpl extends HangingEntity implements 
         trades.removeIf(trade -> trade == null || trade.getResult().isEmpty());
         if (trades.size() != before) {
             com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn(
-                    "Skipped {} unavailable v121x homemaker trades", before - trades.size());
+                    "Skipped {} unavailable minecraft1211 homemaker trades", before - trades.size());
         }
     }
 
@@ -3835,7 +3835,7 @@ public static class ColoredItemFrameEntityImpl extends HangingEntity implements 
                         new ItemStack(Services.PLATFORM.getItem(new CommonId("buildscape", "frost_rose")), 1),
                         5, 1, 0.05f);
                 if (!rare.getResult().isEmpty()) offers.add(rare);
-                else com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Skipping unavailable v121x festive homemaker rare trade");
+                else com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Skipping unavailable minecraft1211 festive homemaker rare trade");
             }
         }
     }
@@ -3956,7 +3956,7 @@ public static class PoplarBoatEntityImpl extends Boat implements PoplarBoatEntit
                         new ItemStack(Services.PLATFORM.getItem(new CommonId("buildscape", "ancient_ashen_scroll")), 1),
                         1, 1, 0.0f);
                 if (!rare.getResult().isEmpty()) offers.add(rare);
-                else com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Skipping unavailable v121x homemaker rare trade");
+                else com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Skipping unavailable minecraft1211 homemaker rare trade");
             }
         }
     }

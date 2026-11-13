@@ -13,10 +13,10 @@ BUILD_SCAPE = {
     "Trophy": "trophy_block_entity", "Pillar": "pillar_block_entity",
     "AshenKingPillar": "pillar_block_entity", "GlowLights": "glow_lights_block_entity",
     "HollowLog": "hollow_log", "HollowPipe": "hollow_log",
-    "V26xBambooStandingSign": "bamboo_sign_block_entity",
-    "V26xBambooWallSign": "bamboo_sign_block_entity",
-    "V26xMangroveStandingSign": "mangrove_sign_block_entity",
-    "V26xMangroveWallSign": "mangrove_sign_block_entity",
+    "BambooStandingSign": "bamboo_sign_block_entity",
+    "BambooWallSign": "bamboo_sign_block_entity",
+    "MangroveStandingSign": "mangrove_sign_block_entity",
+    "MangroveWallSign": "mangrove_sign_block_entity",
 }
 
 VANILLA = {

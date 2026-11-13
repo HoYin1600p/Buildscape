@@ -11,7 +11,7 @@ public final class ContentRemovalPolicy {
 
     private ContentRemovalPolicy() {}
 
-    public static final List<Removal> V121X = List.of(
+    public static final List<Removal> MINECRAFT_1211 = List.of(
             new Removal("buildscape:bamboo_block", "block+item", "minecraft:bamboo_block"),
             new Removal("buildscape:bamboo_button", "block+item", "minecraft:bamboo_button"),
             new Removal("buildscape:bamboo_chest_raft", "item", "minecraft:bamboo_chest_raft"),
@@ -144,7 +144,7 @@ public final class ContentRemovalPolicy {
             new Removal("buildscape:weathered_copper_trapdoor", "block+item", "minecraft:weathered_copper_trapdoor")
     );
 
-    public static final List<Removal> V26X = List.of(
+    public static final List<Removal> MINECRAFT_262 = List.of(
             new Removal("buildscape:copper_trapdoor", "block+item", "minecraft:copper_trapdoor"),
             new Removal("buildscape:copper_door", "block+item", "minecraft:copper_door"),
             new Removal("buildscape:copper_grate", "block+item", "minecraft:copper_grate"),
@@ -369,9 +369,9 @@ public final class ContentRemovalPolicy {
 
     public static List<Removal> removals(String cluster) {
         return switch (cluster) {
-            case "v118x" -> List.of();
-            case "v121x" -> V121X;
-            case "v26x" -> V26X;
+            case "minecraft1182" -> List.of();
+            case "minecraft1211" -> MINECRAFT_1211;
+            case "minecraft262" -> MINECRAFT_262;
             default -> throw new IllegalArgumentException("Unknown VersionCluster: " + cluster);
         };
     }

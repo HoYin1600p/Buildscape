@@ -21,19 +21,19 @@ unimined.minecraft {
 
 configurations { commonVariant }
 dependencies {
-    commonVariant project(path: ':common', configuration: 'v26xElements')
+    commonVariant project(path: ':common', configuration: 'minecraft262Elements')
     // FML must see shared packages inside this mod rather than a second module.
-    compileOnly files(commonProject.sourceSets.v26x.output.classesDirs)
+    compileOnly files(commonProject.sourceSets.minecraft262.output.classesDirs)
 }
 
 tasks.named('compileJava', JavaCompile) {
-    dependsOn ':common:compileV26xJava'
-    inputs.files(commonProject.sourceSets.v26x.output.classesDirs)
+    dependsOn ':common:compileMinecraft262Java'
+    inputs.files(commonProject.sourceSets.minecraft262.output.classesDirs)
             .withPathSensitivity(PathSensitivity.RELATIVE)
     // Both dev runs and the release jar must expose one FML module for shared packages.
     doLast {
         project.copy {
-            from commonProject.sourceSets.v26x.output.classesDirs
+            from commonProject.sourceSets.minecraft262.output.classesDirs
             into destinationDirectory
         }
     }

@@ -69,7 +69,7 @@ public class GlowLightsBlockEntity extends DataBlockEntity implements IDataSeria
     public void writeData(IBlockEntityWriteData data) {
         // The 1.18.2 save format retains DyeColors even when the list is empty.
         if (!this.dyeColors.isEmpty()
-                || com.kingodogo.buildscape.platform.Services.isVersionCluster("v118x")) {
+                || com.kingodogo.buildscape.platform.Services.isVersionCluster("minecraft1182")) {
             data.putStringList("DyeColors", this.dyeColors);
         }
     }

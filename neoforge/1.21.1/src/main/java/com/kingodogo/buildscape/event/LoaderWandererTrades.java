@@ -12,11 +12,11 @@ public final class LoaderWandererTrades {
 
     public static void register(WandererTradesEvent event) {
         for (var trade : WandererTradeTable.generic()) {
-            // The v121x adapter resolves later vanilla content to its restored counterpart.
+            // The minecraft1211 adapter resolves later vanilla content to its restored counterpart.
             var id = CommonId.parse(trade.item().contains(":") ? trade.item() : "buildscape:" + trade.item());
             var item = Services.PLATFORM.getItem(id);
             if (item == null || item == Items.AIR) {
-                com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Skipping unavailable v121x wandering trade item: {}", id);
+                com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Skipping unavailable minecraft1211 wandering trade item: {}", id);
                 continue;
             }
             event.getGenericTrades().add((trader, random) -> new MerchantOffer(
@@ -25,7 +25,7 @@ public final class LoaderWandererTrades {
         }
         var scroll = Services.PLATFORM.getItem(new CommonId("buildscape", "ancient_ashen_scroll"));
         if (scroll == null || scroll == Items.AIR) {
-            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Skipping unavailable v121x wandering rare trade: buildscape:ancient_ashen_scroll");
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Skipping unavailable minecraft1211 wandering rare trade: buildscape:ancient_ashen_scroll");
             return;
         }
         event.getRareTrades().add((trader, random) -> random.nextInt(5000) == 0

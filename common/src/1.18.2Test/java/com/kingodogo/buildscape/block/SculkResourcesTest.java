@@ -40,7 +40,7 @@ class SculkResourcesTest {
         String source = Files.readString(resources().getParent().getParent().getParent()
                 .resolve("src/main/java/com/kingodogo/buildscape/sound/ModSounds.java"));
         for (String dotted : new String[]{"block.sculk_catalyst.bloom", "block.sculk.spread", "block.sculk.charge"}) {
-            assertTrue(source.contains("registerV118xSound(\"" + dotted + "\")"), dotted);
+            assertTrue(source.contains("registerLegacySound(\"" + dotted + "\")"), dotted);
         }
     }
 
@@ -59,7 +59,7 @@ class SculkResourcesTest {
     }
 
     private static Path resources() {
-        return Path.of(System.getProperty("buildscape.v118xMixinConfig", "src/1.18.2/resources/buildscape.mixins.json"))
+        return Path.of(System.getProperty("buildscape.minecraft1182MixinConfig", "src/1.18.2/resources/buildscape.mixins.json"))
                 .toAbsolutePath().getParent();
     }
 }

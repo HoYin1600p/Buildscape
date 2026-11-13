@@ -17,7 +17,7 @@ public abstract class MangroveLeavesBlock extends Block {
 
     /** 1.18.2 has no vanilla mangrove blocks, so the mod registers its own under its namespace. */
     public static String mangroveNamespace() {
-        return Services.isVersionCluster("v118x") ? "buildscape" : "minecraft";
+        return Services.isVersionCluster("minecraft1182") ? "buildscape" : "minecraft";
     }
 
     public static Block getPropaguleBlock() {

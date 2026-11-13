@@ -9,7 +9,7 @@ import java.lang.reflect.Proxy;
 /** Loader-free registration fixture with bounded registry access for block parity construction. */
 public final class Services {
     private Services() {}
-    public static boolean isVersionCluster(String cluster) { return "v121x".equals(cluster); }
+    public static boolean isVersionCluster(String cluster) { return "minecraft1211".equals(cluster); }
     public static final IRegistryAdapter REGISTRY = new BaseRegistryAdapter("buildscape") {};
     public static final java.util.Map<String, net.minecraft.world.level.block.Block> PARITY_BLOCKS = new java.util.LinkedHashMap<>();
     public static final IPlatformAdapter PLATFORM = (IPlatformAdapter) Proxy.newProxyInstance(

@@ -32,14 +32,14 @@ unimined.minecraft {
 // Supply only shared classes to dev runs; this module processes cluster resources.
 configurations { commonVariant }
 dependencies {
-    commonVariant project(path: ':common', configuration: 'v121xElements')
-    implementation files(commonProject.sourceSets.v121x.output.classesDirs)
+    commonVariant project(path: ':common', configuration: 'minecraft1211Elements')
+    implementation files(commonProject.sourceSets.minecraft1211.output.classesDirs)
     modImplementation 'net.fabricmc.fabric-api:fabric-api:0.116.6+1.21.1'
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
 }
 
 sourceSets.main.resources.srcDir rootProject.file('common/src/1.21.1/resources')
-tasks.named('compileJava') { dependsOn ':common:compileV121xJava' }
+tasks.named('compileJava') { dependsOn ':common:compileMinecraft1211Java' }
 tasks.named('processResources', ProcessResources) {
     inputs.property 'mod_version', project.version
     filesMatching('fabric.mod.json') { expand mod_version: project.version }
@@ -54,7 +54,7 @@ tasks.withType(JavaCompile).configureEach {
     options.compilerArgs += ['-proc:none']
 }
 tasks.withType(JavaExec).configureEach {
-    dependsOn ':common:compileV121xJava'
+    dependsOn ':common:compileMinecraft1211Java'
     javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
     standardInput = System.in
 }

@@ -21,20 +21,20 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # Install Java versions for multi-cluster builds (17 for v118x, 21 for v121x, 25 for v26x)
-      - name: Set up Java 17 (v118x)
+      # Install Java versions for multi-cluster builds (17 for minecraft1182, 21 for minecraft1211, 25 for minecraft262)
+      - name: Set up Java 17 (minecraft1182)
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Set up Java 21 (v121x)
+      - name: Set up Java 21 (minecraft1211)
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Set up Java 25 (v26x & Gradle Runner)
+      - name: Set up Java 25 (minecraft262 & Gradle Runner)
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'

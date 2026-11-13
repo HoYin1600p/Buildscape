@@ -11,9 +11,9 @@ import net.minecraft.world.level.block.SoundType;
 import com.kingodogo.buildscape.block.CustomSoundType;
 public class ModSounds {
     // The vanilla 1.19 sculk sounds exist only for the 1.18.2 sculk backport.
-    public static final RegistrySupplier<SoundEvent> SCULK_CATALYST_BLOOM = registerV118xSound("block.sculk_catalyst.bloom");
-    public static final RegistrySupplier<SoundEvent> SCULK_SPREAD = registerV118xSound("block.sculk.spread");
-    public static final RegistrySupplier<SoundEvent> SCULK_CHARGE = registerV118xSound("block.sculk.charge");
+    public static final RegistrySupplier<SoundEvent> SCULK_CATALYST_BLOOM = registerLegacySound("block.sculk_catalyst.bloom");
+    public static final RegistrySupplier<SoundEvent> SCULK_SPREAD = registerLegacySound("block.sculk.spread");
+    public static final RegistrySupplier<SoundEvent> SCULK_CHARGE = registerLegacySound("block.sculk.charge");
     public static final RegistrySupplier<SoundEvent> COPPER_GRATE_BREAK = registerSound("block.copper_grate.break");
     public static final RegistrySupplier<SoundEvent> COPPER_GRATE_STEP = registerSound("block.copper_grate.step");
     public static final RegistrySupplier<SoundEvent> COPPER_GRATE_PLACE = COPPER_GRATE_STEP;
@@ -174,7 +174,7 @@ public class ModSounds {
                                        java.util.function.Supplier<SoundEvent> placeSound,
                                        java.util.function.Supplier<SoundEvent> hitSound,
                                        java.util.function.Supplier<SoundEvent> fallSound) {
-        if (Services.isVersionCluster("v118x") || Services.isVersionCluster("v121x")) {
+        if (Services.isVersionCluster("minecraft1182") || Services.isVersionCluster("minecraft1211")) {
             return new SoundType(volume, pitch, SoundEvents.STONE_BREAK, SoundEvents.STONE_STEP,
                     SoundEvents.STONE_PLACE, SoundEvents.STONE_HIT, SoundEvents.STONE_FALL) {
                 @Override public SoundEvent getBreakSound() { return breakSound.get(); }
@@ -196,7 +196,7 @@ public class ModSounds {
                                           java.util.function.Supplier<SoundEvent> placeSound,
                                           java.util.function.Supplier<SoundEvent> hitSound,
                                           java.util.function.Supplier<SoundEvent> fallSound) {
-        if (Services.isVersionCluster("v118x") || Services.isVersionCluster("v121x")) {
+        if (Services.isVersionCluster("minecraft1182") || Services.isVersionCluster("minecraft1211")) {
             return new CustomSoundType(breakVolume, breakPitch, stepVolume, stepPitch, placeVolume, placePitch,
                     hitVolume, hitPitch, fallVolume, fallPitch, SoundEvents.STONE_BREAK, SoundEvents.STONE_STEP,
                     SoundEvents.STONE_PLACE, SoundEvents.STONE_HIT, SoundEvents.STONE_FALL) {
@@ -216,8 +216,8 @@ public class ModSounds {
         return Services.REGISTRY.registerSound(sanitized, () -> Services.PLATFORM.createSoundEvent(new CommonId(BuildscapeCommon.MOD_ID, sanitized)));
     }
 
-    private static RegistrySupplier<SoundEvent> registerV118xSound(String path) {
-        return Services.isVersionCluster("v118x") ? registerSound(path) : null;
+    private static RegistrySupplier<SoundEvent> registerLegacySound(String path) {
+        return Services.isVersionCluster("minecraft1182") ? registerSound(path) : null;
     }
     public static void init() {
     }

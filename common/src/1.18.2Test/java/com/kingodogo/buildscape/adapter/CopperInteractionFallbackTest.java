@@ -34,7 +34,7 @@ class CopperInteractionFallbackTest {
 
     @Test
     void bothLoadersRouteCopperClicksThroughTheFallback() throws Exception {
-        Path adapter = Path.of(System.getProperty("buildscape.v118xMixinConfig",
+        Path adapter = Path.of(System.getProperty("buildscape.minecraft1182MixinConfig",
                         "src/1.18.2/resources/buildscape.mixins.json"))
                 .toAbsolutePath().getParent().getParent().getParent()
                 .resolve("1.18.2/java/com/kingodogo/buildscape/adapter/PlatformAdapterBase.java");

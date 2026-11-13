@@ -101,8 +101,9 @@ def foreign_clusters(config, target):
 
 
 def cluster_tag(path):
-    match = re.search(r"/(?:src|adapter)/(v\w+)/", path)
-    return match[1] if match else ""
+    match = re.search(r"/src/(1\.18\.2|1\.21\.1|26\.2|26\.3)/", path)
+    return {"1.18.2": "minecraft1182", "1.21.1": "minecraft1211",
+            "26.2": "minecraft262", "26.3": "minecraft263"}.get(match[1], "") if match else ""
 
 
 def source_revision(repo, config, source_repo=None, fetch=False):
@@ -252,14 +253,14 @@ def affected_clusters(paths, target, source_path=""):
     clusters = target.get("version_clusters", [target.get("version_cluster", "")])
     result = set()
     for path in paths:
-        match = re.search(r"/(?:src|adapter)/(v\w+)/", path)
-        if match:
-            result.add(match[1])
+        cluster = cluster_tag(path)
+        if cluster:
+            result.add(cluster)
         elif path.startswith(target["java_root"] + "/"):
             result.update(clusters)
     # The reference snapshot (resources and metadata included) feeds Forge 1.18.2.
-    if source_path and "v118x" in clusters:
-        result.add("v118x")
+    if source_path and "minecraft1182" in clusters:
+        result.add("minecraft1182")
     if "/resources/" in source_path:
         result.add(target.get("version_cluster", ""))
     return sorted(result - {""})
@@ -461,7 +462,7 @@ def validate(target, values, worktree, log):
                                    r"Cannot [^\n]+ in offline mode)", output, re.IGNORECASE)
             if not check.get("skip_on_offline_cache_miss") or not cache_miss:
                 raise
-            note = "Forge 1.18.2 validation skipped: offline cache lacks required artifacts; -Pbuildscape.v118x=true needs network."
+            note = "Forge 1.18.2 validation skipped: offline cache lacks required artifacts; -Pbuildscape.minecraft1182=true needs network."
             with log.open("a", encoding="utf-8") as stream:
                 stream.write(note + "\n")
             print(note)

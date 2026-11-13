@@ -32,7 +32,7 @@ public final class ModCreativeTabs {
                 modItems
         );
     }
-    private static List<String> v118xItemOrder() {
+    private static List<String> legacyItemOrder() {
         return List.of(
                 "bit_copper_block", "bit_copper_block_stairs", "bit_copper_block_slab", "bit_copper_block_vertical_slab", "bit_copper_block_wall", "bit_cut_copper", "bit_cut_copper_stairs", "bit_cut_copper_slab",
                 "bit_cut_copper_vertical_slab", "bit_cut_copper_wall", "bit_chiseled_copper", "bit_copper_bulb", "bit_copper_grate", "bit_exposed_copper_block", "bit_exposed_copper_block_stairs", "bit_exposed_copper_block_slab",
@@ -428,7 +428,7 @@ public final class ModCreativeTabs {
     }
 
     private static List<String> loadOrderedItemIds() {
-        if (Services.isVersionCluster("v118x")) return v118xItemOrder();
+        if (Services.isVersionCluster("minecraft1182")) return legacyItemOrder();
         List<String> list = new ArrayList<>(3200);
         try (InputStream in = ModCreativeTabs.class.getResourceAsStream("/data/buildscape/creative_tab_order.txt")) {
             if (in != null) {

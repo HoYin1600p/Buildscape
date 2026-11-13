@@ -90,7 +90,7 @@ import com.kingodogo.buildscape.platform.IPlatformAdapter.BlockColorSample;
 public final class ClientPlatformHooks {
     private ClientPlatformHooks() {}
     private static final int COLOR_MAX_SAMPLES = 32;
-    private static final java.util.Map<String, double[]> v26xSpriteCache = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.Map<String, double[]> spriteCache = new java.util.concurrent.ConcurrentHashMap<>();
     private static final Identifier BIRCH_PLANKS_26 = Identifier.parse("minecraft:textures/block/birch_planks.png");
 
     public static int getClientParticleSetting() {
@@ -782,7 +782,7 @@ public final class ClientPlatformHooks {
                             if (source != null) tint = source.color(state) & 0xFFFFFF;
                         }
                         int resolvedTint = tint;
-                        double[] sample = v26xSpriteCache.computeIfAbsent(spriteName + "#" + tint, key -> {
+                        double[] sample = spriteCache.computeIfAbsent(spriteName + "#" + tint, key -> {
                             com.mojang.blaze3d.platform.NativeImage image = getV26SpriteImage(sprite.contents());
                             if (image == null) return new double[]{0, 0, 0, 0, 0};
                             int width = sprite.contents().width(), height = sprite.contents().height();

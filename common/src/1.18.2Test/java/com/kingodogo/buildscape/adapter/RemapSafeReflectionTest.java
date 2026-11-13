@@ -26,7 +26,7 @@ class RemapSafeReflectionTest {
     private static final Map<String, Set<String>> ALLOWED_LOOKUPS = Map.of();
 
     static Path commonRoot() {
-        Path config = Path.of(System.getProperty("buildscape.v118xMixinConfig",
+        Path config = Path.of(System.getProperty("buildscape.minecraft1182MixinConfig",
                 "src/1.18.2/resources/buildscape.mixins.json")).toAbsolutePath();
         return config.getParent().getParent().getParent().getParent();
     }

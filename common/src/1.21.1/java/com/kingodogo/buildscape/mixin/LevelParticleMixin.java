@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Level.class)
 public abstract class LevelParticleMixin {
 
-    @Dynamic("v121x particle overload with a single alwaysRender flag")
+    @Dynamic("minecraft1211 particle overload with a single alwaysRender flag")
     @Inject(method = "addParticle(Lnet/minecraft/core/particles/ParticleOptions;ZDDDDDD)V", at = @At("HEAD"), cancellable = true, require = 0)
     private void onAddParticleAlways(ParticleOptions options, boolean alwaysRender, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, CallbackInfo ci) {
         if (isWaterParticle(options)) {

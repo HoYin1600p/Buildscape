@@ -27,15 +27,15 @@ configurations {
     commonVariant
 }
 dependencies {
-    commonVariant project(path: ':common', configuration: 'v121xElements')
-    compileOnly files(commonProject.sourceSets.v121x.output.classesDirs)
+    commonVariant project(path: ':common', configuration: 'minecraft1211Elements')
+    compileOnly files(commonProject.sourceSets.minecraft1211.output.classesDirs)
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
 }
 
-// Package the complete v121x resource tree.
+// Package the complete minecraft1211 resource tree.
 sourceSets.main.resources.srcDir rootProject.file('common/src/1.21.1/resources')
 
-tasks.named('compileJava') { dependsOn ':common:compileV121xJava' }
+tasks.named('compileJava') { dependsOn ':common:compileMinecraft1211Java' }
 
 tasks.named('processResources', ProcessResources) {
     inputs.property 'mod_version', project.version
@@ -60,4 +60,4 @@ tasks.withType(JavaCompile).configureEach {
     options.release.set(21)
     options.compilerArgs += ['-proc:none']
 }
-tasks.named('check') { dependsOn ':common:v121xTest' }
+tasks.named('check') { dependsOn ':common:minecraft1211Test' }

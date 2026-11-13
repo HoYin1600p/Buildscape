@@ -421,8 +421,8 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
         self.assertEqual(target["status"], "planned")
         self.assertIsNone(target["base_commit"])
         self.assertEqual(target["loaders"], ["fabric", "neoforge"])
-        self.assertEqual(target["version_cluster"], "v263")
-        self.assertEqual(target["version_clusters"], ["v263"])
+        self.assertEqual(target["version_cluster"], "minecraft263")
+        self.assertEqual(target["version_clusters"], ["minecraft263"])
         self.assertEqual(target["java_roots"], ["common/src/main/java", "common/src/26.3/java"])
         self.assertEqual(target["resource_root"], "common/src/26.3/resources")
         self.assertEqual(target["state_file"], "sync/state/mc26.3.json")
@@ -431,14 +431,14 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
         self.assertIn("26.3", target["converter"]["command"])
         self.assertIn("26.3", target["validation"][0])
         self.assertIn("build263", target["validation"][1])
-        self.assertIn("-Pbuildscape.v263=true", target["validation"][1])
+        self.assertIn("-Pbuildscape.minecraft263=true", target["validation"][1])
         self.assertEqual(target["removal_policy"]["file"], "sync/26.2/removals.json")
         self.assertEqual(target["removal_policy"]["inherits"], "mc26.2")
         # 26.2 keeps its legacy, implicit policy and its own roots.
         old = next(t for t in config["targets"] if t["id"] == "mc26.2")
         self.assertNotIn("removal_policy", old)
         self.assertEqual(old["resource_root"], "common/src/main/resources")
-        self.assertEqual(old["version_clusters"], ["v26x", "v118x"])
+        self.assertEqual(old["version_clusters"], ["minecraft262", "minecraft1182"])
         self.assertEqual(old["ledger_coverage"], ["26x", "118x"])
         state = json.loads((root / target["state_file"]).read_text())
         self.assertEqual(state, {"schema_version": 1, "pending": []})
@@ -502,10 +502,10 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
         with self.assertRaisesRegex(sync.SyncError, "Invalid mc26.2 removal policy"):
             sync.removal_policy(self.repo, target)
 
-    def test_mc263_inherits_policy_plans_and_applies_in_the_v263_root(self):
+    def test_mc263_inherits_policy_plans_and_applies_in_the_minecraft263_root(self):
         retired, model, base, policy = self.policy_files()
         target = self.config["targets"][0]
-        target.update(id="mc26.3", base_commit=base, version_cluster="v263", version_clusters=["v263"],
+        target.update(id="mc26.3", base_commit=base, version_cluster="minecraft263", version_clusters=["minecraft263"],
                       java_roots=["common/src/main/java", "common/src/26.3/java"],
                       resource_root="common/src/26.3/resources", ledger_coverage=["263"],
                       removal_policy={"file": "sync/26.2/removals.json", "inherits": "mc26.2",
@@ -539,7 +539,7 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
         self.assertEqual(plan["removal_policy"]["excluded_target_paths"],
                          ["common/src/26.3/resources/" + model[len("src/main/resources/"):],
                           "common/src/main/java/example/Mapped.java"])
-        self.assertEqual(plan["version_clusters"], ["v263"])
+        self.assertEqual(plan["version_clusters"], ["minecraft263"])
         items = {c["path"]: c for c in plan["changes"]}
         self.assertEqual(items[retired]["classification"], "retired")
         self.assertEqual(items[model]["classification"], "retired")
@@ -547,10 +547,10 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
         before_main = sync.files_at(self.repo, plan["target_commit"], ["common/src/main/resources"])
         sync.apply_plan(self.repo, plan, target, config, source, "sync/targets.json", self.output)
         branch = plan["apply"]["branch"]
-        v263 = "common/src/26.3/resources/"
+        minecraft263 = "common/src/26.3/resources/"
         for path in (retired, model, self.resources + "assets/buildscape/items/copper_rod.json"):
-            self.assertIsNone(sync.blob(self.repo, branch, v263 + path[len("src/main/resources/"):], True), path)
-        self.assertIsNotNone(sync.blob(self.repo, branch, v263 + "data/kept.json"))
+            self.assertIsNone(sync.blob(self.repo, branch, minecraft263 + path[len("src/main/resources/"):], True), path)
+        self.assertIsNotNone(sync.blob(self.repo, branch, minecraft263 + "data/kept.json"))
         # 26.3 never writes into the 26.2 resource root.
         self.assertEqual(sync.files_at(self.repo, branch, ["common/src/main/resources"]), before_main)
         state = json.loads(sync.blob(self.repo, branch, "sync/state/tiny.json"))
@@ -565,56 +565,58 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
 
     def test_foreign_cluster_ledger_paths_are_never_mapped(self):
         registry = {"targets": [
-            {"id": "mc26.2", "version_cluster": "v26x", "version_clusters": ["v26x", "v118x"]},
-            {"id": "mc26.3", "version_cluster": "v263", "version_clusters": ["v263"]},
-            {"id": "mc1.21.1", "version_cluster": "v121x"},
+            {"id": "mc26.2", "version_cluster": "minecraft262", "version_clusters": ["minecraft262", "minecraft1182"]},
+            {"id": "mc26.3", "version_cluster": "minecraft263", "version_clusters": ["minecraft263"]},
+            {"id": "mc1.21.1", "version_cluster": "minecraft1211"},
             {"id": "nothing"}]}
-        self.assertEqual(sync.foreign_clusters(registry, registry["targets"][0]), ["v121x", "v263"])
-        self.assertEqual(sync.foreign_clusters(registry, registry["targets"][1]), ["v118x", "v121x", "v26x"])
+        self.assertEqual(sync.foreign_clusters(registry, registry["targets"][0]), ["minecraft1211", "minecraft263"])
+        self.assertEqual(sync.foreign_clusters(registry, registry["targets"][1]), ["minecraft1182", "minecraft1211", "minecraft262"])
         base = "common/src/main/java/example/Base.java"
-        v26x = "common/src/26.2/java/example/adapter/Adapter.java"
-        v118x = "common/src/main/java/example/adapter/Adapter.java"
-        v263 = "common/src/26.3/java/example/adapter/Adapter.java"
-        for path in (base, v26x, v118x, v263):
+        minecraft262 = "common/src/26.2/java/example/adapter/Adapter.java"
+        minecraft1182 = "common/src/1.18.2/java/example/adapter/Adapter.java"
+        minecraft263 = "common/src/26.3/java/example/adapter/Adapter.java"
+        for path in (base, minecraft262, minecraft1182, minecraft263):
             self.write(self.repo, path, "class X {}\n")
         commit = self.commit(self.repo, "Cluster adapters")
         self.git(self.repo, "branch", "-f", "port/test", commit)
-        row = {"active_paths": ";".join([base, v26x, v118x, v263])}
+        row = {"active_paths": ";".join([base, minecraft262, minecraft1182, minecraft263])}
         source = self.config["source"]
 
         def mapped(clusters, foreign):
+            roots = {"minecraft1182": "1.18.2", "minecraft1211": "1.21.1",
+                     "minecraft262": "26.2", "minecraft263": "26.3"}
             target = {"branch": "port/test", "java_root": "common/src/main/java",
-                      "java_roots": ["common/src/main/java", *["common/src/" + c + "/java" for c in clusters]],
+                      "java_roots": ["common/src/main/java", *["common/src/" + roots[c] + "/java" for c in clusters]],
                       "foreign_clusters": foreign}
             return sync.mapped_java(self.repo, target, "src/main/java/example/Unmapped.java", row, source)
 
-        self.assertEqual(mapped(["v26x", "v118x"], ["v121x", "v263"]), [base, v26x, v118x])
-        self.assertEqual(mapped(["v263"], ["v118x", "v121x", "v26x"]), [base, v263])
+        self.assertEqual(mapped(["minecraft262", "minecraft1182"], ["minecraft1211", "minecraft263"]), [base, minecraft262, minecraft1182])
+        self.assertEqual(mapped(["minecraft263"], ["minecraft1182", "minecraft1211", "minecraft262"]), [base, minecraft263])
         # Without a declaration nothing is filtered, as before.
-        self.assertEqual(mapped(["v26x"], []), [base, v26x, v118x, v263])
+        self.assertEqual(mapped(["minecraft262"], []), [base, minecraft262, minecraft1182, minecraft263])
 
     def test_target_config_keeps_the_registry_unchanged(self):
         config = json.loads(json.dumps(self.config))
-        config["targets"][0].update(version_cluster="v26x", version_clusters=["v26x"])
-        config["targets"][1]["version_cluster"] = "v263"
+        config["targets"][0].update(version_cluster="minecraft262", version_clusters=["minecraft262"])
+        config["targets"][1]["version_cluster"] = "minecraft263"
         self.write(self.repo, "sync/targets.json", json.dumps(config))
         commit = self.commit(self.repo, "Cluster registry")
         self.git(self.repo, "branch", "-f", "port/test", commit)
         target, branch_config = sync.target_config(self.repo, config, "tiny", "sync/targets.json")
-        self.assertEqual(target["foreign_clusters"], ["v263"])
+        self.assertEqual(target["foreign_clusters"], ["minecraft263"])
         # apply writes branch_config back into the registry; the helper key must not leak into it.
         self.assertTrue(all("foreign_clusters" not in t for t in branch_config["targets"]))
 
-    def test_real_ledger_v263_paths_exist_and_are_marked(self):
+    def test_real_ledger_minecraft263_paths_exist_and_are_marked(self):
         root = Path(__file__).resolve().parents[2]
         with (root / "migration/ledger.csv").open(encoding="utf-8", newline="") as stream:
             rows = list(csv.DictReader(stream))
-        marked = [r for r in rows if any("/v263/" in p or "/src/26.3/" in p for p in r["active_paths"].split(";"))]
+        marked = [r for r in rows if any("/minecraft263/" in p or "/src/26.3/" in p for p in r["active_paths"].split(";"))]
         self.assertGreater(len(marked), 200)
         for row in marked:
             self.assertIn("263", row["era_coverage"].split(";"), row["reference_path"])
             for path in row["active_paths"].split(";"):
-                if "/v263/" in path:
+                if "/minecraft263/" in path:
                     self.assertTrue((root / path).is_file(), path)
         # Rows without a 26.3 counterpart stay on their existing coverage.
         marked_ids = {id(r) for r in marked}
@@ -622,18 +624,19 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
 
     def cluster_target(self):
         target = self.config["targets"][0]
-        target.update(id="mc26.2", version_cluster="v26x", version_clusters=["v26x", "v118x"],
+        target.update(id="mc26.2", version_cluster="minecraft262", version_clusters=["minecraft262", "minecraft1182"],
                       java_roots=["common/src/main/java", "common/src/1.18.2/java", "common/src/26.2/java"],
                       ledger_coverage=["26x", "118x"], reference_snapshot="ref/forge/1.18.2")
         (self.repo / "ref/source").rename(self.repo / "ref/forge-tmp")
         (self.repo / "ref/forge").mkdir()
         (self.repo / "ref/forge-tmp").rename(self.repo / "ref/forge/1.18.2")
-        for name, cluster in (("Same", "v118x"), ("Fallback", "v26x"), ("Rename", "v118x")):
+        for name, cluster in (("Same", "minecraft1182"), ("Fallback", "minecraft262"), ("Rename", "minecraft1182")):
             old = "common/" + self.java + name + ".java"
-            dest = "common/src/" + cluster + "/java/example/" + name + ".java"
+            version = {"minecraft1182": "1.18.2", "minecraft262": "26.2"}[cluster]
+            dest = "common/src/" + version + "/java/example/" + name + ".java"
             self.write(self.repo, dest, (self.repo / old).read_bytes())
             (self.repo / old).unlink()
-        # A removal on 26.2 must not retire a restored v118x counterpart.
+        # A removal on 26.2 must not retire a restored minecraft1182 counterpart.
         self.write(self.repo, "sync/26.2/removals.json", json.dumps({"schema_version": 1, "target": "mc26.2",
             "removed_ids": [], "excluded_target_paths": ["common/" + self.java + "Same.java"]}))
         self.write(self.repo, "sync/targets.json", json.dumps(self.config))
@@ -649,12 +652,13 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
         head = self.commit(self.source, "Reference binary and test inputs")
         plan, target, config, source = sync.make_plan(self.repo, self.config, "mc26.2", source_repo=self.source)
         changes = {c["path"]: c for c in plan["changes"]}
-        for name, cluster in (("Same", "v118x"), ("Fallback", "v26x")):
+        for name, cluster in (("Same", "minecraft1182"), ("Fallback", "minecraft262")):
             entry = changes[self.java + name + ".java"]
             self.assertEqual(entry["classification"], "automatic")
-            self.assertEqual(entry["destination"], "common/src/" + cluster + "/java/example/" + name + ".java")
+            version = {"minecraft1182": "1.18.2", "minecraft262": "26.2"}[cluster]
+            self.assertEqual(entry["destination"], "common/src/" + version + "/java/example/" + name + ".java")
             self.assertIn(cluster, entry["affected_clusters"])
-        self.assertEqual(changes[self.java + "Mapped.java"]["affected_clusters"], ["v118x", "v26x"])
+        self.assertEqual(changes[self.java + "Mapped.java"]["affected_clusters"], ["minecraft1182", "minecraft262"])
         rename = changes[self.java + "Renamed.java"]
         self.assertEqual(rename["classification"], "automatic")
         self.assertEqual(rename["destination"], "common/src/1.18.2/java/example/Renamed.java")
@@ -670,7 +674,7 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
         self.assertEqual(rows[self.java + "Same.java"]["active_paths"], "common/src/1.18.2/java/example/Same.java")
         self.assertTrue(all("118x" in r["era_coverage"].split(";") for r in rows.values()))
 
-    def test_single_identical_v118x_mixin_can_sync(self):
+    def test_single_identical_minecraft1182_mixin_can_sync(self):
         target = self.cluster_target()
         path = self.java + "ExampleMixin.java"
         old = b"class ExampleMixin {}\n"
@@ -691,12 +695,12 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
         root = Path(__file__).resolve().parents[2]
         target = json.loads((root / "sync/targets.json").read_text())["targets"][0]
         mandatory = target["validation"][-1]
-        self.assertIn(":common:compileV118xJava", mandatory)
+        self.assertIn(":common:compileMinecraft1182Java", mandatory)
         self.assertIn(":fabric:26.2:build", mandatory)
         self.assertIn(":neoforge:26.2:build", mandatory)
         gated = target["gated_validation"][0]["command"]
-        for token in (":forge:1.18.2:build", ":forge:1.18.2:check", "-Pbuildscape.v118x=true",
-                      "-Pbuildscape.v118xSource=common", "--offline", "--console=plain", "--no-daemon"):
+        for token in (":forge:1.18.2:build", ":forge:1.18.2:check", "-Pbuildscape.minecraft1182=true",
+                      "-Pbuildscape.minecraft1182Source=common", "--offline", "--console=plain", "--no-daemon"):
             self.assertIn(token, gated)
         values = {"gradle": str(self.root / "space's tools/gradlew.bat")}
         log = self.root / "validation.log"
@@ -704,8 +708,8 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
             sync.command(gated, values, self.root, log)
         self.assertEqual(execute.call_args.args[0], [a.format_map(values) for a in gated])
         # Argument arrays preserve dotted -P values; durable logs quote them for inspection.
-        self.assertIn("'-Pbuildscape.v118x=true'", log.read_text())
-        self.assertIn("'-Pbuildscape.v118xSource=common'", log.read_text())
+        self.assertIn("'-Pbuildscape.minecraft1182=true'", log.read_text())
+        self.assertIn("'-Pbuildscape.minecraft1182Source=common'", log.read_text())
 
     def test_gated_forge_cache_miss_is_partial_and_code_failure_is_fatal(self):
         log = self.root / "validation.log"

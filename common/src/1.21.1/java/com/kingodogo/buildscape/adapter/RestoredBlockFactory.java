@@ -154,7 +154,7 @@ final class RestoredBlockFactory {
         // Retained variants must copy main's original base properties, not the newer
         // vanilla replacement's sound/hardness. These unregistered bases are internal
         // constructor references only; removed content stays out of the registry.
-        for (var removal : com.kingodogo.buildscape.registry.ContentRemovalPolicy.V121X) {
+        for (var removal : com.kingodogo.buildscape.registry.ContentRemovalPolicy.MINECRAFT_1211) {
             if (!removal.block() || !removal.id().equals("buildscape:" + id)) continue;
             Block cached = REFERENCE_BASES.get(id);
             if (cached != null) return cached;

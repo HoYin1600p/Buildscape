@@ -36,7 +36,7 @@ public final class CopperOxidationHandler {
     private CopperOxidationHandler() {}
     public static synchronized void init() {
         if (initialized) return;
-        initTables(Services.isVersionCluster("v121x"));
+        initTables(Services.isVersionCluster("minecraft1211"));
         CopperWeathering.addAgeSource(block -> {
             CommonId id = Services.PLATFORM.getBlockId(block);
             return id != null && "buildscape".equals(id.getNamespace()) ? naturalAge(id.getPath()) : -1;

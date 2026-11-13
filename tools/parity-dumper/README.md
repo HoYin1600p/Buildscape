@@ -54,21 +54,21 @@ loader-specific lifecycle hooks and registry extensions stay in `mod` and
 `fabric`. Forge keeps its original manifest and serialization behavior.
 
 At Milestone 1, the repository's default `build` includes shared-code Forge
-1.18.2 alongside the 26.2 loaders, runs the common v118x tests, and produces
+1.18.2 alongside the 26.2 loaders, runs the common minecraft1182 tests, and produces
 `forge/1.18.2/build/libs/buildscape-forge-1.18.2-4.0.3.jar`. Gradle 9.6 runs on JDK 25;
-Forge compilation and v118x test execution use the locally available Java 17
+Forge compilation and minecraft1182 test execution use the locally available Java 17
 toolchain. All dependencies must already be cached for offline use.
 
 ```powershell
 .\gradlew.bat build --offline --console=plain --parallel --max-workers=8
-.\gradlew.bat :forge:1.18.2:build '-Pbuildscape.v118xSource=ref' --offline --console=plain --parallel --max-workers=8
-.\gradlew.bat :forge:1.18.2:build '-Pbuildscape.v118x=true' '-Pbuildscape.v118xSource=common' --offline --console=plain --parallel --max-workers=8
+.\gradlew.bat :forge:1.18.2:build '-Pbuildscape.minecraft1182Source=ref' --offline --console=plain --parallel --max-workers=8
+.\gradlew.bat :forge:1.18.2:build '-Pbuildscape.minecraft1182=true' '-Pbuildscape.minecraft1182Source=common' --offline --console=plain --parallel --max-workers=8
 ```
 
 Use `ref` for the frozen parity baseline and `common` (the default) for the
-shared-code candidate. The explicit `buildscape.v118x=true` gate remains
+shared-code candidate. The explicit `buildscape.minecraft1182=true` gate remains
 compatible with existing parity tooling. For fast 26.2-only builds, pass
-`-Pbuildscape.v118x=false`; this omits the Forge project and skips v118x
+`-Pbuildscape.minecraft1182=false`; this omits the Forge project and skips minecraft1182
 verification in `common:check`. It does not control this standalone helper's
 separate `buildscape.parityDumper` gate.
 

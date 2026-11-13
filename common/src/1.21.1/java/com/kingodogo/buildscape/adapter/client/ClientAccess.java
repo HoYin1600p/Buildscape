@@ -688,7 +688,7 @@ public final class ClientAccess {
         }
     }
 
-    public static BlockColorSample sampleBlockColor(Map<String, double[]> v121xSpriteCache, java.util.function.Function<net.minecraft.client.renderer.texture.SpriteContents, com.mojang.blaze3d.platform.NativeImage> spriteImage, net.minecraft.world.level.block.state.BlockState state) {
+    public static BlockColorSample sampleBlockColor(Map<String, double[]> spriteCache, java.util.function.Function<net.minecraft.client.renderer.texture.SpriteContents, com.mojang.blaze3d.platform.NativeImage> spriteImage, net.minecraft.world.level.block.state.BlockState state) {
         if (state == null) return null;
         try {
             net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
@@ -715,7 +715,7 @@ public final class ClientAccess {
                         if (resolved != -1) tint = resolved & 0xFFFFFF;
                     }
                     int resolvedTint = tint;
-                    double[] sample = v121xSpriteCache.computeIfAbsent(spriteName + "#" + tint, key -> {
+                    double[] sample = spriteCache.computeIfAbsent(spriteName + "#" + tint, key -> {
                         com.mojang.blaze3d.platform.NativeImage image = spriteImage.apply(sprite.contents());
                         int width = sprite.contents().width(), height = sprite.contents().height();
                         int stepX = Math.max(1, (width + COLOR_MAX_SAMPLES - 1) / COLOR_MAX_SAMPLES);

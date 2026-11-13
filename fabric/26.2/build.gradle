@@ -56,8 +56,8 @@ unimined.minecraft {
 
 configurations { commonVariant }
 dependencies {
-    commonVariant project(path: ':common', configuration: 'v26xElements')
-    implementation project(path: ':common', configuration: 'v26xElements')
+    commonVariant project(path: ':common', configuration: 'minecraft262Elements')
+    implementation project(path: ':common', configuration: 'minecraft262Elements')
     modImplementation 'net.fabricmc.fabric-api:fabric-api:0.149.0+26.2'
 }
 

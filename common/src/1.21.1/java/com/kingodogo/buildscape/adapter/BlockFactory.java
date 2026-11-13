@@ -177,6 +177,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import javax.annotation.Nullable;
 import java.util.function.Supplier;
 public class BlockFactory implements IBlockFactory {
+    @Override public String versionCluster() { return "minecraft1211"; }
 
     private static ItemInteractionResult toItemInteractionResult(InteractionResult result) {
         if (result == InteractionResult.SUCCESS) return ItemInteractionResult.SUCCESS;

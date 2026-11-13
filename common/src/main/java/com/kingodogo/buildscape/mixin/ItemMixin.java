@@ -18,7 +18,7 @@ public class ItemMixin {
     @Inject(method = {"getMaxStackSize()I", "m_41741_()I"}, at = @At("HEAD"),
             cancellable = true, require = 0, remap = false)
     private void buildscape$legacyCakeMaxStackSize(CallbackInfoReturnable<Integer> cir) {
-        if (!Services.isVersionCluster("v118x") && !Services.isVersionCluster("v26x")) return;
+        if (!Services.isVersionCluster("minecraft1182") && !Services.isVersionCluster("minecraft262")) return;
         ItemStack self = (ItemStack) (Object) this;
         if (self.is(Items.POTION)) {
             cir.setReturnValue(Services.PLATFORM.isWaterPotion(self)

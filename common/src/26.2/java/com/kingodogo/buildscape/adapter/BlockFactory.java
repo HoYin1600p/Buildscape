@@ -180,6 +180,7 @@ import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 public class BlockFactory implements IBlockFactory {
+    @Override public String versionCluster() { return "minecraft262"; }
     private static final java.util.Set<String> CONSTRUCTING_BASES = new java.util.HashSet<>();
 
     @Override

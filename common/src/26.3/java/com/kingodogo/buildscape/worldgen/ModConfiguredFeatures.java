@@ -800,7 +800,7 @@ public class ModConfiguredFeatures {
     }
 
     private static com.kingodogo.buildscape.block.BlockDefinition vanillaBlock(String id) {
-        if (Services.isVersionCluster("v118x")) {
+        if (Services.isVersionCluster("minecraft1182")) {
             id = switch (id) {
                 case "minecraft:pink_petals" -> "buildscape:pink_petal";
                 case "minecraft:wildflowers", "minecraft:leaf_litter",

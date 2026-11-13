@@ -860,12 +860,12 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         return net.minecraft.world.entity.LivingEntity.getEquipmentSlotForItem(stack);
     }
 
-    private final java.util.Map<net.minecraft.client.resources.model.BakedModel, net.minecraft.world.phys.AABB> v118xModelBoundsCache = new java.util.WeakHashMap<>();
+    private final java.util.Map<net.minecraft.client.resources.model.BakedModel, net.minecraft.world.phys.AABB> modelBoundsCache = new java.util.WeakHashMap<>();
 
     @Override
     public net.minecraft.world.phys.AABB getModelBounds(Object model) {
         if (!(model instanceof net.minecraft.client.resources.model.BakedModel bakedModel)) return new net.minecraft.world.phys.AABB(0, 0, 0, 1, 1, 1);
-        return v118xModelBoundsCache.computeIfAbsent(bakedModel, m -> {
+        return modelBoundsCache.computeIfAbsent(bakedModel, m -> {
             double minX = Double.MAX_VALUE, minY = Double.MAX_VALUE, minZ = Double.MAX_VALUE;
             double maxX = -Double.MAX_VALUE, maxY = -Double.MAX_VALUE, maxZ = -Double.MAX_VALUE;
             java.util.Random rand = new java.util.Random(42L);
@@ -1705,19 +1705,19 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         level.playSound(null, pos, SoundEvents.NOTE_BLOCK_CHIME, SoundSource.PLAYERS, 1.0f, pitch);
     }
 
-    private static final java.util.Map<java.util.UUID, CompoundTag> V118X_ENTITY_DATA = new java.util.concurrent.ConcurrentHashMap<>();
-    private static final java.util.Map<net.minecraft.world.level.block.entity.BlockEntity, CompoundTag> V118X_BLOCK_ENTITY_DATA = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.Map<java.util.UUID, CompoundTag> MINECRAFT_1182_ENTITY_DATA = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.Map<net.minecraft.world.level.block.entity.BlockEntity, CompoundTag> MINECRAFT_1182_BLOCK_ENTITY_DATA = new java.util.concurrent.ConcurrentHashMap<>();
 
     @Override
     public CompoundTag getEntityData(Entity entity) {
         if (entity == null) return new CompoundTag();
-        return V118X_ENTITY_DATA.computeIfAbsent(entity.getUUID(), k -> new CompoundTag());
+        return MINECRAFT_1182_ENTITY_DATA.computeIfAbsent(entity.getUUID(), k -> new CompoundTag());
     }
 
     @Override
     public CompoundTag getBlockEntityData(net.minecraft.world.level.block.entity.BlockEntity be) {
         if (be == null) return new CompoundTag();
-        return V118X_BLOCK_ENTITY_DATA.computeIfAbsent(be, k -> new CompoundTag());
+        return MINECRAFT_1182_BLOCK_ENTITY_DATA.computeIfAbsent(be, k -> new CompoundTag());
     }
 
     @Override
@@ -3119,7 +3119,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     private static final int COLOR_MAX_SAMPLES = 32;
-    private final Map<String, double[]> v118xSpriteCache = new java.util.concurrent.ConcurrentHashMap<>();
+    private final Map<String, double[]> spriteCache = new java.util.concurrent.ConcurrentHashMap<>();
 
     private static com.mojang.blaze3d.platform.NativeImage getSpriteImage(net.minecraft.client.renderer.texture.TextureAtlasSprite sprite) {
         var images = ((com.kingodogo.buildscape.mixin.SpriteAccessor) sprite).buildscape$getImages();
@@ -3169,7 +3169,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
                     int tintB = tint & 255;
 
                     String cacheKey = spriteName + "#" + tint;
-                    double[] sample = v118xSpriteCache.computeIfAbsent(cacheKey, k -> {
+                    double[] sample = spriteCache.computeIfAbsent(cacheKey, k -> {
                         com.mojang.blaze3d.platform.NativeImage img = getSpriteImage(sprite);
                         if (img == null) return new double[]{0, 0, 0, 0, 0};
                         int w = sprite.getWidth();

@@ -27,9 +27,9 @@ class BlockPropertiesParityTest {
     // These four blocks deliberately copy their vanilla plank bases. Allow only
     // the five exact replacement sound IDs, never state or numeric differences.
     private static final String RUNTIME_MIXIN = "<provided by a mixin at runtime>";
-    private static final Map<String, String> ALLOWED_DIFFERENCES = netherWoodSounds();
+    private static final Map<String, String> ALLOWED_DIFFERENCES = allowedDifferences();
 
-    private static Map<String, String> netherWoodSounds() {
+    private static Map<String, String> allowedDifferences() {
         var differences = new TreeMap<String, String>();
         for (String id : new String[]{"crimson_shelf", "warped_shelf", "crimson_vertical_slab", "warped_vertical_slab"}) {
             for (String event : new String[]{"break", "fall", "hit", "place", "step"}) {
@@ -39,6 +39,15 @@ class BlockPropertiesParityTest {
         // On 1.21.1 Buildscape's stripped_bamboo_block is replaced by vanilla's (removals121x), and the stairs copy
         // their base's blast resistance, so they follow vanilla's 3.0 instead of main's custom block's 2.0.
         differences.put("buildscape:stripped_bamboo_block_stairs explosionResistance", "3.0");
+        // Release 4.1 adds a glowing state to every jar on both versions.
+        for (String id : new String[]{"glass_jar", "golden_jar", "tinted_glass_jar",
+                "white_glass_jar", "orange_glass_jar", "magenta_glass_jar", "light_blue_glass_jar",
+                "yellow_glass_jar", "lime_glass_jar", "pink_glass_jar", "gray_glass_jar",
+                "light_gray_glass_jar", "cyan_glass_jar", "purple_glass_jar", "blue_glass_jar",
+                "brown_glass_jar", "green_glass_jar", "red_glass_jar", "black_glass_jar"}) {
+            differences.put("buildscape:" + id + " properties", "{glowing=[false, true], waterlogged=[false, true]}");
+            differences.put("buildscape:" + id + " defaultState", "glowing=false,waterlogged=false");
+        }
         // VineBlockMixin adds the 'sheared' property to vine-derived blocks at runtime; unit tests run without
         // mixins, so the glow lights' property set and default state are checked in game instead.
         for (String id : new String[]{"glow_lights", "multicolor_glow_lights"}) {
@@ -87,7 +96,7 @@ class BlockPropertiesParityTest {
         }
         for (var entry : reference.entrySet()) {
             String id = entry.getKey();
-            if (ContentRemovalPolicy.V121X.stream().anyMatch(removal -> removal.block() && removal.id().equals(id))) continue;
+            if (ContentRemovalPolicy.MINECRAFT_1211.stream().anyMatch(removal -> removal.block() && removal.id().equals(id))) continue;
             if (!created.contains(id)) {
                 failures.add(id + " was not constructed");
                 continue;

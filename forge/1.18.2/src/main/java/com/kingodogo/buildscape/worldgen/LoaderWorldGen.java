@@ -22,7 +22,7 @@ public final class LoaderWorldGen {
         registry.queue(BuiltinRegistries.CONFIGURED_FEATURE, path, feature);
     }
     public static void register(ForgeRegistryAdapter registry) {
-        // 1.18.2 keeps its own mangrove trees (26.2 uses vanilla's), shaped by the v118x adapter.
+        // 1.18.2 keeps its own mangrove trees (26.2 uses vanilla's), shaped by the minecraft1182 adapter.
         queue(registry, "mangrove", () -> com.kingodogo.buildscape.adapter.WorldGenFactory.createMangroveTreeFeature(false));
         queue(registry, "tall_mangrove", () -> com.kingodogo.buildscape.adapter.WorldGenFactory.createMangroveTreeFeature(true));
         queue(registry, "poplar", ModConfiguredFeatures.POPLAR_TREE::get);

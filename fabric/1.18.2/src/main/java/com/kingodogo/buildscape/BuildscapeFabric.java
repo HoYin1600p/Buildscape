@@ -23,7 +23,7 @@ public final class BuildscapeFabric implements ModInitializer {
 
     public static void init() {
         STARTUP.run(() -> {
-            // Reserve the final slot before shared v118x code constructs its tab.
+            // Reserve the final slot before shared minecraft1182 code constructs its tab.
             ((net.fabricmc.fabric.impl.item.group.ItemGroupExtensions)
                     net.minecraft.world.item.CreativeModeTab.TAB_BUILDING_BLOCKS).fabric_expandArray();
             Services.PLATFORM.wrapRegistryAction(com.kingodogo.buildscape.fluid.FabricExperienceFluid::register);

@@ -168,6 +168,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
 public class BlockFactory implements IBlockFactory {
+    @Override public String versionCluster() { return "minecraft1182"; }
     private static java.util.function.BiFunction<Supplier<FlowingFluid>, BlockBehaviour.Properties, Block> experienceFluidFactory;
 
     public static void installExperienceFluidFactory(

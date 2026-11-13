@@ -4,7 +4,8 @@
   "package": "com.kingodogo.buildscape.mixin.neoforge",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
-    "ItemStackLimitsMixin"
+    "ItemStackLimitsMixin",
+    "BeaconStopperColorMixin"
   ],
   "injectors": {
     "defaultRequire": 1

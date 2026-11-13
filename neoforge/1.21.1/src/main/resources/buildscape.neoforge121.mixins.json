@@ -3,6 +3,6 @@
   "minVersion": "0.8",
   "package": "com.kingodogo.buildscape.mixin.neoforge121",
   "compatibilityLevel": "JAVA_21",
-  "mixins": ["FluidInteractionMixin"],
+  "mixins": ["FluidInteractionMixin", "BeaconStopperColorMixin"],
   "injectors": { "defaultRequire": 1 }
 }

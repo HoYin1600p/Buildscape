@@ -89,7 +89,7 @@ public final class BeaconScanContext {
         for (int y = beaconPos.getY() + 1; y <= top; y++) {
             scanPos.set(beaconPos.getX(), y, beaconPos.getZ());
             BlockState state = level.getBlockState(scanPos);
-            if ((stopper != null && stopper.test(state))
+            if (BeaconBeamStoppers.isStopper(state) || (stopper != null && stopper.test(state))
                     || (tintedOrnament != null && state.is(tintedOrnament))
                     || (bigTintedOrnament != null && state.is(bigTintedOrnament))) {
                 return y - beaconPos.getY();

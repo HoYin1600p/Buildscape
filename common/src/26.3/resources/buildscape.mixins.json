@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_25",
   "plugin": "com.kingodogo.buildscape.mixin.BuildscapeMixinPlugin",
   "mixins": [
+    "BeaconStopperMixin",
     "BiomeTintChunkWatchMixin",
     "AbstractContainerMenuMixin",
     "AnvilMenuMixin",

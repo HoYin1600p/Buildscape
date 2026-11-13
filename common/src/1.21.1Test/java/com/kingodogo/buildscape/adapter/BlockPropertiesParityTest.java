@@ -39,6 +39,12 @@ class BlockPropertiesParityTest {
         // On 1.21.1 Buildscape's stripped_bamboo_block is replaced by vanilla's (1.21.1 removals), and the stairs copy
         // their base's blast resistance, so they follow vanilla's 3.0 instead of main's custom block's 2.0.
         differences.put("buildscape:stripped_bamboo_block_stairs explosionResistance", "3.0");
+        // Release 4.1.3 corrects the sculk building variants after the main-branch snapshot.
+        for (String id : new String[]{"sculk_slab", "sculk_stairs", "sculk_wall", "sculk_vertical_slab"}) {
+            differences.put("buildscape:" + id + " destroyTime", "0.2");
+            differences.put("buildscape:" + id + " explosionResistance", "0.2");
+            differences.put("buildscape:" + id + " light", "0");
+        }
         // Release 4.1 adds a glowing state to every jar on both versions.
         for (String id : new String[]{"glass_jar", "golden_jar", "tinted_glass_jar",
                 "white_glass_jar", "orange_glass_jar", "magenta_glass_jar", "light_blue_glass_jar",
@@ -104,6 +110,11 @@ class BlockPropertiesParityTest {
             try {
                 var block = Services.PARITY_BLOCKS.get(id.substring(id.indexOf(':') + 1));
                 BlockState state = block.defaultBlockState();
+                if (id.equals("buildscape:sculk_slab") || id.equals("buildscape:sculk_stairs")
+                        || id.equals("buildscape:sculk_wall") || id.equals("buildscape:sculk_vertical_slab")) {
+                    assertEquals(net.minecraft.world.level.material.MapColor.COLOR_BLACK,
+                            state.getMapColor(EmptyBlockGetter.INSTANCE, BlockPos.ZERO), id);
+                }
                 JsonObject expected = entry.getValue().getAsJsonObject();
                 var properties = new TreeMap<String, TreeSet<String>>();
                 for (Property<?> property : block.getStateDefinition().getProperties()) {

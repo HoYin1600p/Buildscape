@@ -58,6 +58,30 @@ public final class FoliageColors {
         };
     }
 
+    private static BlockTintSource petalGrass() {
+        return new BlockTintSource() {
+            public int color(BlockState state) { return 0xff7fa832; }
+            public int colorInWorld(BlockState state, BlockAndTintGetter view, BlockPos pos) {
+                var level = net.minecraft.client.Minecraft.getInstance().level;
+                return level == null || view == null || pos == null ? color(state)
+                        : 0xff000000 | level.getBiome(pos).value().getGrassColor(pos.getX(), pos.getZ());
+            }
+        };
+    }
+
+    private static BlockTintSource stringColor(net.minecraft.world.level.block.state.properties.EnumProperty<
+            com.kingodogo.buildscape.block.OrnamentBlock.StringColor> property) {
+        return new BlockTintSource() {
+            public int color(BlockState state) {
+                return state != null && state.hasProperty(property)
+                        ? 0xff000000 | state.getValue(property).getColor() : -1;
+            }
+            public java.util.Set<net.minecraft.world.level.block.state.properties.Property<?>> relevantProperties() {
+                return java.util.Set.of(property);
+            }
+        };
+    }
+
     public static void register(BlockColors colors) {
         register(colors::register);
     }
@@ -67,9 +91,19 @@ public final class FoliageColors {
         for (var block : BuiltInRegistries.BLOCK) {
             Identifier id = BuiltInRegistries.BLOCK.getKey(block);
             if (!id.getNamespace().equals("buildscape")) continue;
+            if (block instanceof com.kingodogo.buildscape.block.OrnamentBlock) {
+                sink.register(List.of(stringColor(com.kingodogo.buildscape.block.OrnamentBlock.STRING_COLOR)), block);
+                continue;
+            }
+            if (block instanceof com.kingodogo.buildscape.block.StringLightBlock) {
+                sink.register(List.of(stringColor(com.kingodogo.buildscape.block.StringLightBlock.STRING_COLOR)), block);
+                continue;
+            }
             // Match vanilla 26.2 BlockColors, including wildflowers' untinted flower layer.
             // Short/tall dry grass, firefly bush and cactus flower have no vanilla tint.
             List<BlockTintSource> potSources = switch (id.getPath()) {
+                case "clover", "red_petal", "blue_petal", "orange_petal", "pink_petal", "purple_petal" ->
+                        List.of(BlockTintSources.constant(-1), petalGrass());
                 case "potted_bush" -> List.of(BlockTintSources.grass());
                 case "potted_leaf_litter" -> List.of(BlockTintSources.dryFoliage());
                 case "potted_wildflowers" -> List.of(BlockTintSources.constant(-1), BlockTintSources.grass());

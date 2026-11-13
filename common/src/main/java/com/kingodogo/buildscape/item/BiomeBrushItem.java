@@ -230,8 +230,22 @@ public class BiomeBrushItem extends BiomeBrushItemBase {
                 return InteractionResult.FAIL;
             }
 
-            int affectedBlocks = Services.PLATFORM.applyBiomeToArea(serverLevel, pos1, pos2, biomeHolder, stack,
-                    player.getAbilities().instabuild);
+            if (!(player instanceof ServerPlayer serverPlayer) || !player.mayBuild()
+                    || player.distanceToSqr(pos1.getX() + 0.5, pos1.getY() + 0.5, pos1.getZ() + 0.5) > 64.0 * 64.0
+                    || player.distanceToSqr(pos2.getX() + 0.5, pos2.getY() + 0.5, pos2.getZ() + 0.5) > 64.0 * 64.0
+                    || level.isOutsideBuildHeight(minY) || level.isOutsideBuildHeight(maxY)) {
+                Services.PLATFORM.sendActionBarMessage(player, ComponentHelper.literal(
+                        "Cannot paint: both corners must be within 64 blocks and you must have build permission.").withStyle(ChatFormatting.RED));
+                return InteractionResult.FAIL;
+            }
+            if (!allColumnsPaintable(serverLevel, serverPlayer, stack, context.getClickedFace(),
+                    minX, maxX, minY, maxY, minZ, maxZ)) {
+                Services.PLATFORM.sendActionBarMessage(player, ComponentHelper.literal(
+                        "Cannot paint: the selection includes an unloaded or protected column.").withStyle(ChatFormatting.RED));
+                return InteractionResult.FAIL;
+            }
+
+            int affectedBlocks = paintColumns(serverLevel, player, stack, biomeKey, minX, maxX, minZ, maxZ);
 
             Services.PLATFORM.playBoneMealUse(level, player.getX(), player.getY(), player.getZ());
 
@@ -277,6 +291,61 @@ public class BiomeBrushItem extends BiomeBrushItemBase {
         }
 
         return InteractionResult.SUCCESS;
+    }
+
+    private static boolean allColumnsPaintable(ServerLevel level, ServerPlayer player, ItemStack stack,
+            net.minecraft.core.Direction face, int minX, int maxX, int minY, int maxY, int minZ, int maxZ) {
+        int maxWorldY = Services.PLATFORM.getMaxBuildHeight(level);
+        if (level.isOutsideBuildHeight(maxWorldY)) maxWorldY--;
+        int minWorldY = maxWorldY - level.getHeight() + 1;
+        for (int x = minX; x <= maxX; x++) {
+            for (int z = minZ; z <= maxZ; z++) {
+                BlockPos bottom = new BlockPos(x, minY, z);
+                BlockPos top = new BlockPos(x, maxY, z);
+                if (!level.hasChunkAt(bottom) || !level.getWorldBorder().isWithinBounds(bottom)
+                        || !canPaintAt(level, player, bottom, face, stack)
+                        || (!bottom.equals(top) && !canPaintAt(level, player, top, face, stack))) return false;
+                for (int y = minWorldY; y <= maxWorldY; y += 16) {
+                    if (y != minY && y != maxY && !canPaintAt(level, player, new BlockPos(x, y, z), face, stack)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    private static int paintColumns(ServerLevel level, Player player, ItemStack stack, CommonId biome,
+            int minX, int maxX, int minZ, int maxZ) {
+        var tints = com.kingodogo.buildscape.biome.BiomeTintData.get(level);
+        var changedChunks = new java.util.HashSet<Long>();
+        int unbreaking = Services.PLATFORM.getUnbreakingLevel(stack);
+        boolean creative = player.getAbilities().instabuild;
+        int changed = 0;
+        for (int x = minX; x <= maxX; x++) {
+            for (int z = minZ; z <= maxZ; z++) {
+                if (!creative && stack.getDamageValue() >= stack.getMaxDamage()) break;
+                if (!tints.putColumn(x, z, biome)) continue;
+                changed++;
+                changedChunks.add(com.kingodogo.buildscape.biome.BiomeTintStore.chunkKey(x >> 4, z >> 4));
+                if (com.kingodogo.buildscape.biome.BiomeBrushDurability.chargesDurability(
+                        creative, unbreaking, level.getRandom()::nextInt)) {
+                    stack.setDamageValue(stack.getDamageValue() + 1);
+                }
+            }
+            if (!creative && stack.getDamageValue() >= stack.getMaxDamage()) break;
+        }
+        for (long chunk : changedChunks) {
+            com.kingodogo.buildscape.biome.BiomeTintSync.syncChunk(level, (int) chunk, (int) (chunk >> 32));
+        }
+        return changed;
+    }
+
+    private static boolean canPaintAt(ServerLevel level, ServerPlayer player, BlockPos pos,
+            net.minecraft.core.Direction face, ItemStack stack) {
+        return level.mayInteract(player, pos) && player.mayUseItemAt(pos, face, stack)
+                && !player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())
+                && Services.PLATFORM.canRotateBlock(player, pos);
     }
 
     public void addHoverText(ItemStack stack, java.util.function.Consumer<Component> tooltip) {

@@ -6,11 +6,7 @@
     "F": "c:"
   },
   "recipes": [
-    {
-      "type": "buildscape:clear_shulker_filters"
-    },
-    {
-      "type": "buildscape:confetti_configure"
-    }
+    {"type":"buildscape:clear_shulker_filters"},
+    {"type":"buildscape:confetti_configure"}
   ]
 }

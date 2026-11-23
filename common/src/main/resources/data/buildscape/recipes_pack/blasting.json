@@ -6,19 +6,7 @@
     "F": "c:"
   },
   "blasting": [
-    [
-      "BS:steel_block",
-      "MC:iron_block",
-      1,
-      0.7,
-      100
-    ],
-    [
-      "BS:steel_ingot",
-      "MC:iron_ingot",
-      1,
-      0.7,
-      100
-    ]
+    ["BS:steel_block","MC:iron_block",1,0.7,100],
+    ["BS:steel_ingot","MC:iron_ingot",1,0.7,100]
   ]
 }

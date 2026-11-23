@@ -217,6 +217,11 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         if (id >= 10 && id <= 18) {
             if (this.blockEntity != null) {
                 this.blockEntity.incrementResultOffset(id - 10);
+            } else {
+                int slot = id - 10;
+                int tab = getActiveTab();
+                int idx = 3 + tab * 9 + slot;
+                this.data.set(idx, this.data.get(idx) + 1);
             }
             return true;
         }
@@ -240,6 +245,11 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         if (id == 30) {
             if (this.blockEntity != null) {
                 this.blockEntity.resetResultOffsets();
+            } else {
+                int base = 3 + getActiveTab() * 9;
+                for (int s = 0; s < 9; s++) {
+                    this.data.set(base + s, 0);
+                }
             }
             return true;
         }

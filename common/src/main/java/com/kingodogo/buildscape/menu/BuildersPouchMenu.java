@@ -132,8 +132,11 @@ public class BuildersPouchMenu extends AbstractContainerMenu implements GhostFil
 
     @Override
     public boolean stillValid(Player player) {
+        ItemStack held = player.getItemInHand(hand);
         return pouchInventory.stillValid(player)
-                && player.getItemInHand(hand) == originalStack;
+                && !held.isEmpty()
+                && held.getItem() instanceof BuildersPouchItem
+                && (held == originalStack || ItemStack.isSameItem(held, originalStack));
     }
 
     @Nullable

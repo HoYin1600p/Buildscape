@@ -120,7 +120,7 @@ public final class GlassJarRenderer implements BlockEntityRenderer<GlassJarBlock
             pose.mulPose(Axis.ZP.rotationDegrees(state.wobbleAngle));
             pose.translate(-0.5, 0, -0.5);
             if (state.liquidSprite != null) {
-                collector.submitCustomGeometry(pose, RenderTypes.entityTranslucent(TextureAtlas.LOCATION_BLOCKS),
+                collector.submitCustomGeometry(pose, RenderTypes.translucentMovingBlock(),
                         (transform, consumer) -> submitLiquid(state, transform, consumer, light, overlay));
             }
             for (int i = 0; i < state.count; i++) {

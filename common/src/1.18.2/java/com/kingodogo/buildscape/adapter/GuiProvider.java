@@ -34,7 +34,15 @@ public final class GuiProvider {
                             this.imageWidth = delegate.getImageWidth();
                             this.imageHeight = delegate.getImageHeight();
                             super.init();
+                            this.titleLabelX = -9999;
+                            this.titleLabelY = -9999;
+                            this.inventoryLabelX = -9999;
+                            this.inventoryLabelY = -9999;
                             delegate.init(this.leftPos, this.topPos, this.width, this.height);
+                        }
+
+                        @Override
+                        protected void renderLabels(PoseStack poseStack, int mouseX, int mouseY) {
                         }
 
                         @Override
@@ -85,6 +93,14 @@ public final class GuiProvider {
                             this.imageWidth = BuildersPouchScreen.GUI_WIDTH;
                             this.imageHeight = BuildersPouchScreen.GUI_HEIGHT;
                             super.init();
+                            this.titleLabelX = -9999;
+                            this.titleLabelY = -9999;
+                            this.inventoryLabelX = -9999;
+                            this.inventoryLabelY = -9999;
+                        }
+
+                        @Override
+                        protected void renderLabels(PoseStack poseStack, int mouseX, int mouseY) {
                         }
 
                         @Override

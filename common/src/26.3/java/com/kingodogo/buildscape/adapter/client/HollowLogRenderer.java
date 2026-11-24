@@ -76,7 +76,7 @@ public final class HollowLogRenderer implements BlockEntityRenderer<HollowLogBlo
         if (state.fluid != null) {
             var fluid = state.fluid;
             int light = state.lightCoords;
-            collector.submitCustomGeometry(pose, RenderTypes.entityTranslucent(TextureAtlas.LOCATION_BLOCKS),
+            collector.submitCustomGeometry(pose, RenderTypes.translucentMovingBlock(),
                     (transform, consumer) -> {
                         PoseStack drawing = new PoseStack();
                         drawing.mulPose(transform.pose());

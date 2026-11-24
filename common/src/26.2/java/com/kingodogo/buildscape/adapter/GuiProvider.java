@@ -55,8 +55,16 @@ public final class GuiProvider {
                             @Override
                             protected void init() {
                                 super.init();
+                                this.titleLabelX = -9999;
+                                this.titleLabelY = -9999;
+                                this.inventoryLabelX = -9999;
+                                this.inventoryLabelY = -9999;
                                 this.leftPos = (this.width - com.kingodogo.buildscape.client.screen.BuildersWorkbenchScreen.COLOR_WIDTH) / 2;
                                 delegate.init(delegateLeft(), this.topPos, this.width, this.height);
+                            }
+
+                            @Override
+                            protected void extractLabels(net.minecraft.client.gui.GuiGraphicsExtractor extractor, int mouseX, int mouseY) {
                             }
 
                             @Override
@@ -103,6 +111,19 @@ public final class GuiProvider {
                                 menu, inventory, title,
                                 com.kingodogo.buildscape.client.screen.BuildersPouchScreen.GUI_WIDTH,
                                 com.kingodogo.buildscape.client.screen.BuildersPouchScreen.GUI_HEIGHT) {
+                            @Override
+                            protected void init() {
+                                super.init();
+                                this.titleLabelX = -9999;
+                                this.titleLabelY = -9999;
+                                this.inventoryLabelX = -9999;
+                                this.inventoryLabelY = -9999;
+                            }
+
+                            @Override
+                            protected void extractLabels(net.minecraft.client.gui.GuiGraphicsExtractor extractor, int mouseX, int mouseY) {
+                            }
+
                             @Override
                             public void extractContents(net.minecraft.client.gui.GuiGraphicsExtractor extractor,
                                                         int mouseX, int mouseY, float partialTick) {

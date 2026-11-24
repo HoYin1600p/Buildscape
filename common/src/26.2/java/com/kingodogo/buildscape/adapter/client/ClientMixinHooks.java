@@ -104,7 +104,7 @@ public final class ClientMixinHooks {
 
         Button button = Button.builder(Component.literal("BS"), b -> {
             Minecraft.getInstance().setScreenAndShow(Services.PLATFORM.createConfigScreen(screen));
-        }).bounds(targetX, targetY, 20, 20).build();
+        }).bounds(targetX, targetY, 20, 20).tooltip(net.minecraft.client.gui.components.Tooltip.create(Component.translatable("buildscape.config.title"))).build();
         addWidgetToScreen(screen, button);
     }
 

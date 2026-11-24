@@ -109,20 +109,27 @@ public class WorldPipeTopologyAccess implements PipeTopologyAccess {
     }
 
     public static boolean isTransportFluid(@Nullable Fluid fluid) {
-        return fluid != null && (fluid.isSame(Fluids.WATER) || fluid.isSame(Fluids.LAVA));
+        return fluid != null && (fluid.isSame(Fluids.WATER) || fluid.isSame(Fluids.LAVA)
+                || com.kingodogo.buildscape.fluid.ModFluids.isExperience(fluid));
     }
 
     public static String fluidId(Fluid fluid) {
-        Fluid canonical = fluid.isSame(Fluids.WATER) ? Fluids.WATER
-                : fluid.isSame(Fluids.LAVA) ? Fluids.LAVA : fluid;
-        com.kingodogo.buildscape.util.CommonId key = com.kingodogo.buildscape.platform.Services.PLATFORM.getFluidId(canonical);
+        if (fluid == null || fluid == Fluids.EMPTY) return "";
+        if (fluid.isSame(Fluids.WATER)) return PipeFlowState.WATER_FLUID_ID;
+        if (fluid.isSame(Fluids.LAVA)) return "minecraft:lava";
+        if (com.kingodogo.buildscape.fluid.ModFluids.isExperience(fluid)) return "buildscape:experience_still";
+        com.kingodogo.buildscape.util.CommonId key = com.kingodogo.buildscape.platform.Services.PLATFORM.getFluidId(fluid);
         return key == null ? "" : key.toString();
     }
 
     public static Fluid fluidById(String fluidId) {
         if (fluidId == null || fluidId.isEmpty() || "none".equals(fluidId)) return Fluids.EMPTY;
-        if ("water".equals(fluidId)) return Fluids.WATER;
-        if ("lava".equals(fluidId)) return Fluids.LAVA;
+        if ("water".equals(fluidId) || "minecraft:water".equals(fluidId)) return Fluids.WATER;
+        if ("lava".equals(fluidId) || "minecraft:lava".equals(fluidId)) return Fluids.LAVA;
+        if ("experience".equals(fluidId) || "buildscape:experience".equals(fluidId)
+                || "buildscape:experience_still".equals(fluidId) || "buildscape:experience_flowing".equals(fluidId)) {
+            return com.kingodogo.buildscape.fluid.ModFluids.getStill();
+        }
         com.kingodogo.buildscape.util.CommonId key = com.kingodogo.buildscape.util.CommonId.tryParse(fluidId);
         if (key == null) return Fluids.EMPTY;
         return com.kingodogo.buildscape.platform.Services.PLATFORM.getFluid(key);

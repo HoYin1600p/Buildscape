@@ -260,6 +260,9 @@ public abstract class BaseRegistryAdapter implements IRegistryAdapter {
         if (Services.isVersionCluster("minecraft1182")) modEntities.putAll(Services.PLATFORM.createClusterEntityTypes());
         modEntities.put("colored_item_frame", Services.PLATFORM.getColoredItemFrameEntityType());
         modEntities.put("seat", Services.PLATFORM.getSeatEntityType());
+        if (Services.PLATFORM.getCushionEntityType() != null) {
+            modEntities.put("cushion", Services.PLATFORM.getCushionEntityType());
+        }
         modEntities.put("poplar_boat", Services.PLATFORM.getPoplarBoatEntityType());
         modEntities.put("wandering_homemaker", Services.PLATFORM.getWanderingHomemakerEntityType());
         modEntities.put("festive_wandering_homemaker", Services.PLATFORM.getFestiveWanderingHomemakerEntityType());

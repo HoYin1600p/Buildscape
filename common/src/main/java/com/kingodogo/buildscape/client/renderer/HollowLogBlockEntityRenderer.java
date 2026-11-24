@@ -140,9 +140,7 @@ public class HollowLogBlockEntityRenderer {
             boolean stationarySource = flow != null && flow.isSource() && inlet == null && outlets.size() != 1;
             flowing = flow != null && flow.hasWater() && !outlets.isEmpty() && !stationarySource;
         }
-        Fluid xpStill = Services.PLATFORM.getFluid(new CommonId("buildscape", "experience_still"));
-        Fluid xpFlow = Services.PLATFORM.getFluid(new CommonId("buildscape", "experience_flow"));
-        boolean xp = fluid == xpStill || fluid == xpFlow;
+        boolean xp = com.kingodogo.buildscape.fluid.ModFluids.isExperience(fluid);
         CommonId texture = fluid == Fluids.LAVA
                 ? new CommonId("minecraft", flowing ? "block/lava_flow" : "block/lava_still")
                 : xp ? new CommonId("buildscape", flowing ? "fluid/experience_flow" : "fluid/experience_still")
@@ -181,7 +179,9 @@ public class HollowLogBlockEntityRenderer {
         float b = (data.color & 255) / 255.0F;
         float a = 1;
         boolean connDown = state.getValue(HollowPipeBlock.DOWN);
+        boolean connUp = state.getValue(HollowPipeBlock.UP);
         float yFloor = connDown ? 0 : 0.125F;
+        float yCeil = connUp ? 1.0F : HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
         Direction inDir = data.inlet;
         Set<Direction> outDirs = data.outlets;
         boolean flowFromAbove = data.fromAbove, flowToAbove = data.toAbove;
@@ -191,8 +191,8 @@ public class HollowLogBlockEntityRenderer {
         boolean connNorth = state.getValue(HollowPipeBlock.NORTH), connSouth = state.getValue(HollowPipeBlock.SOUTH);
         boolean connWest = state.getValue(HollowPipeBlock.WEST), connEast = state.getValue(HollowPipeBlock.EAST);
         Direction.Axis pipeAxis = data.axis;
-        boolean isStraightX = (pipeAxis == Direction.Axis.X || connWest || connEast) && !connNorth && !connSouth && !flowIsVertical;
-        boolean isStraightZ = (pipeAxis == Direction.Axis.Z || connNorth || connSouth) && !connWest && !connEast && !flowIsVertical;
+        boolean isStraightX = !connDown && !connUp && !connNorth && !connSouth && (pipeAxis == Direction.Axis.X || connWest || connEast);
+        boolean isStraightZ = !connDown && !connUp && !connWest && !connEast && (pipeAxis == Direction.Axis.Z || connNorth || connSouth);
 
         if (isStraightX) {
             boolean openWest = HollowPipeBlock.isOpenEndpoint(state, Direction.WEST);
@@ -217,6 +217,8 @@ public class HollowLogBlockEntityRenderer {
                 yW = yIn;
                 yE = yIn;
             }
+            yW = Math.min(yCeil, yW);
+            yE = Math.min(yCeil, yE);
 
             float uZ1 = getSpriteU(sprite, z1);
             float uZ2 = getSpriteU(sprite, z2);
@@ -235,13 +237,24 @@ public class HollowLogBlockEntityRenderer {
                     uZ1, vX2,
                     light, overlay, 0, 1, 0);
 
+            renderQuad(poseStack, buffer,
+                    x1, yFloor, z1,
+                    x2, yFloor, z1,
+                    x2, yFloor, z2,
+                    x1, yFloor, z2,
+                    r, g, b, a,
+                    uZ1, vX1,
+                    uZ2, vX1,
+                    uZ2, vX2,
+                    uZ1, vX2,
+                    light, overlay, 0, -1, 0);
+
             if (!connWest && openWest && !data.hasNeighborFluid(Direction.WEST)) {
                 float uW0 = getSpriteU(sprite, z1);
                 float uW1 = getSpriteU(sprite, z2);
                 float vW0 = getSpriteV(sprite, yFloor);
                 float vW1 = getSpriteV(sprite, yW);
                 renderQuad(poseStack, buffer, x1, yW, z1, x1, yFloor, z1, x1, yFloor, z2, x1, yW, z2, r, g, b, a, uW0, vW1, uW0, vW0, uW1, vW0, uW1, vW1, light, overlay, -1, 0, 0);
-                renderQuad(poseStack, buffer, x1, yW, z2, x1, yFloor, z2, x1, yFloor, z1, x1, yW, z1, r, g, b, a, uW1, vW1, uW1, vW0, uW0, vW0, uW0, vW1, light, overlay, 1, 0, 0);
             }
 
             if (!connEast && openEast && !data.hasNeighborFluid(Direction.EAST)) {
@@ -250,7 +263,6 @@ public class HollowLogBlockEntityRenderer {
                 float vE0 = getSpriteV(sprite, yFloor);
                 float vE1 = getSpriteV(sprite, yE);
                 renderQuad(poseStack, buffer, x2, yE, z2, x2, yFloor, z2, x2, yFloor, z1, x2, yE, z1, r, g, b, a, uE1, vE1, uE1, vE0, uE0, vE0, uE0, vE1, light, overlay, 1, 0, 0);
-                renderQuad(poseStack, buffer, x2, yE, z1, x2, yFloor, z1, x2, yFloor, z2, x2, yE, z2, r, g, b, a, uE0, vE1, uE0, vE0, uE1, vE0, uE1, vE1, light, overlay, -1, 0, 0);
             }
             return;
         }
@@ -278,6 +290,8 @@ public class HollowLogBlockEntityRenderer {
                 yN = yIn;
                 yS = yIn;
             }
+            yN = Math.min(yCeil, yN);
+            yS = Math.min(yCeil, yS);
 
             float uX1 = getSpriteU(sprite, x1);
             float uX2 = getSpriteU(sprite, x2);
@@ -296,13 +310,24 @@ public class HollowLogBlockEntityRenderer {
                     uX2, vZ1,
                     light, overlay, 0, 1, 0);
 
+            renderQuad(poseStack, buffer,
+                    x1, yFloor, z1,
+                    x2, yFloor, z1,
+                    x2, yFloor, z2,
+                    x1, yFloor, z2,
+                    r, g, b, a,
+                    uX1, vZ1,
+                    uX2, vZ1,
+                    uX2, vZ2,
+                    uX1, vZ2,
+                    light, overlay, 0, -1, 0);
+
             if (!connNorth && openNorth && !data.hasNeighborFluid(Direction.NORTH)) {
                 float uN0 = getSpriteU(sprite, x1);
                 float uN1 = getSpriteU(sprite, x2);
                 float vN0 = getSpriteV(sprite, yFloor);
                 float vN1 = getSpriteV(sprite, yN);
                 renderQuad(poseStack, buffer, x2, yN, z1, x2, yFloor, z1, x1, yFloor, z1, x1, yN, z1, r, g, b, a, uN1, vN1, uN1, vN0, uN0, vN0, uN0, vN1, light, overlay, 0, 0, -1);
-                renderQuad(poseStack, buffer, x1, yN, z1, x1, yFloor, z1, x2, yFloor, z1, x2, yN, z1, r, g, b, a, uN0, vN1, uN0, vN0, uN1, vN0, uN1, vN1, light, overlay, 0, 0, 1);
             }
 
             if (!connSouth && openSouth && !data.hasNeighborFluid(Direction.SOUTH)) {
@@ -311,7 +336,6 @@ public class HollowLogBlockEntityRenderer {
                 float vS0 = getSpriteV(sprite, yFloor);
                 float vS1 = getSpriteV(sprite, yS);
                 renderQuad(poseStack, buffer, x1, yS, z2, x1, yFloor, z2, x2, yFloor, z2, x2, yS, z2, r, g, b, a, uS0, vS1, uS0, vS0, uS1, vS0, uS1, vS1, light, overlay, 0, 0, 1);
-                renderQuad(poseStack, buffer, x2, yS, z2, x2, yFloor, z2, x1, yFloor, z2, x1, yS, z2, r, g, b, a, uS1, vS1, uS1, vS0, uS0, vS0, uS0, vS1, light, overlay, 0, 0, -1);
             }
             return;
         }
@@ -324,9 +348,10 @@ public class HollowLogBlockEntityRenderer {
         float x2 = (connEast  || openEast)  ? 1.0F : (0.875F - ZB);
         float z1 = (connNorth || openNorth) ? 0.0F : (0.125F + ZB);
         float z2 = (connSouth || openSouth) ? 1.0F : (0.875F - ZB);
-        float yTop = flowIsVertical ? 1.0F : yCenter;
+        float yTop = connUp ? (flowIsVertical && !connNorth && !connSouth && !connWest && !connEast ? 1.0F : yCeil)
+                : Math.min(yCenter, HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT);
 
-        if (!flowToAbove && !flowFromAbove) {
+        if (!connUp) {
             float uX1 = getSpriteU(sprite, x1);
             float uX2 = getSpriteU(sprite, x2);
             float vZ1 = getSpriteV(sprite, z1);
@@ -344,13 +369,92 @@ public class HollowLogBlockEntityRenderer {
                     light, overlay, 0, 1, 0);
         }
 
+        if (!connDown) {
+            float uX1 = getSpriteU(sprite, x1);
+            float uX2 = getSpriteU(sprite, x2);
+            float vZ1 = getSpriteV(sprite, z1);
+            float vZ2 = getSpriteV(sprite, z2);
+            renderQuad(poseStack, buffer,
+                    x1, yFloor, z1,
+                    x2, yFloor, z1,
+                    x2, yFloor, z2,
+                    x1, yFloor, z2,
+                    r, g, b, a,
+                    uX1, vZ1,
+                    uX2, vZ1,
+                    uX2, vZ2,
+                    uX1, vZ2,
+                    light, overlay, 0, -1, 0);
+        } else {
+            if (connWest || openWest) {
+                float uW0 = getSpriteU(sprite, z1);
+                float uW1 = getSpriteU(sprite, z2);
+                float vW0 = getSpriteV(sprite, x1);
+                float vW1 = getSpriteV(sprite, 0.125F);
+                renderQuad(poseStack, buffer, x1, 0.125F, z1, 0.125F, 0.125F, z1, 0.125F, 0.125F, z2, x1, 0.125F, z2, r, g, b, a, uW0, vW0, uW0, vW1, uW1, vW1, uW1, vW0, light, overlay, 0, -1, 0);
+            }
+            if (connEast || openEast) {
+                float uE0 = getSpriteU(sprite, z1);
+                float uE1 = getSpriteU(sprite, z2);
+                float vE0 = getSpriteV(sprite, 0.875F);
+                float vE1 = getSpriteV(sprite, x2);
+                renderQuad(poseStack, buffer, 0.875F, 0.125F, z1, x2, 0.125F, z1, x2, 0.125F, z2, 0.875F, 0.125F, z2, r, g, b, a, uE0, vE0, uE0, vE1, uE1, vE1, uE1, vE0, light, overlay, 0, -1, 0);
+            }
+            if (connNorth || openNorth) {
+                float uN0 = getSpriteU(sprite, x1);
+                float uN1 = getSpriteU(sprite, x2);
+                float vN0 = getSpriteV(sprite, z1);
+                float vN1 = getSpriteV(sprite, 0.125F);
+                renderQuad(poseStack, buffer, x1, 0.125F, z1, x2, 0.125F, z1, x2, 0.125F, 0.125F, x1, 0.125F, 0.125F, r, g, b, a, uN0, vN0, uN1, vN0, uN1, vN1, uN0, vN1, light, overlay, 0, -1, 0);
+            }
+            if (connSouth || openSouth) {
+                float uS0 = getSpriteU(sprite, x1);
+                float uS1 = getSpriteU(sprite, x2);
+                float vS0 = getSpriteV(sprite, 0.875F);
+                float vS1 = getSpriteV(sprite, z2);
+                renderQuad(poseStack, buffer, x1, 0.125F, 0.875F, x2, 0.125F, 0.875F, x2, 0.125F, z2, x1, 0.125F, z2, r, g, b, a, uS0, vS0, uS1, vS0, uS1, vS1, uS0, vS1, light, overlay, 0, -1, 0);
+            }
+        }
+
+        if (connDown || connUp) {
+            float cY0 = connDown ? 0.0F : 0.125F;
+            float cY1 = connUp ? 1.0F : yTop;
+            if (!connWest && !openWest) {
+                float uZ1 = getSpriteU(sprite, z1);
+                float uZ2 = getSpriteU(sprite, z2);
+                float vY0 = getSpriteV(sprite, cY0);
+                float vY1 = getSpriteV(sprite, cY1);
+                renderQuad(poseStack, buffer, 0.125F, cY1, z1, 0.125F, cY0, z1, 0.125F, cY0, z2, 0.125F, cY1, z2, r, g, b, a, uZ1, vY1, uZ1, vY0, uZ2, vY0, uZ2, vY1, light, overlay, -1, 0, 0);
+            }
+            if (!connEast && !openEast) {
+                float uZ1 = getSpriteU(sprite, z1);
+                float uZ2 = getSpriteU(sprite, z2);
+                float vY0 = getSpriteV(sprite, cY0);
+                float vY1 = getSpriteV(sprite, cY1);
+                renderQuad(poseStack, buffer, 0.875F, cY1, z2, 0.875F, cY0, z2, 0.875F, cY0, z1, 0.875F, cY1, z1, r, g, b, a, uZ2, vY1, uZ2, vY0, uZ1, vY0, uZ1, vY1, light, overlay, 1, 0, 0);
+            }
+            if (!connNorth && !openNorth) {
+                float uX1 = getSpriteU(sprite, x1);
+                float uX2 = getSpriteU(sprite, x2);
+                float vY0 = getSpriteV(sprite, cY0);
+                float vY1 = getSpriteV(sprite, cY1);
+                renderQuad(poseStack, buffer, x2, cY1, 0.125F, x2, cY0, 0.125F, x1, cY0, 0.125F, x1, cY1, 0.125F, r, g, b, a, uX2, vY1, uX2, vY0, uX1, vY0, uX1, vY1, light, overlay, 0, 0, -1);
+            }
+            if (!connSouth && !openSouth) {
+                float uX1 = getSpriteU(sprite, x1);
+                float uX2 = getSpriteU(sprite, x2);
+                float vY0 = getSpriteV(sprite, cY0);
+                float vY1 = getSpriteV(sprite, cY1);
+                renderQuad(poseStack, buffer, x1, cY1, 0.875F, x1, cY0, 0.875F, x2, cY0, 0.875F, x2, cY1, 0.875F, r, g, b, a, uX1, vY1, uX1, vY0, uX2, vY0, uX2, vY1, light, overlay, 0, 0, 1);
+            }
+        }
+
         if (!connNorth && openNorth && !data.hasNeighborFluid(Direction.NORTH)) {
             float uN0 = getSpriteU(sprite, x1);
             float uN1 = getSpriteU(sprite, x2);
             float vN0 = getSpriteV(sprite, yFloor);
             float vN1 = getSpriteV(sprite, yTop);
             renderQuad(poseStack, buffer, x2, yTop, z1, x2, yFloor, z1, x1, yFloor, z1, x1, yTop, z1, r, g, b, a, uN1, vN1, uN1, vN0, uN0, vN0, uN0, vN1, light, overlay, 0, 0, -1);
-            renderQuad(poseStack, buffer, x1, yTop, z1, x1, yFloor, z1, x2, yFloor, z1, x2, yTop, z1, r, g, b, a, uN0, vN1, uN0, vN0, uN1, vN0, uN1, vN1, light, overlay, 0, 0, 1);
         }
 
         if (!connSouth && openSouth && !data.hasNeighborFluid(Direction.SOUTH)) {
@@ -359,7 +463,6 @@ public class HollowLogBlockEntityRenderer {
             float vS0 = getSpriteV(sprite, yFloor);
             float vS1 = getSpriteV(sprite, yTop);
             renderQuad(poseStack, buffer, x1, yTop, z2, x1, yFloor, z2, x2, yFloor, z2, x2, yTop, z2, r, g, b, a, uS0, vS1, uS0, vS0, uS1, vS0, uS1, vS1, light, overlay, 0, 0, 1);
-            renderQuad(poseStack, buffer, x2, yTop, z2, x2, yFloor, z2, x1, yFloor, z2, x1, yTop, z2, r, g, b, a, uS1, vS1, uS1, vS0, uS0, vS0, uS0, vS1, light, overlay, 0, 0, -1);
         }
 
         if (!connWest && openWest && !data.hasNeighborFluid(Direction.WEST)) {
@@ -368,7 +471,6 @@ public class HollowLogBlockEntityRenderer {
             float vW0 = getSpriteV(sprite, yFloor);
             float vW1 = getSpriteV(sprite, yTop);
             renderQuad(poseStack, buffer, x1, yTop, z1, x1, yFloor, z1, x1, yFloor, z2, x1, yTop, z2, r, g, b, a, uW0, vW1, uW0, vW0, uW1, vW0, uW1, vW1, light, overlay, -1, 0, 0);
-            renderQuad(poseStack, buffer, x1, yTop, z2, x1, yFloor, z2, x1, yFloor, z1, x1, yTop, z1, r, g, b, a, uW1, vW1, uW1, vW0, uW0, vW0, uW0, vW1, light, overlay, 1, 0, 0);
         }
 
         if (!connEast && openEast && !data.hasNeighborFluid(Direction.EAST)) {
@@ -377,14 +479,20 @@ public class HollowLogBlockEntityRenderer {
             float vE0 = getSpriteV(sprite, yFloor);
             float vE1 = getSpriteV(sprite, yTop);
             renderQuad(poseStack, buffer, x2, yTop, z2, x2, yFloor, z2, x2, yFloor, z1, x2, yTop, z1, r, g, b, a, uE1, vE1, uE1, vE0, uE0, vE0, uE0, vE1, light, overlay, 1, 0, 0);
-            renderQuad(poseStack, buffer, x2, yTop, z1, x2, yFloor, z1, x2, yFloor, z2, x2, yTop, z2, r, g, b, a, uE0, vE1, uE0, vE0, uE1, vE0, uE1, vE1, light, overlay, -1, 0, 0);
         }
+    }
+
+    private static boolean isMatchingFluid(Fluid a, Fluid b) {
+        if (a == null || b == null) return false;
+        if (a.isSame(b)) return true;
+        return com.kingodogo.buildscape.fluid.ModFluids.isExperience(a)
+                && com.kingodogo.buildscape.fluid.ModFluids.isExperience(b);
     }
 
     public static float getOwnFluidHeight(BlockGetter level, BlockState state, BlockPos pos, Fluid fluid) {
         if (state.getBlock() instanceof HollowPipeBlock) {
             Fluid contained = HollowPipeBlock.getContainedFluid(state, level.getBlockEntity(pos));
-            if (!contained.isSame(fluid)) return -1.0F;
+            if (!isMatchingFluid(contained, fluid)) return -1.0F;
             if (HollowPipeBlock.getSourceFluid(state, level.getBlockEntity(pos)) != Fluids.EMPTY) {
                 return HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
             }
@@ -395,7 +503,7 @@ public class HollowLogBlockEntityRenderer {
             }
         } else if (state.getBlock() instanceof HollowLogBlock) {
             Fluid contained = HollowPipeBlock.getContainedFluid(state, level.getBlockEntity(pos));
-            if (!contained.isSame(fluid)) return -1.0F;
+            if (!isMatchingFluid(contained, fluid)) return -1.0F;
             if (level.getBlockEntity(pos) instanceof HollowLogBlockEntity entity
                     && entity.getPipeFlowState().hasFluid()) {
                 boolean source = HollowPipeBlock.getSourceFluid(state, entity) != Fluids.EMPTY;
@@ -405,7 +513,7 @@ public class HollowLogBlockEntityRenderer {
             return HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
         }
         FluidState fs = state.getFluidState();
-        if (fs.getType().isSame(fluid)) {
+        if (isMatchingFluid(fs.getType(), fluid)) {
             return fs.getOwnHeight();
         }
         return 8.0F / 9.0F;
@@ -418,7 +526,7 @@ public class HollowLogBlockEntityRenderer {
 
         if (neighborState.getBlock() instanceof HollowPipeBlock) {
             Fluid contained = HollowPipeBlock.getContainedFluid(neighborState, level.getBlockEntity(neighborPos));
-            if (!contained.isSame(fluid)) return -1.0F;
+            if (!isMatchingFluid(contained, fluid)) return -1.0F;
             if (HollowPipeBlock.getSourceFluid(neighborState, level.getBlockEntity(neighborPos)) != Fluids.EMPTY) {
                 return HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
             }
@@ -434,7 +542,7 @@ public class HollowLogBlockEntityRenderer {
             Direction.Axis nAxis = neighborState.hasProperty(HollowLogBlock.AXIS) ? neighborState.getValue(HollowLogBlock.AXIS) : Direction.Axis.Y;
             if (nAxis == dir.getAxis()) {
                 Fluid nFluid = HollowPipeBlock.getContainedFluid(neighborState, level.getBlockEntity(neighborPos));
-                if (nFluid != Fluids.EMPTY && (fluid == null || nFluid.isSame(fluid))) {
+                if (nFluid != Fluids.EMPTY && (fluid == null || isMatchingFluid(nFluid, fluid))) {
                     if (level.getBlockEntity(neighborPos) instanceof HollowLogBlockEntity entity
                             && entity.getPipeFlowState().hasFluid()) {
                         boolean source = HollowPipeBlock.getSourceFluid(neighborState, entity) != Fluids.EMPTY;
@@ -448,9 +556,9 @@ public class HollowLogBlockEntityRenderer {
         }
 
         FluidState nFluidState = neighborState.getFluidState();
-        if (nFluidState.getType().isSame(fluid)) {
+        if (isMatchingFluid(nFluidState.getType(), fluid)) {
             BlockState aboveState = level.getBlockState(neighborPos.above());
-            if (aboveState.getFluidState().getType().isSame(fluid)) {
+            if (isMatchingFluid(aboveState.getFluidState().getType(), fluid)) {
                 return 1.0F;
             }
             return nFluidState.getOwnHeight();
@@ -500,7 +608,7 @@ public class HollowLogBlockEntityRenderer {
                     || (neighborState.hasProperty(HollowPipeBlock.getPropertyForDirection(dir.getOpposite()))
                         && neighborState.getValue(HollowPipeBlock.getPropertyForDirection(dir.getOpposite())))) {
                 Fluid neighborFluid = HollowPipeBlock.getContainedFluid(neighborState, level.getBlockEntity(neighborPos));
-                if (neighborFluid != Fluids.EMPTY && (fluid == null || neighborFluid.isSame(fluid))) {
+                if (neighborFluid != Fluids.EMPTY && (fluid == null || isMatchingFluid(neighborFluid, fluid))) {
                     return true;
                 }
             }
@@ -517,14 +625,14 @@ public class HollowLogBlockEntityRenderer {
                     return false;
                 }
                 Fluid neighborFluid = HollowPipeBlock.getContainedFluid(neighborState, level.getBlockEntity(neighborPos));
-                if (neighborFluid != Fluids.EMPTY && (fluid == null || neighborFluid.isSame(fluid))) {
+                if (neighborFluid != Fluids.EMPTY && (fluid == null || isMatchingFluid(neighborFluid, fluid))) {
                     return true;
                 }
             }
             return false;
         }
         FluidState fs = level.getFluidState(neighborPos);
-        return fs != null && !fs.isEmpty() && (fluid == null || fs.getType().isSame(fluid));
+        return fs != null && !fs.isEmpty() && (fluid == null || isMatchingFluid(fs.getType(), fluid));
     }
 
     private static void renderQuad(

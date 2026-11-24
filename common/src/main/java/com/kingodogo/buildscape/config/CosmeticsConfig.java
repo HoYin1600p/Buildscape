@@ -24,6 +24,7 @@ public class CosmeticsConfig {
     private final Map<String, Map<String, String>> playerCosmeticColors = new HashMap<>();
     private final Map<String, Boolean> playerCreativeTreeBreaker = new HashMap<>();
     private final Map<String, Boolean> playerShulkerPreview = new HashMap<>();
+    private final Map<String, Boolean> playerCushionEntities = new HashMap<>();
 
     private Integer colorPickerX = null;
     private Integer colorPickerY = null;
@@ -225,6 +226,12 @@ public class CosmeticsConfig {
                 } else {
                     playerShulkerPreview.put(uuidStr, true);
                 }
+
+                if (nbt.contains("cushion_entities")) {
+                    playerCushionEntities.put(uuidStr, Services.PLATFORM.getTagBoolean(nbt, "cushion_entities", false));
+                } else {
+                    playerCushionEntities.put(uuidStr, false);
+                }
             }
         } catch (Exception e) {
             BuildscapeCommon.logError("CosmeticsConfig: Failed to read data for " + uuidStr, e);
@@ -232,6 +239,7 @@ public class CosmeticsConfig {
             playerCosmeticColors.putIfAbsent(uuidStr, null);
             playerCreativeTreeBreaker.putIfAbsent(uuidStr, false);
             playerShulkerPreview.putIfAbsent(uuidStr, true);
+            playerCushionEntities.putIfAbsent(uuidStr, false);
         }
     }
 
@@ -271,6 +279,11 @@ public class CosmeticsConfig {
         Boolean shulkerPreview = playerShulkerPreview.get(uuidStr);
         if (shulkerPreview != null) {
             nbt.putBoolean("shulker_preview", shulkerPreview);
+        }
+
+        Boolean cushionEntities = playerCushionEntities.get(uuidStr);
+        if (cushionEntities != null) {
+            nbt.putBoolean("cushion_entities", cushionEntities);
         }
 
         try {
@@ -392,6 +405,19 @@ public class CosmeticsConfig {
     public void setShulkerPreview(UUID playerUuid, boolean enabled) {
         String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
         playerShulkerPreview.put(uuidStr, enabled);
+        savePlayer(playerUuid);
+    }
+
+    public boolean getCushionEntities(UUID playerUuid) {
+        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        if (!playerCushionEntities.containsKey(uuidStr)) loadPlayer(playerUuid);
+        return playerCushionEntities.getOrDefault(uuidStr, com.kingodogo.buildscape.block.CushionBlock.USE_CUSHION_ENTITIES);
+    }
+
+    public void setCushionEntities(UUID playerUuid, boolean enabled) {
+        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        playerCushionEntities.put(uuidStr, enabled);
+        com.kingodogo.buildscape.block.CushionBlock.USE_CUSHION_ENTITIES = enabled;
         savePlayer(playerUuid);
     }
 

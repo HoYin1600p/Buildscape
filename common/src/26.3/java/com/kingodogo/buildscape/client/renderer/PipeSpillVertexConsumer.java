@@ -12,8 +12,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
-
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,8 +64,7 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
                 && entity.getPipeFlowState().hasFlowDirection(Direction.DOWN)) {
             return List.of(new Outlet(Direction.UP, 1.0));
         }
-        if (fluid.getValue(net.minecraft.world.level.material.FlowingFluid.FALLING)
-                || level.getFluidState(pos.above()).getType().isSame(fluid.getType())) {
+        if (level.getFluidState(pos.above()).getType().isSame(fluid.getType())) {
             return List.of();
         }
         List<Outlet> outlets = null;
@@ -79,8 +79,12 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
                     continue;
                 }
                 PipeFlowState flow = entity.getPipeFlowState();
+                Fluid containedFluid = flow != null && flow.hasFluid() ? WorldPipeTopologyAccess.fluidById(flow.getFluidId()) : Fluids.EMPTY;
+                boolean fluidMatches = containedFluid.isSame(fluid.getType())
+                        || (com.kingodogo.buildscape.fluid.ModFluids.isExperience(containedFluid)
+                            && com.kingodogo.buildscape.fluid.ModFluids.isExperience(fluid.getType()));
                 if (flow == null || !flow.hasFluid()
-                        || !WorldPipeTopologyAccess.fluidById(flow.getFluidId()).isSame(fluid.getType())
+                        || !fluidMatches
                         || !flow.hasFlowDirection(exit) || flow.getDistance() >= 7
                         || flow.getInflowDirection() == Direction.UP
                         || (flow.hasFlowDirection(Direction.UP) && flow.getBubbleColumn() == BubbleColumnState.UP)) {
@@ -177,10 +181,11 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
             for (double across : new double[]{OPEN_MIN, OPEN_MAX}) {
                 double sideX = outlet.direction.getAxis() == Direction.Axis.X ? edgeX : across;
                 double sideZ = outlet.direction.getAxis() == Direction.Axis.Z ? edgeZ : across;
-                gap = Math.max(gap, outlet.height - (sample(corners, sideX, sideZ).y - baseY));
+                double edgeG = outlet.height - (sample(corners, sideX, sideZ).y - baseY);
+                if (Math.abs(edgeG) > Math.abs(gap)) gap = edgeG;
             }
-            if (gap <= 0.001) continue;
-            double length = Math.min(0.875, Math.max(0.25, gap * 2.0));
+            if (Math.abs(gap) <= 0.001) continue;
+            double length = Math.min(0.875, Math.max(0.25, Math.abs(gap) * 2.0));
             spills.add(new Spill(outlet, length));
             cuts.add(length);
             cuts.add(1.0 - length);
@@ -235,8 +240,8 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
             double edgeX = direction == Direction.WEST ? 0 : direction == Direction.EAST ? 1 : x;
             double edgeZ = direction == Direction.NORTH ? 0 : direction == Direction.SOUTH ? 1 : z;
             double edgeHeight = sample(corners, edgeX, edgeZ).y;
-            double lift = Math.max(0, baseY + spill.outlet.height - edgeHeight);
-            height = Math.max(height, original.y + lift * widthWeight * alongWeight);
+            double diff = (baseY + spill.outlet.height) - edgeHeight;
+            height = original.y + diff * widthWeight * alongWeight;
         }
         return original.at(original.x, height, original.z, original.u, original.v);
     }

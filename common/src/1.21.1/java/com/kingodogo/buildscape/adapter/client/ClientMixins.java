@@ -125,7 +125,7 @@ public final class ClientMixins {
         Button configButton = Button.builder(
                 Component.literal("B"),
                 button -> Minecraft.getInstance().setScreen(Services.PLATFORM.createConfigScreen(screen))
-        ).bounds(targetX - 2, targetY, 20, 20).build();
+        ).bounds(targetX - 2, targetY, 20, 20).tooltip(net.minecraft.client.gui.components.Tooltip.create(Component.translatable("buildscape.config.title"))).build();
         addWidgetToScreen(screen, configButton);
     }
 

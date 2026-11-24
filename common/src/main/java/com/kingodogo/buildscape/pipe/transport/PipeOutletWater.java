@@ -14,7 +14,8 @@ public final class PipeOutletWater {
         if (pipe.getBlock() instanceof HollowPipeBlock) {
             open = HollowPipeBlock.isOpenEndpoint(pipe, exit);
             containedFluid = pipe.getValue(HollowPipeBlock.WATERLOGGED)
-                    || pipe.getValue(HollowPipeBlock.LAVA_LOGGED);
+                    || pipe.getValue(HollowPipeBlock.LAVA_LOGGED)
+                    || (flow != null && flow.hasFluid());
         } else {
             return 0;
         }

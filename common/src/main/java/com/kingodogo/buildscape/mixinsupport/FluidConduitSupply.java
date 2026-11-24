@@ -41,7 +41,7 @@ public final class FluidConduitSupply {
             var flow = entity.getPipeFlowState();
             if (flow == null || !flow.hasFluid()) continue;
             Fluid suppliedFluid = WorldPipeTopologyAccess.fluidById(flow.getFluidId());
-            if (!flowingFluid.isSame(suppliedFluid)) continue;
+            if (!flowingFluid.isSame(suppliedFluid) && !(com.kingodogo.buildscape.fluid.ModFluids.isExperience(flowingFluid) && com.kingodogo.buildscape.fluid.ModFluids.isExperience(suppliedFluid))) continue;
             int supply = PipeOutletWater.amount(pipe, flow, direction.getOpposite());
             if (supply == 0 || !wallPasser.canPass(direction, pos, state, pipePos, pipe)) continue;
             if (direction == Direction.UP) return flowingFluid.getFlowing(8, true);

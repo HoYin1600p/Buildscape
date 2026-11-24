@@ -105,6 +105,23 @@ public final class RenderFactory {
                         new ResourceLocation(BuildscapeCommon.MOD_ID, "textures/entity/boat/poplar.png")));
         registrar.registerEntity((EntityType<Entity>) Services.PLATFORM.getSeatEntityType(),
                 net.minecraft.client.renderer.entity.NoopRenderer::new);
+        registrar.registerEntity((EntityType<PlatformAdapterBase.CushionEntityImpl>) Services.PLATFORM.getCushionEntityType(),
+                context -> new EntityRenderer<PlatformAdapterBase.CushionEntityImpl>(context) {
+                    @Override public ResourceLocation getTextureLocation(PlatformAdapterBase.CushionEntityImpl entity) {
+                        return net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS;
+                    }
+                    @Override public void render(PlatformAdapterBase.CushionEntityImpl entity, float yaw, float partialTick,
+                            PoseStack pose, MultiBufferSource buffers, int light) {
+                        net.minecraft.world.level.block.state.BlockState state = entity.getRenderState();
+                        if (state != null && state.getRenderShape() == net.minecraft.world.level.block.RenderShape.MODEL) {
+                            pose.pushPose();
+                            pose.translate(-0.5D, 0.0D, -0.5D);
+                            net.minecraft.client.Minecraft.getInstance().getBlockRenderer().renderSingleBlock(state, pose, buffers, light, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
+                            pose.popPose();
+                        }
+                        super.render(entity, yaw, partialTick, pose, buffers, light);
+                    }
+                });
         registrar.registerEntity((EntityType<PlatformAdapterBase.FallingIcicleEntityImpl>) Services.PLATFORM.getFallingIcicleEntityType(),
                 context -> new EntityRenderer<PlatformAdapterBase.FallingIcicleEntityImpl>(context) {
                     @Override public ResourceLocation getTextureLocation(PlatformAdapterBase.FallingIcicleEntityImpl entity) {

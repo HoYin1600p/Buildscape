@@ -55,7 +55,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty LAVA_LOGGED = BooleanProperty.create("lava_logged");
-    public static final float WATER_SOURCE_VISUAL_HEIGHT = 14.0F / 16.0F;
+    public static final float WATER_SOURCE_VISUAL_HEIGHT = 13.5F / 16.0F;
     public static final IntegerProperty WATER_LEVEL = IntegerProperty.create("water_level", 0, 7);
 
     public static final BooleanProperty DOWN  = BlockStateProperties.DOWN;
@@ -408,6 +408,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         if (state.getFluidState().isSource()) return null;
         Fluid existing = state.getFluidState().getType();
         if (existing != Fluids.EMPTY && !fluid.isSame(existing)
+                && !(com.kingodogo.buildscape.fluid.ModFluids.isExperience(fluid) && com.kingodogo.buildscape.fluid.ModFluids.isExperience(existing))
                 && com.kingodogo.buildscape.fluid.ModFluids.cannotMix(fluid, existing)) {
             return null;
         }

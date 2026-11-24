@@ -10,6 +10,7 @@ public class ModEntities {
     public static final RegistrySupplier<EntityDefinition> MANGROVE_BOAT = registerLegacy("mangrove_boat");
     public static final RegistrySupplier<EntityDefinition> COLORED_ITEM_FRAME = register("colored_item_frame");
     public static final RegistrySupplier<EntityDefinition> SEAT_ENTITY = register("seat");
+    public static final RegistrySupplier<EntityDefinition> CUSHION = register("cushion");
     public static final RegistrySupplier<EntityDefinition> POPLAR_BOAT = register("poplar_boat");
     public static final RegistrySupplier<EntityDefinition> WANDERING_HOMEMAKER = register("wandering_homemaker");
     public static final RegistrySupplier<EntityDefinition> FESTIVE_WANDERING_HOMEMAKER = register("festive_wandering_homemaker");

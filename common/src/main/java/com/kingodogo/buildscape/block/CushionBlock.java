@@ -32,6 +32,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.List;
 public class CushionBlock extends Block implements SimpleWaterloggedBlock, ICommonInteractable {
+    public static boolean USE_CUSHION_ENTITIES = false;
     public static final EnumProperty<Half> HALF = BlockStateProperties.HALF;
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 

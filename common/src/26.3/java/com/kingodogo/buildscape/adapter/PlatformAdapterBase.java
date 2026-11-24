@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.adapter;
 import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
+import com.kingodogo.buildscape.entity.CushionEntity;
 import com.kingodogo.buildscape.entity.FallingIcicleEntity;
 import com.kingodogo.buildscape.entity.FestiveStockingEntity;
 import com.kingodogo.buildscape.entity.FestiveWanderingHomemakerEntity;
@@ -409,6 +410,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     @Override
     public CommonId getFluidId(Fluid fluid) {
         if (fluid == null) return null;
+        if (fluid == com.kingodogo.buildscape.adapter.fluid.ExperienceFluids.still()) return new CommonId("buildscape", "experience_still");
+        if (fluid == com.kingodogo.buildscape.adapter.fluid.ExperienceFluids.flowing()) return new CommonId("buildscape", "experience_flowing");
         Identifier rl = BuiltInRegistries.FLUID.getKey(fluid);
         return rl != null ? new CommonId(rl.getNamespace(), rl.getPath()) : null;
     }
@@ -505,6 +508,22 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
                     .sized(0.1F, 0.1F).clientTrackingRange(10).updateInterval(20).build(entityKey("seat"));
         }
         return seatType;
+    }
+
+    protected EntityType<CushionEntityImpl> cushionType;
+
+    @Override
+    public Entity createCushionEntity(Level level, BlockPos supportPos, double localX, double localZ, double supportHeight, net.minecraft.world.item.DyeColor color) {
+        return new CushionEntityImpl(level, supportPos, localX, localZ, supportHeight, color);
+    }
+
+    @Override
+    public EntityType<?> getCushionEntityType() {
+        if (cushionType == null) {
+            cushionType = EntityType.Builder.<CushionEntityImpl>of(CushionEntityImpl::new, MobCategory.MISC)
+                    .sized(1.0F, 0.1875F).clientTrackingRange(10).updateInterval(20).build(entityKey("cushion"));
+        }
+        return cushionType;
     }
 
     @Override
@@ -3485,6 +3504,132 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
                     this.discard();
                 }
             }
+        }
+    }
+
+    public static class CushionEntityImpl extends Entity implements CushionEntity {
+        private static final EntityDataAccessor<Integer> COLOR = SynchedEntityData.defineId(CushionEntityImpl.class, EntityDataSerializers.INT);
+        private static final int SUPPORT_CHECK_INTERVAL = 20;
+
+        private BlockPos supportPos = BlockPos.ZERO;
+        private double supportLocalX = 0.5;
+        private double supportLocalZ = 0.5;
+
+        public CushionEntityImpl(EntityType<?> type, Level level) {
+            super(type, level);
+            this.noPhysics = true;
+        }
+
+        public CushionEntityImpl(Level level, BlockPos supportPos, double localX, double localZ, double supportHeight, net.minecraft.world.item.DyeColor color) {
+            this(Services.PLATFORM.getCushionEntityType(), level);
+            this.supportPos = supportPos.immutable();
+            this.supportLocalX = localX;
+            this.supportLocalZ = localZ;
+            this.entityData.set(COLOR, color.getId());
+            this.setPos(supportPos.getX() + 0.5, supportPos.getY() + supportHeight, supportPos.getZ() + 0.5);
+        }
+
+        @Override
+        protected void defineSynchedData(SynchedEntityData.Builder builder) {
+            builder.define(COLOR, net.minecraft.world.item.DyeColor.WHITE.getId());
+        }
+
+        @Override
+        protected void readAdditionalSaveData(ValueInput input) {
+            this.supportPos = BlockPos.of(input.getLongOr("SupportPos", 0L));
+            this.supportLocalX = input.getDoubleOr("SupportLocalX", 0.5);
+            this.supportLocalZ = input.getDoubleOr("SupportLocalZ", 0.5);
+            this.entityData.set(COLOR, input.getIntOr("Color", 0));
+        }
+
+        @Override
+        protected void addAdditionalSaveData(ValueOutput output) {
+            output.putLong("SupportPos", this.supportPos.asLong());
+            output.putDouble("SupportLocalX", this.supportLocalX);
+            output.putDouble("SupportLocalZ", this.supportLocalZ);
+            output.putInt("Color", this.entityData.get(COLOR));
+        }
+
+        @Override
+        public void tick() {
+            super.tick();
+            if (!this.level().isClientSide() && this.tickCount % SUPPORT_CHECK_INTERVAL == 0) {
+                this.refreshSupport();
+            }
+        }
+
+        private void refreshSupport() {
+            BlockState support = this.level().getBlockState(this.supportPos);
+            double supportHeight = com.kingodogo.buildscape.block.CushionSurface.topAt(
+                    support.getShape(this.level(), this.supportPos), this.supportLocalX, this.supportLocalZ);
+            if (Double.isNaN(supportHeight)) {
+                this.dropAndDiscard();
+                return;
+            }
+            this.setPos(this.supportPos.getX() + 0.5, this.supportPos.getY() + supportHeight, this.supportPos.getZ() + 0.5);
+        }
+
+        @Override
+        public net.minecraft.world.InteractionResult interact(net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.Vec3 location) {
+            if (hand != net.minecraft.world.InteractionHand.MAIN_HAND || player.isShiftKeyDown()) {
+                return net.minecraft.world.InteractionResult.PASS;
+            }
+            if (player.isPassenger() && !(player.getVehicle() instanceof SeatEntity)) {
+                return net.minecraft.world.InteractionResult.PASS;
+            }
+            java.util.List<Entity> seats = this.level().getEntitiesOfClass(Entity.class, this.getBoundingBox(),
+                    seat -> seat instanceof SeatEntity && !seat.getPassengers().isEmpty());
+            if (!seats.isEmpty()) {
+                return net.minecraft.world.InteractionResult.PASS;
+            }
+            if (!this.level().isClientSide()) {
+                SeatEntity.createSeat(this.level(), this.getX(), this.getY() - 0.075, this.getZ(), player);
+            }
+            return Services.PLATFORM.sidedSuccess(this.level().isClientSide());
+        }
+
+        @Override
+        public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+            if (!this.isRemoved()) {
+                this.dropAndDiscard();
+            }
+            return true;
+        }
+
+        private void dropAndDiscard() {
+            String itemId = this.getColor().getName() + "_cushion";
+            net.minecraft.world.item.Item item = Services.PLATFORM.getItem(new com.kingodogo.buildscape.util.CommonId("buildscape", itemId));
+            if (item != null && this.level() instanceof ServerLevel sLevel) {
+                this.spawnAtLocation(sLevel, new net.minecraft.world.item.ItemStack(item));
+            }
+            this.discard();
+        }
+
+        @Override
+        public boolean isPickable() {
+            return !this.isRemoved();
+        }
+
+        @Override
+        public boolean isNoGravity() {
+            return true;
+        }
+
+        @Override
+        public net.minecraft.world.item.DyeColor getColor() {
+            return net.minecraft.world.item.DyeColor.byId(this.entityData.get(COLOR));
+        }
+
+        @Override
+        public BlockPos getSupportPos() {
+            return this.supportPos;
+        }
+
+        @Override
+        public BlockState getRenderState() {
+            String blockId = this.getColor().getName() + "_cushion";
+            net.minecraft.world.level.block.Block block = Services.PLATFORM.getBlock(new com.kingodogo.buildscape.util.CommonId("buildscape", blockId));
+            return block != null ? block.defaultBlockState() : net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
         }
     }
 

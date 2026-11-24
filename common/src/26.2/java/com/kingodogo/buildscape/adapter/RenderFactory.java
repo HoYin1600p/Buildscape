@@ -56,6 +56,8 @@ public final class RenderFactory {
                 context -> new com.kingodogo.buildscape.adapter.client.BuildscapeBoatRenderer(context, "poplar"));
         registrar.register((EntityType<PlatformAdapterBase.SeatEntityImpl>) Services.PLATFORM.getSeatEntityType(),
                 net.minecraft.client.renderer.entity.NoopRenderer::new);
+        registrar.register((EntityType<PlatformAdapterBase.CushionEntityImpl>) Services.PLATFORM.getCushionEntityType(),
+                com.kingodogo.buildscape.adapter.client.CushionEntityRenderer::new);
         registrar.register((EntityType<PlatformAdapterBase.FallingIcicleEntityImpl>) Services.PLATFORM.getFallingIcicleEntityType(),
                 com.kingodogo.buildscape.adapter.client.FallingIcicleEntityRenderer::new);
         registrar.register((EntityType<PlatformAdapterBase.FestiveStockingEntityImpl>) Services.PLATFORM.getFestiveStockingEntityType(),

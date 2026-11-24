@@ -46,7 +46,19 @@ public final class ItemFactory {
                 || block instanceof com.kingodogo.buildscape.block.SnowyTallGrassBlock) {
             return Services.PLATFORM.createDoublePlantBlockItem(block, p);
         }
+        if (block instanceof com.kingodogo.buildscape.block.CushionBlock) {
+            return new CushionBlockItem(block, p, getColorFromId(id));
+        }
         return new BlockItem(block, p);
+    }
+
+    private static net.minecraft.world.item.DyeColor getColorFromId(String id) {
+        for (net.minecraft.world.item.DyeColor color : net.minecraft.world.item.DyeColor.values()) {
+            if (id.startsWith(color.getName())) {
+                return color;
+            }
+        }
+        return net.minecraft.world.item.DyeColor.WHITE;
     }
     public static Item createItem(ItemDefinition def) {
         String id = def.getId();

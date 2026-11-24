@@ -27,6 +27,13 @@ public class WaterPipeTransport extends PipeFluidTransport {
         return Fluids.WATER;
     }
 
+    private static boolean canBubble(PipeFlowState flow) {
+        if (flow == null || !flow.hasFluid()) return false;
+        if (flow.hasWater()) return true;
+        Fluid fluid = WorldPipeTopologyAccess.fluidById(flow.getFluidId());
+        return com.kingodogo.buildscape.fluid.ModFluids.isExperience(fluid);
+    }
+
     public record FlowStep(BlockPos pos, Direction arrivedFromDir, int distance) {}
 
     public Set<BlockPos> discoverComponent(PipeTopologyAccess topology, BlockPos startPos) {
@@ -228,7 +235,7 @@ public class WaterPipeTransport extends PipeFluidTransport {
                 state.setDistance(initialDistance);
                 state.setInflowDirection(topology.getSourceInflowDirection(sourcePos));
 
-                BubbleColumnState baseState = state.hasWater()
+                BubbleColumnState baseState = canBubble(state)
                         ? topology.getBubbleColumnBase(sourcePos) : BubbleColumnState.NONE;
                 if (baseState != null && baseState != BubbleColumnState.NONE) {
                     state.setBubbleColumn(baseState);
@@ -253,7 +260,7 @@ public class WaterPipeTransport extends PipeFluidTransport {
                 continue;
             }
 
-            BubbleColumnState baseState = currFlow.hasWater()
+            BubbleColumnState baseState = canBubble(currFlow)
                     ? topology.getBubbleColumnBase(currPos) : BubbleColumnState.NONE;
             if (baseState != null && baseState != BubbleColumnState.NONE && currFlow.getBubbleColumn() == BubbleColumnState.NONE) {
                 currFlow.setBubbleColumn(baseState);

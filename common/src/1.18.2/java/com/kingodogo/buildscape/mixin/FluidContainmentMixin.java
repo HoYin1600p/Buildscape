@@ -49,7 +49,7 @@ public abstract class FluidContainmentMixin {
             var flow = entity.getPipeFlowState();
             if (flow == null || !flow.hasFluid()) continue;
             Fluid suppliedFluid = WorldPipeTopologyAccess.fluidById(flow.getFluidId());
-            if (!flowingFluid.isSame(suppliedFluid)) continue;
+            if (!flowingFluid.isSame(suppliedFluid) && !(ModFluids.isExperience(flowingFluid) && ModFluids.isExperience(suppliedFluid))) continue;
             int supply = PipeOutletWater.amount(pipe, flow, direction.getOpposite());
             if (supply == 0 || !canPassThroughWall(direction, level, pos, state, pipePos, pipe)) continue;
             if (direction == Direction.UP) {

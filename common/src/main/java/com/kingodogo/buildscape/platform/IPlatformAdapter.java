@@ -141,6 +141,9 @@ public interface IPlatformAdapter {
     Block getFlowerPotPlant(net.minecraft.world.level.block.FlowerPotBlock pot);
 
     Entity createSeatEntity(Level level, double x, double y, double z);
+    default Entity createCushionEntity(Level level, net.minecraft.core.BlockPos supportPos, double localX, double localZ, double supportHeight, net.minecraft.world.item.DyeColor color) {
+        return null;
+    }
     Entity createFallingIcicleEntity(Level level, double x, double y, double z, net.minecraft.world.level.block.state.BlockState state);
     Entity createWanderingHomemakerEntity(Level level, boolean festive);
     Entity createBoatEntity(Level level, double x, double y, double z);
@@ -158,6 +161,9 @@ public interface IPlatformAdapter {
     net.minecraft.world.entity.EntityType<?> getFestiveStockingEntityType();
     net.minecraft.world.entity.EntityType<?> getColoredItemFrameEntityType();
     net.minecraft.world.entity.EntityType<?> getSeatEntityType();
+    default net.minecraft.world.entity.EntityType<?> getCushionEntityType() {
+        return null;
+    }
     net.minecraft.world.entity.EntityType<?> getPoplarBoatEntityType();
     net.minecraft.world.entity.EntityType<?> getWanderingHomemakerEntityType();
     net.minecraft.world.entity.EntityType<?> getFestiveWanderingHomemakerEntityType();

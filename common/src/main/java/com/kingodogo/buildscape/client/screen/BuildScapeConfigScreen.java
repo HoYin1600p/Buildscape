@@ -1886,11 +1886,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 navX, navY, navW, navH,
                 contentX, contentY, contentW, contentH, alpha);
 
-        // 3c. Presets Side Tab (protruding drawer button on right chassis edge when closed)
-        if (selectedTabIndex == 0 && sidePanelProgress < 0.05f) {
-            drawPresetsSideTab(poseStackOrGraphics, font, frameRight, frameY + 36, effMouseX, effMouseY, alpha);
-        }
-
         // 4. Header Bar Contents
         int themeToggleX = themeToggleX(font, headerX, headerW);
         drawText(poseStackOrGraphics, font, trimTextToWidth(font, Services.PLATFORM.getPlatformName(),
@@ -2164,7 +2159,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
         int count = switch (tabId) {
             case "particles" -> 12;
-            case "world" -> 10;
+            case "world" -> 11;
             case "system" -> 0;
             case "links" -> CONFIG_LINKS.size();
             default -> 0;
@@ -2202,9 +2197,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         int curY = y + catHeaderH + 4;
 
-        // Row 1: Sub-View Switcher (Display Items vs Display Tags)
+        // Row 1: Sub-View Switcher + Presets Drawer Button
         int row1H = 18;
-        int subBtnW = (w - 16) / 2;
+        int presetsBtnW = 60;
+        int subBtnW = (w - 20 - presetsBtnW) / 2;
         int subBtnH = 15;
         int subY = curY + 1;
 
@@ -2227,6 +2223,13 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         Services.PLATFORM.blitTinted(poseStackOrGraphics, uiIcon("subtab_tags"), sub1Start, subY + 1,
                 12, 12, 16, 16, applyAlpha(isSub1 ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
         drawText(poseStackOrGraphics, font, sub1Label, sub1Start + 16, subY + 3, applyAlpha(isSub1 ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
+
+        int presetBtnX = sub1X + subBtnW + 4;
+        boolean isPresetsOpen = (sidePanelType == SidePanelType.PRESETS && (isSidePanelOpening || sidePanelProgress > 0.05f));
+        boolean hoverPreset = mouseX >= presetBtnX && mouseX <= presetBtnX + presetsBtnW && mouseY >= subY && mouseY <= subY + subBtnH;
+        drawBeveledButton(poseStackOrGraphics, presetBtnX, subY, presetsBtnW, subBtnH, isPresetsOpen ? COLOR_BTN_BG_ACTIVE : COLOR_BTN_BG, hoverPreset, isPresetsOpen, alpha);
+        drawCenteredText(poseStackOrGraphics, font, "▤ Presets", presetBtnX + presetsBtnW / 2, subY + 3,
+                applyAlpha(isPresetsOpen ? COLOR_TEXT_WHITE : (hoverPreset ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER), alpha));
 
         curY += row1H + 2;
 
@@ -2916,6 +2919,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         boolean treeBreaker = CosmeticsConfig.get().getCreativeTreeBreaker(playerUuid);
         boolean shulkerPeek = CosmeticsConfig.get().getShulkerPreview(playerUuid);
+        boolean cushionEntities = CosmeticsConfig.get().getCushionEntities(playerUuid);
         boolean fastLeaves = level != null ? Services.PLATFORM.getGameRuleBoolean(level, ModGameRules.FAST_LEAF_DECAY, ModGameRules.clientFastLeafDecay) : ModGameRules.clientFastLeafDecay;
         boolean endermanGrief = level != null ? Services.PLATFORM.getGameRuleBoolean(level, ModGameRules.DISABLE_ENDERMAN_GRIEFING, ModGameRules.clientDisableEndermanGriefing) : ModGameRules.clientDisableEndermanGriefing;
         boolean creeperGrief = level != null ? Services.PLATFORM.getGameRuleBoolean(level, ModGameRules.DISABLE_CREEPER_GRIEFING, ModGameRules.clientDisableCreeperGriefing) : ModGameRules.clientDisableCreeperGriefing;
@@ -2932,6 +2936,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         curY += h + gap;
 
         renderConfigRowToggle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Shulker Box Preview", "Preview shulker box inventory contents on hover.", shulkerPeek, mouseX, mouseY, alpha);
+        curY += h + gap;
+
+        renderConfigRowToggle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Cushion Entities", "Place cushions as seating entities on shaped surfaces.", cushionEntities, mouseX, mouseY, alpha);
         curY += h + gap;
 
         renderSectionDivider(poseStackOrGraphics, font, x, curY, w, "World Rules", alpha);
@@ -4415,17 +4422,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             }
         }
 
-        // 0b. Presets Side Tab Click (when Presets panel is closed, clicking the protruding side tab expands it)
-        if (selectedTabIndex == 0 && sidePanelProgress < 0.05f) {
-            int tabY = frameY + 36;
-            PresetSideTabGeometry tab = calculatePresetSideTabGeometry(layout.frameRight, tabY, true);
-            if (mouseX >= tab.x() && mouseX <= tab.x() + tab.width()
-                    && mouseY >= tab.y() && mouseY <= tab.y() + tab.height()) {
-                openSidePanel(SidePanelType.PRESETS);
-                return true;
-            }
-        }
-
         int headerH = 24;
         int headerX = panelX + 7;
         int headerY = panelY + 7;
@@ -4527,9 +4523,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 PillarParticleConfig cfg = PillarParticleConfig.get();
                 int curY = contentY + catHeaderH + 4;
 
-                // Row 1: Sub-View Switcher (Display Items vs Display Tags)
+                // Row 1: Sub-View Switcher + Presets Drawer Button
                 int row1H = 18;
-                int subBtnW = (contentW - 16) / 2;
+                int presetsBtnW = 60;
+                int subBtnW = (contentW - 20 - presetsBtnW) / 2;
                 int subBtnH = 15;
                 int subY = curY + 1;
 
@@ -4553,6 +4550,16 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                         startItemContentTransition();
                     }
                     scrollOffset = 0;
+                    return true;
+                }
+
+                int presetBtnX = sub1X + subBtnW + 4;
+                if (mouseX >= presetBtnX && mouseX <= presetBtnX + presetsBtnW && mouseY >= subY && mouseY <= subY + subBtnH) {
+                    if (sidePanelType == SidePanelType.PRESETS && (isSidePanelOpening || sidePanelProgress > 0.05f)) {
+                        closeSidePanel();
+                    } else {
+                        openSidePanel(SidePanelType.PRESETS);
+                    }
                     return true;
                 }
 
@@ -4945,6 +4952,14 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 if (checkToggleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
                     boolean val = !CosmeticsConfig.get().getShulkerPreview(playerUuid);
                     CosmeticsConfig.get().setShulkerPreview(playerUuid, val);
+                    return true;
+                }
+                curY += h + gap;
+
+                // Row 2: Cushion Entities
+                if (checkToggleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
+                    boolean val = !CosmeticsConfig.get().getCushionEntities(playerUuid);
+                    CosmeticsConfig.get().setCushionEntities(playerUuid, val);
                     return true;
                 }
                 curY += h + gap;

@@ -27,6 +27,10 @@ public final class ModFluids {
 
     public static boolean isExperience(Fluid fluid) {
         if (fluid == null) return false;
+        Fluid still = getStill();
+        Fluid flowing = getFlowing();
+        if (still != null && fluid.isSame(still)) return true;
+        if (flowing != null && fluid.isSame(flowing)) return true;
         CommonId id = Services.PLATFORM.getFluidId(fluid);
         if (id == null) return false;
         return "buildscape".equals(id.getNamespace())

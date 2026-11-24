@@ -47,12 +47,6 @@
                         },
                         {
                             "request":  "1",
-                            "id":  "buildscape:copper_bars",
-                            "kind":  "block+item",
-                            "vanilla_equivalent":  "minecraft:copper_bars"
-                        },
-                        {
-                            "request":  "1",
                             "id":  "buildscape:copper_chain",
                             "kind":  "block+item",
                             "vanilla_equivalent":  "minecraft:copper_chain"
@@ -98,12 +92,6 @@
                             "id":  "buildscape:exposed_copper_lantern",
                             "kind":  "block+item",
                             "vanilla_equivalent":  "minecraft:exposed_copper_lantern"
-                        },
-                        {
-                            "request":  "1",
-                            "id":  "buildscape:exposed_copper_bars",
-                            "kind":  "block+item",
-                            "vanilla_equivalent":  "minecraft:exposed_copper_bars"
                         },
                         {
                             "request":  "1",
@@ -155,12 +143,6 @@
                         },
                         {
                             "request":  "1",
-                            "id":  "buildscape:weathered_copper_bars",
-                            "kind":  "block+item",
-                            "vanilla_equivalent":  "minecraft:weathered_copper_bars"
-                        },
-                        {
-                            "request":  "1",
                             "id":  "buildscape:weathered_copper_chain",
                             "kind":  "block+item",
                             "vanilla_equivalent":  "minecraft:weathered_copper_chain"
@@ -206,12 +188,6 @@
                             "id":  "buildscape:oxidized_copper_lantern",
                             "kind":  "block+item",
                             "vanilla_equivalent":  "minecraft:oxidized_copper_lantern"
-                        },
-                        {
-                            "request":  "1",
-                            "id":  "buildscape:oxidized_copper_bars",
-                            "kind":  "block+item",
-                            "vanilla_equivalent":  "minecraft:oxidized_copper_bars"
                         },
                         {
                             "request":  "1",
@@ -263,12 +239,6 @@
                         },
                         {
                             "request":  "1",
-                            "id":  "buildscape:waxed_copper_bars",
-                            "kind":  "block+item",
-                            "vanilla_equivalent":  "minecraft:waxed_copper_bars"
-                        },
-                        {
-                            "request":  "1",
                             "id":  "buildscape:waxed_exposed_copper_trapdoor",
                             "kind":  "block+item",
                             "vanilla_equivalent":  "minecraft:waxed_exposed_copper_trapdoor"
@@ -308,12 +278,6 @@
                             "id":  "buildscape:waxed_exposed_copper_lantern",
                             "kind":  "block+item",
                             "vanilla_equivalent":  "minecraft:waxed_exposed_copper_lantern"
-                        },
-                        {
-                            "request":  "1",
-                            "id":  "buildscape:waxed_exposed_copper_bars",
-                            "kind":  "block+item",
-                            "vanilla_equivalent":  "minecraft:waxed_exposed_copper_bars"
                         },
                         {
                             "request":  "1",
@@ -359,12 +323,6 @@
                         },
                         {
                             "request":  "1",
-                            "id":  "buildscape:waxed_weathered_copper_bars",
-                            "kind":  "block+item",
-                            "vanilla_equivalent":  "minecraft:waxed_weathered_copper_bars"
-                        },
-                        {
-                            "request":  "1",
                             "id":  "buildscape:waxed_oxidized_copper_trapdoor",
                             "kind":  "block+item",
                             "vanilla_equivalent":  "minecraft:waxed_oxidized_copper_trapdoor"
@@ -404,12 +362,6 @@
                             "id":  "buildscape:waxed_oxidized_copper_lantern",
                             "kind":  "block+item",
                             "vanilla_equivalent":  "minecraft:waxed_oxidized_copper_lantern"
-                        },
-                        {
-                            "request":  "1",
-                            "id":  "buildscape:waxed_oxidized_copper_bars",
-                            "kind":  "block+item",
-                            "vanilla_equivalent":  "minecraft:waxed_oxidized_copper_bars"
                         },
                         {
                             "request":  "1",
@@ -1322,6 +1274,108 @@
                             "id":  "buildscape:warped_shelf",
                             "kind":  "block+item",
                             "vanilla_equivalent":  "minecraft:warped_shelf"
+                        },
+                        {
+                            "request":  "modern-duplicates",
+                            "id":  "buildscape:creaking_heart",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:creaking_heart"
+                        },
+                        {
+                            "request":  "modern-duplicates",
+                            "id":  "buildscape:resin_clump",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:resin_clump"
+                        },
+                        {
+                            "request":  "modern-duplicates",
+                            "id":  "buildscape:resin_block",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:resin_block"
+                        },
+                        {
+                            "request":  "modern-duplicates",
+                            "id":  "buildscape:resin_bricks",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:resin_bricks"
+                        },
+                        {
+                            "request":  "modern-duplicates",
+                            "id":  "buildscape:resin_brick_slab",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:resin_brick_slab"
+                        },
+                        {
+                            "request":  "modern-duplicates",
+                            "id":  "buildscape:resin_brick_stairs",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:resin_brick_stairs"
+                        },
+                        {
+                            "request":  "modern-duplicates",
+                            "id":  "buildscape:resin_brick_wall",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:resin_brick_wall"
+                        },
+                        {
+                            "request":  "modern-duplicates",
+                            "id":  "buildscape:chiseled_resin_bricks",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:chiseled_resin_bricks"
+                        },
+                        {
+                            "request":  "modern-duplicates",
+                            "id":  "buildscape:mud",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:mud"
+                        },
+                        {
+                            "request":  "modern-duplicates",
+                            "id":  "buildscape:packed_mud",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:packed_mud"
+                        },
+                        {
+                            "request":  "modern-duplicates",
+                            "id":  "buildscape:mud_bricks",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:mud_bricks"
+                        },
+                        {
+                            "request":  "modern-duplicates",
+                            "id":  "buildscape:mud_brick_stairs",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:mud_brick_stairs"
+                        },
+                        {
+                            "request":  "modern-duplicates",
+                            "id":  "buildscape:mud_brick_slab",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:mud_brick_slab"
+                        },
+                        {
+                            "request":  "modern-duplicates",
+                            "id":  "buildscape:mud_brick_wall",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:mud_brick_wall"
+                        },
+                        {
+                            "request":  "modern-duplicates",
+                            "id":  "buildscape:pale_moss_carpet",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:pale_moss_carpet"
+                        },
+                        {
+                            "request":  "modern-duplicates",
+                            "id":  "buildscape:pale_hanging_moss",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:pale_hanging_moss"
+                        },
+                        {
+                            "request":  "modern-duplicates",
+                            "id":  "buildscape:pale_moss_block",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:pale_moss_block"
                         }
                     ],
     "excluded_target_paths":  [

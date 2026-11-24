@@ -144,8 +144,8 @@ class TranslationKeysTest {
         }
         // Retained inventory after the two vanilla replacement passes. Exact counts
         // catch accidental omissions while allowing the intentionally removed items.
-        assertEquals(2939 + addedItems, itemCount, "expected the retained item list plus haze bushes and ice crystal");
-        assertEquals(2893 + addedBlockItems, blockItems, "expected the retained block item list plus new content");
+        assertEquals(2930 + addedItems, itemCount, "expected the retained item list plus haze bushes and ice crystal");
+        assertEquals(2884 + addedBlockItems, blockItems, "expected the retained block item list plus new content");
 
         // Trophy blocks and their items use the block key (their block is built by the loader adapter, so check the key by id)
         for (TrophyDefinition trophy : Trophies.getAll()) {

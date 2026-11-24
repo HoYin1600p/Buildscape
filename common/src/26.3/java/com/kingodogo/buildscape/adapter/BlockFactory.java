@@ -2321,7 +2321,7 @@ public class BlockFactory implements IBlockFactory {
                 || def.getId().contains("ladder")) {
             props.noOcclusion();
             props.isSuffocating((state, reader, pos) -> false);
-            props.isViewBlocking((state, reader, pos) -> false);
+            props.isViewBlocking((state, reader, pos, aabb) -> false);
         }
         if (cp.getLightLevel() > 0) {
             final int light = cp.getLightLevel();

@@ -53,6 +53,8 @@ public final class ItemFactory {
         Item.Properties props = createProperties(id, def.getProperties());
         return switch (id) {
             case "builders_pouch" -> com.kingodogo.buildscape.platform.Services.PLATFORM.createBuildersPouchItem(props);
+            case "music_disc_celebration", "music_disc_snowfall", "music_disc_builder" ->
+                    Services.PLATFORM.createMusicDiscItem(id, props);
             case "wrench" -> Services.PLATFORM.createWrenchItem(props);
             case "iron_hammer" -> com.kingodogo.buildscape.platform.Services.PLATFORM.createHammerItem(HammerItem.HammerTier.IRON, props);
             case "diamond_hammer" -> com.kingodogo.buildscape.platform.Services.PLATFORM.createHammerItem(HammerItem.HammerTier.DIAMOND, props);

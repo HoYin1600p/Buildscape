@@ -24,7 +24,7 @@ class SpecialItemModelsTest {
                 "white_glass_jar", "orange_glass_jar", "magenta_glass_jar", "light_blue_glass_jar",
                 "yellow_glass_jar", "lime_glass_jar", "pink_glass_jar", "gray_glass_jar", "light_gray_glass_jar",
                 "cyan_glass_jar", "purple_glass_jar", "blue_glass_jar", "brown_glass_jar", "green_glass_jar",
-                "red_glass_jar", "black_glass_jar"}) {
+                "red_glass_jar", "black_glass_jar", "golden_jar"}) {
             JsonObject model = definition(item);
             assertEquals("minecraft:special", model.get("type").getAsString());
             assertEquals("buildscape:item/" + item, model.get("base").getAsString());

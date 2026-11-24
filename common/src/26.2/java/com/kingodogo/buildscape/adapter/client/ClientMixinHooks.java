@@ -144,7 +144,8 @@ public final class ClientMixinHooks {
 
     public static void renderClippedBeaconBeam(BeaconBlockEntity blockEntity, float partialTicks, PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay) {
         if (blockEntity.getLevel() == null) return;
-        int height = com.kingodogo.buildscape.util.BeaconScanContext.confirmedHeight(blockEntity.getLevel(), blockEntity.getBlockPos());
+        int height = com.kingodogo.buildscape.util.BeaconScanContext.confirmedHeight(blockEntity.getLevel(), blockEntity.getBlockPos(),
+                com.kingodogo.buildscape.util.BeaconBeamStoppers::isStopper);
         if (height >= com.kingodogo.buildscape.util.BeaconBeamScanState.UNLIMITED) return;
         var state = new net.minecraft.client.renderer.blockentity.state.BeaconRenderState();
         net.minecraft.client.renderer.blockentity.BeaconRenderer.extract(blockEntity, state, partialTicks, net.minecraft.world.phys.Vec3.ZERO);
@@ -155,6 +156,14 @@ public final class ClientMixinHooks {
 
     public static void submitClippedBeam(net.minecraft.client.renderer.blockentity.state.BeaconRenderState state,
             PoseStack pose, net.minecraft.client.renderer.SubmitNodeCollector collector, int height) {
+        if (state.sections.isEmpty()) {
+            net.minecraft.client.renderer.blockentity.BeaconRenderer.submitBeaconBeam(pose, collector,
+                    net.minecraft.client.renderer.blockentity.BeaconRenderer.BEAM_LOCATION, state.beamRadiusScale,
+                    state.animationTime, 0, height, 0xFFFFFFFF,
+                    net.minecraft.client.renderer.blockentity.BeaconRenderer.SOLID_BEAM_RADIUS,
+                    net.minecraft.client.renderer.blockentity.BeaconRenderer.BEAM_GLOW_RADIUS);
+            return;
+        }
         int offset = 0;
         for (int i = 0; i < state.sections.size() && offset < height; i++) {
             var section = state.sections.get(i);

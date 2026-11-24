@@ -82,11 +82,11 @@ public final class BeaconScanContext {
     }
 
     private static int scanHeight(Level level, BlockPos beaconPos, java.util.function.Predicate<BlockState> stopper) {
-        int top = level.getHeight(Heightmap.Types.WORLD_SURFACE, beaconPos.getX(), beaconPos.getZ());
+        int max = Services.PLATFORM.getMaxBuildHeight(level);
         Block tintedOrnament = Services.PLATFORM.getBlock(TINTED_ORNAMENT_ID);
         Block bigTintedOrnament = Services.PLATFORM.getBlock(BIG_TINTED_ORNAMENT_ID);
         BlockPos.MutableBlockPos scanPos = new BlockPos.MutableBlockPos();
-        for (int y = beaconPos.getY() + 1; y <= top; y++) {
+        for (int y = beaconPos.getY() + 1; y <= max; y++) {
             scanPos.set(beaconPos.getX(), y, beaconPos.getZ());
             BlockState state = level.getBlockState(scanPos);
             if (BeaconBeamStoppers.isStopper(state) || (stopper != null && stopper.test(state))
@@ -94,6 +94,12 @@ public final class BeaconScanContext {
                     || (bigTintedOrnament != null && state.is(bigTintedOrnament))) {
                 return y - beaconPos.getY();
             }
+            if (Services.PLATFORM.isGlassBlock(state.getBlock())
+                    || state.isAir()
+                    || beamColor(state, level, scanPos, beaconPos) != null) {
+                continue;
+            }
+            return BeaconBeamScanState.UNLIMITED;
         }
         return BeaconBeamScanState.UNLIMITED;
     }

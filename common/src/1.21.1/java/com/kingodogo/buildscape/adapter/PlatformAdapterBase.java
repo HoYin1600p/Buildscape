@@ -1678,6 +1678,15 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    public Item createMusicDiscItem(String id, Item.Properties properties) {
+        String songName = id.replace("music_disc_", "");
+        var songKey = net.minecraft.resources.ResourceKey.create(
+                net.minecraft.core.registries.Registries.JUKEBOX_SONG,
+                net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("buildscape", songName));
+        return new Item(properties.jukeboxPlayable(songKey));
+    }
+
+    @Override
     public Item createBuildersPouchItem(Item.Properties properties) {
         return new com.kingodogo.buildscape.item.BuildersPouchItem(properties) {
             @Override

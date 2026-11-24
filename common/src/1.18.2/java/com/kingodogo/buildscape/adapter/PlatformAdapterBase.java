@@ -1616,6 +1616,13 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    public Item createMusicDiscItem(String id, Item.Properties properties) {
+        SoundEvent sound = com.kingodogo.buildscape.sound.ModSounds.getDiscSound(id);
+        int comparator = id.equals("music_disc_builder") ? 15 : (id.equals("music_disc_snowfall") ? 14 : 13);
+        return new net.minecraft.world.item.RecordItem(comparator, sound, properties) {};
+    }
+
+    @Override
     public Item createBuildersPouchItem(Item.Properties properties) {
         return new com.kingodogo.buildscape.item.BuildersPouchItem(properties) {
             @Override

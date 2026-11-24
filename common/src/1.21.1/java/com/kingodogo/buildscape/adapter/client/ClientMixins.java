@@ -176,7 +176,8 @@ public final class ClientMixins {
     }
 
     public static void renderClippedBeaconBeam(net.minecraft.world.level.block.entity.BeaconBlockEntity blockEntity, float partialTicks, PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay) {
-        int cutoff = com.kingodogo.buildscape.util.BeaconScanContext.confirmedHeight(blockEntity.getLevel(), blockEntity.getBlockPos());
+        int cutoff = com.kingodogo.buildscape.util.BeaconScanContext.confirmedHeight(blockEntity.getLevel(), blockEntity.getBlockPos(),
+                com.kingodogo.buildscape.util.BeaconBeamStoppers::isStopper);
         long gameTime = blockEntity.getLevel().getGameTime();
         int yOffset = 0;
         for (net.minecraft.world.level.block.entity.BeaconBlockEntity.BeaconBeamSection section : blockEntity.getBeamSections()) {

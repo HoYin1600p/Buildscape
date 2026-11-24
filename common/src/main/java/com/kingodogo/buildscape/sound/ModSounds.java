@@ -78,6 +78,15 @@ public class ModSounds {
     public static final RegistrySupplier<SoundEvent> MUSIC_DISC_SNOWFALL = registerSound("music_disc_snowfall");
     public static final RegistrySupplier<SoundEvent> MUSIC_DISC_BUILDER = registerSound("music_disc_builder");
 
+    public static SoundEvent getDiscSound(String id) {
+        return switch (id) {
+            case "music_disc_celebration" -> MUSIC_DISC_CELEBRATION.get();
+            case "music_disc_snowfall" -> MUSIC_DISC_SNOWFALL.get();
+            case "music_disc_builder" -> MUSIC_DISC_BUILDER.get();
+            default -> null;
+        };
+    }
+
     public static SoundType COPPER_GRATE_SOUNDS() {
         return soundType(1f, 1f, () -> sound(COPPER_GRATE_BREAK, SoundEvents.COPPER_BREAK),
                 () -> sound(COPPER_GRATE_STEP, SoundEvents.COPPER_STEP), () -> sound(COPPER_GRATE_PLACE, SoundEvents.COPPER_STEP),

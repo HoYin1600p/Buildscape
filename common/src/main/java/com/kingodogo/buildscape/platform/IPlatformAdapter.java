@@ -403,6 +403,7 @@ public interface IPlatformAdapter {
     boolean isOnGround(net.minecraft.world.entity.Entity entity);
     void spawnMobFromEgg(net.minecraft.server.level.ServerLevel level, net.minecraft.core.BlockPos pos, net.minecraft.world.item.ItemStack eggStack);
     net.minecraft.world.item.Item createBuildersPouchItem(net.minecraft.world.item.Item.Properties properties);
+    net.minecraft.world.item.Item createMusicDiscItem(String id, net.minecraft.world.item.Item.Properties properties);
     net.minecraft.world.item.Item createHammerItem(com.kingodogo.buildscape.item.HammerItem.HammerTier tier, net.minecraft.world.item.Item.Properties properties);
     boolean supportsHammerEnchantment(net.minecraft.world.item.ItemStack stack, Object enchantment);
     default boolean canHammerHarvest(net.minecraft.world.level.block.state.BlockState state, net.minecraft.world.item.ItemStack hammer, com.kingodogo.buildscape.item.HammerItem.HammerTier tier) { return true; }

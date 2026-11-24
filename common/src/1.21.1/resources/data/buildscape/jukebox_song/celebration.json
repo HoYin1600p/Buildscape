@@ -1,0 +1,8 @@
+{
+  "comparator_output": 13,
+  "description": {
+    "translate": "item.buildscape.music_disc_celebration.desc"
+  },
+  "length_in_seconds": 180.0,
+  "sound_event": "buildscape:music_disc_celebration"
+}

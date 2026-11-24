@@ -41,8 +41,6 @@
     "client.MouseInputMixin",
     "client.ClientWorldInputMixin",
     "client.ExperimentalSettingsMixin",
-    "client.CameraInputMixin",
-    "client.GameRendererMixin",
     "client.AdvancementsScreenMixin",
     "client.ModelBakeryMixin",
     "client.FogRendererMixin",

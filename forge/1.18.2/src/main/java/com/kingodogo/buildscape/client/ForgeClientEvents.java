@@ -43,14 +43,6 @@ public final class ForgeClientEvents {
     }
 
     @SubscribeEvent
-    public static void scroll(InputEvent.MouseScrollEvent event) {
-        if (Minecraft.getInstance().screen == null && ZoomHandler.isZooming()) {
-            ZoomHandler.handleScroll(event.getScrollDelta());
-            event.setCanceled(true);
-        }
-    }
-
-    @SubscribeEvent
     public static void advancementScroll(net.minecraftforge.client.event.ScreenEvent.MouseScrollEvent.Pre event) {
         if (event.getScreen() instanceof net.minecraft.client.gui.screens.advancements.AdvancementsScreen screen) {
             net.minecraft.client.gui.screens.advancements.AdvancementTab tab =
@@ -76,16 +68,6 @@ public final class ForgeClientEvents {
         if (ClientEvents.renderBlockHighlight(event.getPoseStack(), event.getCamera(), event.getMultiBufferSource(), event.getTarget())) {
             event.setCanceled(true);
         }
-    }
-
-    @SubscribeEvent
-    public static void fov(EntityViewRenderEvent.FieldOfView event) { event.setFOV(event.getFOV() * ZoomHandler.getZoomLevel()); }
-
-    @SubscribeEvent
-    public static void camera(EntityViewRenderEvent.CameraSetup event) {
-        float[] angles = ZoomHandler.getSmoothedRotation(event.getYaw(), event.getPitch());
-        event.setYaw(angles[0]);
-        event.setPitch(angles[1]);
     }
 
     @SubscribeEvent

@@ -1,7 +1,6 @@
 package com.kingodogo.buildscape.mixin.fabric.client;
 
 import com.kingodogo.buildscape.client.ClientEvents;
-import com.kingodogo.buildscape.client.ZoomHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 import org.spongepowered.asm.mixin.Dynamic;
@@ -18,14 +17,5 @@ public abstract class MouseInputMixin {
         if (window == Minecraft.getInstance().getWindow().getWindow() && button == 1 && action == 1) {
             ClientEvents.onRightClick();
         }
-    }
-    @Dynamic
-    @Inject(method = "onScroll(JDD)V", at = @At("HEAD"), cancellable = true, require = 0)
-    private void buildscape$zoomScroll(long window, double horizontal, double vertical, CallbackInfo ci) {
-        Minecraft mc = Minecraft.getInstance();
-        if (window != mc.getWindow().getWindow() || mc.screen != null || !ZoomHandler.isZooming()) return;
-        double delta = mc.options.discreteMouseScroll().get() ? Math.signum(vertical) : vertical;
-        ZoomHandler.handleScroll(delta * mc.options.mouseWheelSensitivity().get());
-        ci.cancel();
     }
 }

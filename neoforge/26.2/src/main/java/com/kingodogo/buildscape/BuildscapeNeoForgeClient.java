@@ -38,11 +38,8 @@ final class BuildscapeNeoForgeClient {
         NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::worldOverlays);
         NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::keyInput);
         NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::mouseInput);
-        NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::scroll);
         NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::interaction);
         NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::highlight);
-        NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::fov);
-        NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::camera);
         NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::disconnect);
         NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::unload);
     }
@@ -62,13 +59,6 @@ final class BuildscapeNeoForgeClient {
     private static void mouseInput(net.neoforged.neoforge.client.event.InputEvent.MouseButton.Post event) {
         if (event.getButton() == 1 && event.getAction() == 1) com.kingodogo.buildscape.client.ClientEvents.onRightClick();
     }
-    private static void scroll(net.neoforged.neoforge.client.event.InputEvent.MouseScrollingEvent event) {
-        if (!com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.isScreenOpen()
-                && com.kingodogo.buildscape.client.ZoomHandler.isZooming()) {
-            com.kingodogo.buildscape.client.ZoomHandler.handleScroll(event.getScrollDeltaY());
-            event.setCanceled(true);
-        }
-    }
     private static void interaction(net.neoforged.neoforge.client.event.InputEvent.InteractionKeyMappingTriggered event) {
         var mc = net.minecraft.client.Minecraft.getInstance();
         if (event.isAttack()) com.kingodogo.buildscape.client.BiomeBrushClientHandler.onAttack(mc.player, mc.hitResult);
@@ -81,14 +71,6 @@ final class BuildscapeNeoForgeClient {
     private static void highlight(net.neoforged.neoforge.client.event.ExtractBlockOutlineRenderStateEvent event) {
         if (com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.extractBlockHighlight(
                 event.getCamera(), event.getHitResult(), event.getLevelRenderState())) event.setCanceled(true);
-    }
-    private static void fov(net.neoforged.neoforge.client.event.ViewportEvent.ComputeFov event) {
-        event.setFOV(event.getFOV() * com.kingodogo.buildscape.client.ZoomHandler.getZoomLevel());
-    }
-    private static void camera(net.neoforged.neoforge.client.event.ViewportEvent.ComputeCameraAngles event) {
-        float[] rotation = com.kingodogo.buildscape.client.ZoomHandler.getSmoothedRotation(event.getYaw(), event.getPitch());
-        event.setYaw(rotation[0]);
-        event.setPitch(rotation[1]);
     }
     private static void disconnect(net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut event) {
         com.kingodogo.buildscape.client.ClientEvents.onClientDisconnect();

@@ -148,12 +148,6 @@ public final class BuildscapeForgeClient {
         gameBus.addListener((net.minecraftforge.client.event.InputEvent.MouseButton.Post event) -> {
             if (event.getButton() == 1 && event.getAction() == 1) com.kingodogo.buildscape.client.ClientEvents.onRightClick();
         });
-        gameBus.addListener((net.minecraftforge.client.event.InputEvent.MouseScrollingEvent event) -> {
-            if (net.minecraft.client.Minecraft.getInstance().screen == null && com.kingodogo.buildscape.client.ZoomHandler.isZooming()) {
-                com.kingodogo.buildscape.client.ZoomHandler.handleScroll(event.getDeltaY());
-                event.setCanceled(true);
-            }
-        });
         gameBus.addListener((net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered event) -> {
             var mc = net.minecraft.client.Minecraft.getInstance();
             if (event.isAttack()) com.kingodogo.buildscape.client.BiomeBrushClientHandler.onAttack(mc.player, mc.hitResult);
@@ -161,13 +155,6 @@ public final class BuildscapeForgeClient {
                 event.setCanceled(true);
                 event.setSwingHand(true);
             }
-        });
-        gameBus.addListener((net.minecraftforge.client.event.ViewportEvent.ComputeFov event) ->
-                event.setFOV(event.getFOV() * com.kingodogo.buildscape.client.ZoomHandler.getZoomLevel()));
-        gameBus.addListener((net.minecraftforge.client.event.ViewportEvent.ComputeCameraAngles event) -> {
-            float[] angles = com.kingodogo.buildscape.client.ZoomHandler.getSmoothedRotation(event.getYaw(), event.getPitch());
-            event.setYaw(angles[0]);
-            event.setPitch(angles[1]);
         });
         gameBus.addListener((net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut event) -> {
             com.kingodogo.buildscape.client.ClientEvents.onClientDisconnect();

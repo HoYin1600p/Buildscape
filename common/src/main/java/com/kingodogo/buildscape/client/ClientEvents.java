@@ -145,7 +145,6 @@ public class ClientEvents {
             com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.warmupAsync();
         }
         if (mc.level == null || mc.player == null) {
-            while (ModKeyBinds.CINEMATIC_ZOOM.consumeClick()) { }
             return;
         }
         ModKeyBinds.tick();
@@ -157,7 +156,6 @@ public class ClientEvents {
         SmokeVentParticleHandler.clientTick();
         ItemFrameParticleHandler.clientTick(mc.level, mc.player, mc.level.getGameTime());
         BiomeBrushClientHandler.tickClient(mc.player);
-        ZoomHandler.tick();
 
         Player player = mc.player;
         if (Services.PLATFORM.isOnGround(player)) {
@@ -220,10 +218,7 @@ public class ClientEvents {
 
     public static void onClientWorldUnload() {
         com.kingodogo.buildscape.client.biome.ClientBiomeTints.clear();
-        ZoomHandler.reset();
         TreeChopHandler.reset();
-        ModKeyBinds.CINEMATIC_ZOOM.setDown(false);
-        while (ModKeyBinds.CINEMATIC_ZOOM.consumeClick()) { }
         overlayMessage = null;
         overlayMessageTime = 0;
         lastHedgeStep = -1;

@@ -37,11 +37,8 @@ final class BuildscapeForgeClient {
         ClientTickEvent.Post.BUS.addListener(BuildscapeForgeClient::tick);
         net.minecraftforge.client.event.InputEvent.Key.BUS.addListener(BuildscapeForgeClient::keyInput);
         net.minecraftforge.client.event.InputEvent.MouseButton.Post.BUS.addListener(BuildscapeForgeClient::mouseInput);
-        net.minecraftforge.client.event.InputEvent.MouseScrollingEvent.BUS.addListener(BuildscapeForgeClient::scroll);
         net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered.Attack.BUS.addListener(BuildscapeForgeClient::interaction);
         net.minecraftforge.client.event.RenderHighlightEvent.Block.BUS.addListener(BuildscapeForgeClient::highlight);
-        net.minecraftforge.client.event.ViewportEvent.ComputeFov.BUS.addListener(BuildscapeForgeClient::fov);
-        net.minecraftforge.client.event.ViewportEvent.ComputeCameraAngles.BUS.addListener(BuildscapeForgeClient::camera);
         net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut.BUS.addListener(BuildscapeForgeClient::disconnect);
         net.minecraftforge.event.level.LevelEvent.Unload.BUS.addListener(BuildscapeForgeClient::unload);
     }
@@ -85,14 +82,6 @@ final class BuildscapeForgeClient {
     private static void mouseInput(net.minecraftforge.client.event.InputEvent.MouseButton.Post event) {
         if (event.getButton() == 1 && event.getAction() == 1) com.kingodogo.buildscape.client.ClientEvents.onRightClick();
     }
-    private static boolean scroll(net.minecraftforge.client.event.InputEvent.MouseScrollingEvent event) {
-        if (!com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.isScreenOpen()
-                && com.kingodogo.buildscape.client.ZoomHandler.isZooming()) {
-            com.kingodogo.buildscape.client.ZoomHandler.handleScroll(event.getDeltaY());
-            return true;
-        }
-        return false;
-    }
     private static boolean interaction(net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered.Attack event) {
         var mc = net.minecraft.client.Minecraft.getInstance();
         com.kingodogo.buildscape.client.BiomeBrushClientHandler.onAttack(mc.player, mc.hitResult);
@@ -109,14 +98,6 @@ final class BuildscapeForgeClient {
             event.setCustomRenderer((collector, pose, state) ->
                     com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.collectBlockHighlight(pose, collector, state));
         }
-    }
-    private static void fov(net.minecraftforge.client.event.ViewportEvent.ComputeFov event) {
-        event.setFOV(event.getFOV() * com.kingodogo.buildscape.client.ZoomHandler.getZoomLevel());
-    }
-    private static void camera(net.minecraftforge.client.event.ViewportEvent.ComputeCameraAngles event) {
-        float[] rotation = com.kingodogo.buildscape.client.ZoomHandler.getSmoothedRotation(event.getYaw(), event.getPitch());
-        event.setYaw(rotation[0]);
-        event.setPitch(rotation[1]);
     }
     private static void disconnect(net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut event) {
         com.kingodogo.buildscape.client.ClientEvents.onClientDisconnect();

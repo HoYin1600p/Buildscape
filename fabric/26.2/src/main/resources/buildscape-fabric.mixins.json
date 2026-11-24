@@ -22,7 +22,6 @@
   "client": [
     "client.KeyboardInputMixin",
     "client.MouseInputMixin",
-    "client.CameraInputMixin",
     "client.AttackInputMixin",
     "client.FogRendererMixin",
     "client.ModelBakeryMixin"

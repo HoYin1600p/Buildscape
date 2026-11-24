@@ -1,8 +1,6 @@
 package com.kingodogo.buildscape.mixin.client;
 
-import com.kingodogo.buildscape.adapter.client.ClientPlatformHooks;
 import com.kingodogo.buildscape.client.ClientEvents;
-import com.kingodogo.buildscape.client.ZoomHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.input.MouseButtonInfo;
@@ -18,17 +16,5 @@ public abstract class MouseInputMixin {
         if (window == Minecraft.getInstance().getWindow().handle() && button.button() == 1 && action == 1) {
             ClientEvents.onRightClick();
         }
-    }
-
-    // Match NeoForge's scroll event after vanilla scales and accumulates the
-    // wheel movement, before either hotbar or spectator controls consume it.
-    @Inject(method = "onScroll(JDD)V", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/player/LocalPlayer;isSpectator()Z"), cancellable = true)
-    private void buildscape$zoomScroll(long window, double horizontal, double vertical, CallbackInfo ci) {
-        if (ClientPlatformHooks.isScreenOpen() || !ZoomHandler.isZooming()) return;
-        Minecraft mc = Minecraft.getInstance();
-        double delta = mc.options.discreteMouseScroll().get() ? Math.signum(vertical) : vertical;
-        ZoomHandler.handleScroll(delta * mc.options.mouseWheelSensitivity().get());
-        ci.cancel();
     }
 }

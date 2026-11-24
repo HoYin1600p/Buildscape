@@ -2337,14 +2337,20 @@ public class BlockFactory implements IBlockFactory {
         if (cp.isNoCollision()) {
             props.noCollission();
         }
-        if (cp.isNoOcclusion()) {
+        if (cp.isNoOcclusion()
+                || def.getId().contains("glass")
+                || def.isLeaves()
+                || def.isTrapdoor()
+                || def.getId().contains("ladder")) {
             props.noOcclusion();
+            props.isSuffocating((state, reader, pos) -> false);
+            props.isViewBlocking((state, reader, pos) -> false);
         }
         if (cp.getLightLevel() > 0) {
             final int light = cp.getLightLevel();
             props.lightLevel(state -> light);
         }
-        props.sound(mapSound(cp.getSound()));
+        props.sound(referenceControlSound(def));
         if (cp.getMapColor() != null) {
             props.mapColor(mapColor(cp.getMapColor()));
         }
@@ -2355,6 +2361,9 @@ public class BlockFactory implements IBlockFactory {
         String id = def.getId();
         if (id.startsWith("flaming_steel")) return SoundType.NETHERITE_BLOCK;
         if (id.startsWith("steel_")) return SoundType.COPPER;
+        if (id.contains("glass")) return SoundType.GLASS;
+        if (id.contains("leaves")) return SoundType.GRASS;
+        if (id.contains("ladder")) return SoundType.LADDER;
         if (id.startsWith("pale_oak_") || id.startsWith("poplar_")) return SoundType.WOOD;
         return mapSound(def.getProperties().getSound());
     }

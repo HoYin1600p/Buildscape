@@ -2692,14 +2692,24 @@ public class BlockFactory implements IBlockFactory {
         if (cp.isNoCollision()) {
             props.noCollission();
         }
-        if (cp.isNoOcclusion()) {
+        if (cp.isNoOcclusion()
+                || def.getId().contains("glass")
+                || def.isLeaves()
+                || def.isTrapdoor()
+                || def.getId().contains("ladder")) {
             props.noOcclusion();
+            props.isSuffocating((state, reader, pos) -> false);
+            props.isViewBlocking((state, reader, pos) -> false);
         }
         if (cp.getLightLevel() > 0) {
             final int light = cp.getLightLevel();
             props.lightLevel(state -> light);
         }
-        props.sound(mapSound(cp.getSound()));
+        String id = def.getId();
+        if (id.contains("glass")) props.sound(SoundType.GLASS);
+        else if (id.contains("leaves")) props.sound(SoundType.GRASS);
+        else if (id.contains("ladder")) props.sound(SoundType.LADDER);
+        else props.sound(mapSound(cp.getSound()));
         return props;
     }
 

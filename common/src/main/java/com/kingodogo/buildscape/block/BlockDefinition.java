@@ -133,7 +133,7 @@ public class BlockDefinition {
     public boolean isLeafLitter() { return "LeafLitterBlock".equals(blockType) || "leaf_litter".equals(id); }
     public boolean isMossOverlay() { return "MossOverlayBlock".equals(blockType) || id.endsWith("_moss_overlay") || "moss_overlay".equals(id); }
     public boolean isWoolLayers() { return "WoolLayersBlock".equals(blockType); }
-    public boolean isLayer() { return !isWoolLayers() && !isLeafLayers() && !isColoredMossLayers() && !isMossLayers() && !isMossOverlay() && (typeIn("CarpetBlock", "SnowOverlayBlock")); }
+    public boolean isLayer() { return !isWoolLayers() && !isLeafLayers() && !isColoredMossLayers() && !isMossLayers() && !isMossOverlay() && typeIn("LayerBlock", "ModLayerBlock"); }
     public boolean isAshenKingPillar() { return id.contains("ashen_king_pillar") || typeIn("AshenKingPillarBlock"); }
     public boolean isPillar() { return !isAshenKingPillar() && "PillarBlock".equals(blockType); }
     public boolean isHollowLog() { return typeIn("HollowLogBlock") || (!isHollowPipe() && (id.startsWith("hollow_") || id.contains("_hollow_"))); }

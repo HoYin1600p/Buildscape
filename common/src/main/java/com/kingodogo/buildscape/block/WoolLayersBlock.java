@@ -47,7 +47,7 @@ public class WoolLayersBlock extends SnowLayerBlock {
         if (!belowState.is(Blocks.ICE) && !belowState.is(Blocks.PACKED_ICE) && !belowState.is(Blocks.BARRIER)) {
             if (!belowState.is(Blocks.HONEY_BLOCK) && !belowState.is(Blocks.SOUL_SAND)) {
                 return Block.isFaceFull(belowState.getCollisionShape(level, pos.below()), Direction.UP)
-                        || (belowState.is(this) && belowState.getValue(LAYERS) == 8);
+                        || (belowState.hasProperty(LAYERS) && belowState.getValue(LAYERS) == 8);
             } else {
                 return true;
             }
@@ -59,7 +59,10 @@ public class WoolLayersBlock extends SnowLayerBlock {
     public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
         int layers = state.getValue(LAYERS);
 
-        if (context.getItemInHand().is(this.asItem()) && layers < 8) {
+        boolean isMatchingItem = context.getItemInHand().is(this.asItem())
+                || (carpetItemSupplier != null && carpetItemSupplier.get() != null && context.getItemInHand().is(carpetItemSupplier.get()));
+
+        if (isMatchingItem && layers < 8) {
             if (context.replacingClickedOnBlock()) {
                 return context.getClickedFace() == Direction.UP;
             } else {

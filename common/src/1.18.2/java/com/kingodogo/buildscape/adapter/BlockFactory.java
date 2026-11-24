@@ -1045,7 +1045,9 @@ public class BlockFactory implements IBlockFactory {
             };
         } else if (def.isWoolLayers()) {
             String color = def.getId().replace("_carpet_layers", "").replace("_layered_wool_layers", "");
-            Supplier<Item> carpetSupplier = resolveItemSupplier(color + "_carpet_layers");
+            Supplier<Item> carpetSupplier = def.getId().contains("layered_wool")
+                    ? resolveItemSupplier(color + "_layered_wool_carpet")
+                    : resolveItemSupplier("minecraft:" + color + "_carpet");
             return new WoolLayersBlock(props, color, carpetSupplier) {
                 @Override
                 public boolean isPathfindable(BlockState state, BlockGetter level, BlockPos pos, net.minecraft.world.level.pathfinder.PathComputationType type) {

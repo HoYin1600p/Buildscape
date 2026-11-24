@@ -188,6 +188,10 @@ public class BlockFactory implements IBlockFactory {
     public Block createBlock(BlockDefinition def) {
         BlockBehaviour.Properties props = buildProperties(def);
 
+        if ("CarpetBlock".equals(def.getBlockType())) {
+            return new net.minecraft.world.level.block.CarpetBlock(props);
+        }
+
         Block vanillaPotPlant = switch (def.getId()) {
             case "potted_bush" -> Blocks.BUSH;
             case "potted_dry_grass" -> Blocks.SHORT_DRY_GRASS;
@@ -823,7 +827,9 @@ public class BlockFactory implements IBlockFactory {
             return new NativeMossLayersBlock(props);
         } else if (def.isWoolLayers()) {
             String color = def.getId().replace("_carpet_layers", "").replace("_layered_wool_layers", "");
-            Supplier<Item> carpetSupplier = resolveItemSupplier(color + "_carpet_layers");
+            Supplier<Item> carpetSupplier = def.getId().contains("layered_wool")
+                    ? resolveItemSupplier(color + "_layered_wool_carpet")
+                    : resolveItemSupplier("minecraft:" + color + "_carpet");
             return new WoolLayersBlock(props, color, carpetSupplier) {
                 @Override
                 protected boolean isPathfindable(BlockState state, net.minecraft.world.level.pathfinder.PathComputationType type) {

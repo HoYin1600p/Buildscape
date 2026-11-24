@@ -41,7 +41,7 @@ public class LeafLayersBlock extends SnowLayerBlock implements SimpleWaterlogged
         if (!blockState.is(Blocks.ICE) && !blockState.is(Blocks.PACKED_ICE) && !blockState.is(Blocks.BARRIER)) {
             if (!blockState.is(Blocks.HONEY_BLOCK) && !blockState.is(Blocks.SOUL_SAND)) {
                 return Block.isFaceFull(blockState.getCollisionShape(level, pos.below()), Direction.UP)
-                        || (blockState.is(this) && blockState.getValue(LAYERS) == 8);
+                        || (blockState.hasProperty(LAYERS) && blockState.getValue(LAYERS) == 8);
             } else {
                 return true;
             }

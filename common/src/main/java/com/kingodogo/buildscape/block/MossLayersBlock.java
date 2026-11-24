@@ -38,7 +38,7 @@ public class MossLayersBlock extends SnowLayerBlock {
         if (!belowState.is(Blocks.ICE) && !belowState.is(Blocks.PACKED_ICE) && !belowState.is(Blocks.BARRIER)) {
             if (!belowState.is(Blocks.HONEY_BLOCK) && !belowState.is(Blocks.SOUL_SAND)) {
                 return Block.isFaceFull(belowState.getCollisionShape(level, pos.below()), Direction.UP)
-                        || (belowState.is(this) && belowState.getValue(LAYERS) == 8);
+                        || (belowState.hasProperty(LAYERS) && belowState.getValue(LAYERS) == 8);
             } else {
                 return true;
             }

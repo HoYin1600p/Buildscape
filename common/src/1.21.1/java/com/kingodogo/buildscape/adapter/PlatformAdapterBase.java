@@ -979,6 +979,10 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
                         Item item = items.get(id);
                         if (item != null && added.add(id)) {
                             output.accept(new ItemStack(item));
+                            if (id.equals("music_disc_builder")) {
+                                com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.populateCreativeFireworks(output::accept);
+                                added.add("infinite_phoenix_firework_star");
+                            }
                         }
                     }
                     for (Map.Entry<String, Item> entry : items.entrySet()) {

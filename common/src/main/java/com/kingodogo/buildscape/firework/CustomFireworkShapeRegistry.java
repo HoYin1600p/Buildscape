@@ -9,7 +9,11 @@ import com.kingodogo.buildscape.firework.shapes.PhoenixFireworkShape;
 import com.kingodogo.buildscape.firework.shapes.PresentsFireworkShape;
 import com.kingodogo.buildscape.firework.shapes.SnowflakeFireworkShape;
 import com.kingodogo.buildscape.firework.shapes.TrophyFireworkShape;
+import com.kingodogo.buildscape.item.InfinitePhoenixFireworkStarItem;
+import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.util.CommonId;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,6 +60,41 @@ public final class CustomFireworkShapeRegistry {
 
     public static boolean isCustomShape(byte id) {
         return BY_NUMERIC_ID.containsKey(id);
+    }
+
+    public static void populateCreativeFireworks(java.util.function.Consumer<ItemStack> output) {
+        byte[] shapes = {
+                CAKE_ID,
+                CROWN_ID,
+                TROPHY_ID,
+                CHRISTMAS_TREE_ID,
+                PRESENTS_ID,
+                CANDY_CANE_ID,
+                PHOENIX_ID,
+                SNOWFLAKE_ID
+        };
+        int[][] colors = {
+                {0xFFFDD0, 0x8B4513, 0xFF2D55},
+                {0xFFD700, 0xFFFF77, 0xFF0044, 0x0066FF},
+                {0xFFD700, 0xFFFF88, 0x00FFFF},
+                {0x227733, 0xFF3030, 0xFFD700},
+                {0xFF2233, 0xFFD700},
+                {0xFF0033},
+                {0xFFFFFF, 0xFFF200, 0xFFB000, 0xFF6500, 0xE52B00},
+                {0xFFFFFF, 0xE0F7FF, 0x5AC8FF}
+        };
+        for (int i = 0; i < shapes.length; i++) {
+            if (shapes[i] == PHOENIX_ID) continue;
+            ItemStack star = new ItemStack(Items.FIREWORK_STAR);
+            Services.PLATFORM.configureFireworkStar(star, shapes[i], colors[i], false, false);
+            output.accept(star);
+        }
+        output.accept(InfinitePhoenixFireworkStarItem.createDefaultStack());
+        for (int i = 0; i < shapes.length; i++) {
+            ItemStack rocket = new ItemStack(Items.FIREWORK_ROCKET);
+            Services.PLATFORM.configureFireworkRocket(rocket, 1, shapes[i], colors[i], true, true);
+            output.accept(rocket);
+        }
     }
 
     private static CommonId id(String path) {

@@ -385,6 +385,7 @@ public interface IPlatformAdapter {
     net.minecraft.world.item.Item createBottleOfMistItem(net.minecraft.world.item.Item.Properties properties);
     net.minecraft.world.item.Item createWrenchItem(net.minecraft.world.item.Item.Properties properties);
     net.minecraft.world.item.Item createFestiveGlintShardItem(net.minecraft.world.item.Item.Properties properties);
+    void setEnchantmentGlintOverride(net.minecraft.world.item.ItemStack stack, boolean override);
     net.minecraft.world.item.Item createBigOrnamentTemplateItem(net.minecraft.world.item.Item.Properties properties);
     net.minecraft.world.item.Item createStringlightFrameItem(net.minecraft.world.item.Item.Properties properties);
     net.minecraft.nbt.CompoundTag getTagCompound(net.minecraft.nbt.CompoundTag tag, String key);

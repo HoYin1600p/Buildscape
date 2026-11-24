@@ -33,6 +33,7 @@ public final class FestiveGlintHelper {
             tag.putBoolean(TAG_FESTIVE_GLINT, true);
             tag.putString(TAG_BUILDCAPE_GLINT, "festive");
         });
+        Services.PLATFORM.setEnchantmentGlintOverride(stack, true);
     }
 
     public static boolean isEnchantedItem(ItemStack stack) {

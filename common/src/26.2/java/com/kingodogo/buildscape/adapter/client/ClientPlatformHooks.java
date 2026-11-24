@@ -453,10 +453,11 @@ public final class ClientPlatformHooks {
     private static void renderQuadWithUV26(com.mojang.blaze3d.vertex.VertexConsumer consumer, org.joml.Matrix4f pose, com.mojang.blaze3d.vertex.PoseStack.Pose lastPose, int packedLight,
                                      float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4,
                                      float u1, float v1, float u2, float v2, float nx, float ny, float nz) {
-        consumer.addVertex(pose, x1, y1, z1).setColor(255, 255, 255, 255).setUv(u1, v1).setOverlay(0).setLight(packedLight).setNormal(lastPose, nx, ny, nz);
-        consumer.addVertex(pose, x2, y2, z2).setColor(255, 255, 255, 255).setUv(u2, v1).setOverlay(0).setLight(packedLight).setNormal(lastPose, nx, ny, nz);
-        consumer.addVertex(pose, x3, y3, z3).setColor(255, 255, 255, 255).setUv(u2, v2).setOverlay(0).setLight(packedLight).setNormal(lastPose, nx, ny, nz);
-        consumer.addVertex(pose, x4, y4, z4).setColor(255, 255, 255, 255).setUv(u1, v2).setOverlay(0).setLight(packedLight).setNormal(lastPose, nx, ny, nz);
+        int overlay = net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY;
+        consumer.addVertex(pose, x1, y1, z1).setColor(255, 255, 255, 255).setUv(u1, v1).setOverlay(overlay).setLight(packedLight).setNormal(lastPose, nx, ny, nz);
+        consumer.addVertex(pose, x2, y2, z2).setColor(255, 255, 255, 255).setUv(u2, v1).setOverlay(overlay).setLight(packedLight).setNormal(lastPose, nx, ny, nz);
+        consumer.addVertex(pose, x3, y3, z3).setColor(255, 255, 255, 255).setUv(u2, v2).setOverlay(overlay).setLight(packedLight).setNormal(lastPose, nx, ny, nz);
+        consumer.addVertex(pose, x4, y4, z4).setColor(255, 255, 255, 255).setUv(u1, v2).setOverlay(overlay).setLight(packedLight).setNormal(lastPose, nx, ny, nz);
     }
 
     private static void renderBoxFaces26(com.mojang.blaze3d.vertex.VertexConsumer consumer, org.joml.Matrix4f pose, com.mojang.blaze3d.vertex.PoseStack.Pose lastPose, int packedLight,

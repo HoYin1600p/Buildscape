@@ -26,7 +26,7 @@ public final class FestiveGlintAnvilLogic {
         }
 
         net.minecraft.world.item.Item shard = com.kingodogo.buildscape.platform.Services.PLATFORM.getItem(new com.kingodogo.buildscape.util.CommonId("buildscape", "festive_glint_shard"));
-        if (shard != null && right.is(shard)) {
+        if ((shard != null && right.is(shard)) || right.getItem() instanceof com.kingodogo.buildscape.item.FestiveGlintShardItem) {
             if (!FestiveGlintHelper.isEnchantedItem(left)) {
                 return null;
             }

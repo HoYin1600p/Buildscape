@@ -41,16 +41,19 @@ public class ColoredItemFrameItem extends Item {
         }
 
         net.minecraft.world.entity.Entity itemFrame = com.kingodogo.buildscape.platform.Services.PLATFORM.createColoredItemFrameEntity(level, placePos, face, colorVariant);
-        if (itemFrame != null) {
+        if (itemFrame instanceof net.minecraft.world.entity.decoration.HangingEntity hanging) {
+            if (!hanging.survives()) {
+                return net.minecraft.world.InteractionResult.CONSUME;
+            }
             if (!level.isClientSide()) {
-                com.kingodogo.buildscape.platform.Services.PLATFORM.playItemFrameAdd(level, placePos);
+                hanging.playPlacementSound();
                 level.gameEvent(player, net.minecraft.world.level.gameevent.GameEvent.ENTITY_PLACE, placePos);
                 level.addFreshEntity(itemFrame);
                 if (player != null && !player.getAbilities().instabuild) {
                     itemStack.shrink(1);
                 }
             }
-            return net.minecraft.world.InteractionResult.SUCCESS;
+            return com.kingodogo.buildscape.platform.Services.PLATFORM.sidedSuccess(level.isClientSide());
         }
         return net.minecraft.world.InteractionResult.PASS;
     }

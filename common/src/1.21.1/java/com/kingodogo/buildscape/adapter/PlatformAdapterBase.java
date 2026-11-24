@@ -1882,6 +1882,13 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    public void setEnchantmentGlintOverride(ItemStack stack, boolean override) {
+        if (stack != null && !stack.isEmpty()) {
+            stack.set(net.minecraft.core.component.DataComponents.ENCHANTMENT_GLINT_OVERRIDE, override);
+        }
+    }
+
+    @Override
     public Item createBigOrnamentTemplateItem(Item.Properties properties) {
         return new com.kingodogo.buildscape.item.BigOrnamentTemplateItem(properties) {
             @Override public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {

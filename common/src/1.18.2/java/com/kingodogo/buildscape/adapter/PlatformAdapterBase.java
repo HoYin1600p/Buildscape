@@ -1825,6 +1825,9 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    public void setEnchantmentGlintOverride(ItemStack stack, boolean override) {}
+
+    @Override
     public Item createBigOrnamentTemplateItem(Item.Properties properties) {
         return new com.kingodogo.buildscape.item.BigOrnamentTemplateItem(properties) {
             @Override public void appendHoverText(ItemStack stack, @org.jetbrains.annotations.Nullable Level level, List<Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {

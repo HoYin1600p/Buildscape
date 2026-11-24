@@ -664,9 +664,19 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
         Thickness thickness = icicleState.getValue(THICKNESS);
         if (thickness != Thickness.TIP && thickness != Thickness.TIP_MERGE) return;
 
-        BlockPos cauldronPos = iciclePos.below();
-        BlockState cauldronState = level.getBlockState(cauldronPos);
-        if (!cauldronState.is(Blocks.CAULDRON)) return;
+        BlockPos cauldronPos = null;
+        for (int step = 1; step <= 11; step++) {
+            BlockPos target = iciclePos.below(step);
+            BlockState check = level.getBlockState(target);
+            if (check.is(Blocks.CAULDRON) || check.getBlock() instanceof IcicleCauldronBlock) {
+                cauldronPos = target;
+                break;
+            }
+            if (!check.isAir()) {
+                break;
+            }
+        }
+        if (cauldronPos == null) return;
 
         BlockPos icicleBlockPos = iciclePos.above();
         for (int i = 0; i < 11; i++) {
@@ -682,7 +692,9 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
         Block icicleBlock = icicleBlockState.getBlock();
         boolean isPackedIcicleBlock = (ModBlocks.PACKED_ICICLE_BLOCK != null && icicleBlock == ModBlocks.PACKED_ICICLE_BLOCK.get().getBlock())
                 || icicleBlock instanceof PackedIcicleBlock
-                || icicleBlock == Blocks.PACKED_ICE;
+                || icicleBlock == Blocks.PACKED_ICE
+                || (ModBlocks.ICICLE_BLOCK != null && icicleBlock == ModBlocks.ICICLE_BLOCK.get().getBlock())
+                || icicleBlock instanceof IcicleBlock;
 
         if (!isPackedIcicleBlock) return;
 
@@ -691,17 +703,19 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
         if (!waterState.getFluidState().is(FluidTags.WATER)) return;
 
         if (random.nextInt(10) == 0) {
-            Block icicleCauldron = ModBlocks.ICICLE_CAULDRON != null && ModBlocks.ICICLE_CAULDRON.get() != null ? ModBlocks.ICICLE_CAULDRON.get().getBlock() : null;
-            if (icicleCauldron != null) {
-                level.setBlock(cauldronPos, icicleCauldron.defaultBlockState(), 3);
+            BlockState cauldronState = level.getBlockState(cauldronPos);
+            if (cauldronState.is(Blocks.CAULDRON)) {
+                Block icicleCauldron = ModBlocks.ICICLE_CAULDRON != null && ModBlocks.ICICLE_CAULDRON.get() != null ? ModBlocks.ICICLE_CAULDRON.get().getBlock() : null;
+                if (icicleCauldron != null) {
+                    level.setBlock(cauldronPos, icicleCauldron.defaultBlockState(), 3);
+                }
             }
 
             BlockEntity blockEntity = level.getBlockEntity(cauldronPos);
-            if (blockEntity instanceof IcicleCauldronBlockEntity cauldronEntity) {
+            if (blockEntity instanceof IcicleCauldronBlockEntity cauldronEntity && cauldronEntity.isEmpty()) {
                 cauldronEntity.setStoredIcicle(new ItemStack(Services.PLATFORM.getItem(new CommonId("buildscape", "packed_icicle_block")), 1));
+                Services.PLATFORM.playBlockSound(level, cauldronPos, new CommonId("minecraft", "block.pointed_dripstone.drip_water_into_cauldron"));
             }
-
-            Services.PLATFORM.playBlockSound(level, cauldronPos, new CommonId("minecraft", "block.pointed_dripstone.drip_water_into_cauldron"));
         }
     }
 

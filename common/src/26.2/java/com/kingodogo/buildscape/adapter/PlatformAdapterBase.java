@@ -1783,6 +1783,13 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     }
 
     @Override
+    public void setEnchantmentGlintOverride(net.minecraft.world.item.ItemStack stack, boolean override) {
+        if (stack != null && !stack.isEmpty()) {
+            stack.set(net.minecraft.core.component.DataComponents.ENCHANTMENT_GLINT_OVERRIDE, override);
+        }
+    }
+
+    @Override
     public Item createBigOrnamentTemplateItem(Item.Properties properties) {
         return new com.kingodogo.buildscape.item.BigOrnamentTemplateItem(properties) {
             @Override public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
@@ -2755,7 +2762,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
         }
 
         public ColoredItemFrameEntityImpl(Level level, BlockPos pos, Direction direction, String color) {
-            super(EntityTypes.ITEM_FRAME, level, pos, direction);
+            super((EntityType<? extends ItemFrame>) Services.PLATFORM.getColoredItemFrameEntityType(), level, pos, direction);
             this.setColorVariant(color);
             if ("invisible".equals(color)) {
                 this.setInvisible(true);

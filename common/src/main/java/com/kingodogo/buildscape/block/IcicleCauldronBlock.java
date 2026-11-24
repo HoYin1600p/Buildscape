@@ -128,7 +128,9 @@ public class IcicleCauldronBlock extends CauldronBlock implements EntityBlock, I
         if (stack.isEmpty()) return false;
         Item expected = Services.PLATFORM.getItem(CommonId.of("buildscape", "icicle_block"));
         if (expected != null && stack.getItem() == expected) return true;
+        Item packedExpected = Services.PLATFORM.getItem(CommonId.of("buildscape", "packed_icicle_block"));
+        if (packedExpected != null && stack.getItem() == packedExpected) return true;
         String desc = stack.getItem().getDescriptionId();
-        return desc.contains("icicle_block") || (stack.getItem() instanceof BlockItem bi && bi.getBlock() instanceof IcicleBlock && !(bi.getBlock() instanceof PackedIcicleBlock));
+        return desc.contains("icicle_block") || (stack.getItem() instanceof BlockItem bi && (bi.getBlock() instanceof IcicleBlock || bi.getBlock() instanceof PackedIcicleBlock));
     }
 }

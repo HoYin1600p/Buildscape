@@ -1588,7 +1588,14 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
                     InteractionResult res = onInteract(level, pos, state, player, InteractionHand.MAIN_HAND, hit);
-                    return res != InteractionResult.PASS ? res : super.useWithoutItem(state, level, pos, player, hit);
+                    if (res != InteractionResult.PASS) {
+                        return res;
+                    }
+                    try {
+                        return super.useWithoutItem(state, level, pos, player, hit);
+                    } catch (Exception e) {
+                        return com.kingodogo.buildscape.platform.Services.PLATFORM.sidedSuccess(level.isClientSide());
+                    }
                 }
             };
         } else if (def.isHangingMoss()) {

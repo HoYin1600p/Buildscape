@@ -58,7 +58,7 @@ public abstract class ComposterPlanterMixin {
                     else if (block == Blocks.SAND) newType = PlanterType.SAND;
                     else {
                         com.kingodogo.buildscape.util.CommonId blockId = com.kingodogo.buildscape.platform.Services.PLATFORM.getBlockId(block);
-                        if (blockId != null && "buildscape".equals(blockId.getNamespace())) {
+                        if (blockId != null) {
                             switch (blockId.getPath()) {
                                 case "mud" -> newType = PlanterType.MUD;
                                 case "muddy_mangrove_roots" -> newType = PlanterType.MUDDY_MANGROVE_ROOTS;

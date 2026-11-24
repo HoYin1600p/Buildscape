@@ -32,9 +32,9 @@ public final class StrawBedHandler {
         }
     }
     public static boolean shouldCancelSpawn(Player player, BlockPos newSpawn) {
-        if (newSpawn != null) {
+        if (player != null && newSpawn != null) {
             Level level = Services.PLATFORM.getEntityLevel(player);
-            if (level != null) {
+            if (level != null && level.isLoaded(newSpawn)) {
                 BlockState state = level.getBlockState(newSpawn);
                 if (state.getBlock() instanceof StrawBedBlock) {
                     return true;

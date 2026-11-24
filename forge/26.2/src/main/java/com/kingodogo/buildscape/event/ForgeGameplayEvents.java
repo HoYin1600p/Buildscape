@@ -73,8 +73,9 @@ public final class ForgeGameplayEvents {
         });
         PlayerWakeUpEvent.BUS.addListener((PlayerWakeUpEvent event) -> StrawBedHandler.onPlayerWakeUp(event.getEntity()));
         PlayerSetSpawnEvent.BUS.addListener((PlayerSetSpawnEvent event) -> {
-            return StrawBedHandler.shouldCancelSpawn(event.getEntity(),
-                    event.getConfig() == null ? null : event.getConfig().respawnData().pos());
+            net.minecraft.core.BlockPos spawnPos = (event.getConfig() != null && event.getConfig().respawnData() != null)
+                    ? event.getConfig().respawnData().pos() : null;
+            return StrawBedHandler.shouldCancelSpawn(event.getEntity(), spawnPos);
         });
         EntityMobGriefingEvent.BUS.addListener((EntityMobGriefingEvent event) -> {
             if (ModCommonEvents.isMobGriefingDisabled(event.getEntity(), Services.PLATFORM.getEntityLevel(event.getEntity()))) {

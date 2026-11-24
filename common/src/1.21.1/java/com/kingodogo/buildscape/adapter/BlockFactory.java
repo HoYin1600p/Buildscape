@@ -1539,7 +1539,11 @@ public class BlockFactory implements IBlockFactory {
                     if (res != InteractionResult.PASS) {
                         return res;
                     }
-                    return super.useWithoutItem(state, level, pos, player, hit);
+                    try {
+                        return super.useWithoutItem(state, level, pos, player, hit);
+                    } catch (Exception e) {
+                        return InteractionResult.sidedSuccess(level.isClientSide());
+                    }
                 }
             };
         } else if (def.isHangingMoss()) {

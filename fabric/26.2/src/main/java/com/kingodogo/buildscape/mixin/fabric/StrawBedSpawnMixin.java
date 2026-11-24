@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class StrawBedSpawnMixin {
     @Inject(method = "setRespawnPosition", at = @At("HEAD"), cancellable = true)
     private void buildscape$keepSpawnForStrawBed(ServerPlayer.RespawnConfig config, boolean showMessage, CallbackInfo ci) {
-        if (config != null && StrawBedHandler.shouldCancelSpawn((ServerPlayer) (Object) this, config.respawnData().pos())) {
+        if (config != null && config.respawnData() != null && StrawBedHandler.shouldCancelSpawn((ServerPlayer) (Object) this, config.respawnData().pos())) {
             ci.cancel();
         }
     }

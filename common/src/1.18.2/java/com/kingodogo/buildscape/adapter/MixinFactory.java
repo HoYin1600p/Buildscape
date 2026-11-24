@@ -280,6 +280,8 @@ public class MixinFactory implements IMixinFactory {
     @Override
     public boolean isPlanterPlant(Block block) {
         return block instanceof net.minecraft.world.level.block.BushBlock
+                || block instanceof net.minecraft.world.level.block.CactusBlock
+                || block instanceof net.minecraft.world.level.block.SugarCaneBlock
                 || block instanceof net.minecraft.world.level.block.BambooBlock
                 || block instanceof net.minecraft.world.level.block.BambooSaplingBlock
                 || block instanceof net.minecraft.world.level.block.BigDripleafBlock

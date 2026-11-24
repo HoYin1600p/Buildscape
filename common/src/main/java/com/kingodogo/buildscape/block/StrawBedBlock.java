@@ -39,6 +39,9 @@ public class StrawBedBlock extends BedBlock implements ICommonInteractable {
 
     @Override
     public InteractionResult onInteract(Level level, BlockPos pos, BlockState state, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (!state.hasProperty(PART) || !state.hasProperty(FACING)) {
+            return InteractionResult.PASS;
+        }
         if (com.kingodogo.buildscape.platform.Services.PLATFORM.doesBedExplode(level)) {
             if (!level.isClientSide()) {
                 BlockPos headPos = state.getValue(PART) == BedPart.HEAD ? pos : pos.relative(state.getValue(FACING));

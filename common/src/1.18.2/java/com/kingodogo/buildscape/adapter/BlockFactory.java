@@ -1692,7 +1692,11 @@ public class BlockFactory implements IBlockFactory {
                     if (res != InteractionResult.PASS) {
                         return res;
                     }
-                    return super.use(state, level, pos, player, hand, hit);
+                    try {
+                        return super.use(state, level, pos, player, hand, hit);
+                    } catch (Exception e) {
+                        return InteractionResult.sidedSuccess(level.isClientSide());
+                    }
                 }
             };
         } else if (def.isHangingMoss()) {

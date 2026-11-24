@@ -198,35 +198,7 @@ public final class ParticleFactory {
             }
         );
 
-        register(ModParticles.CONFETTI.get(), sprites ->
-            (type, level, x, y, z, dx, dy, dz, random) -> new SingleQuadParticle(level, x, y, z, dx, dy, dz, sprites.first()) {
-                private final float rotationSpeed;
-                {
-                    setSpriteFromAge(sprites);
-                    int rgb = CONFETTI_COLORS[random.nextInt(CONFETTI_COLORS.length)];
-                    setColor(((rgb >> 16) & 255) / 255.0F, ((rgb >> 8) & 255) / 255.0F, (rgb & 255) / 255.0F);
-                    this.gravity = 0.05F + random.nextFloat() * 0.04F;
-                    this.lifetime = 70 + random.nextInt(40);
-                    this.hasPhysics = true;
-                    this.quadSize = 0.08F + random.nextFloat() * 0.12F;
-                    this.roll = random.nextFloat() * (float)(Math.PI * 2.0D);
-                    this.oRoll = this.roll;
-                    this.rotationSpeed = (random.nextFloat() - 0.5F) * 0.5F;
-                    this.xd = dx; this.yd = dy; this.zd = dz;
-                    this.alpha = 1.0F;
-                }
-                @Override public void tick() {
-                    super.tick();
-                    this.oRoll = this.roll;
-                    this.roll += this.rotationSpeed;
-                    this.xd *= 0.98D; this.zd *= 0.98D;
-                    if (this.age % 5 == 0) { this.xd += (random.nextDouble() - 0.5D) * 0.01D; this.zd += (random.nextDouble() - 0.5D) * 0.01D; }
-                    if (this.age > this.lifetime * 0.8F) this.alpha = 1.0F - (float)(this.age - this.lifetime * 0.8F) / (this.lifetime * 0.2F);
-                }
-                @Override public ParticleRenderType getGroup() { return ParticleRenderType.SINGLE_QUADS; }
-                @Override protected Layer getLayer() { return Layer.TRANSLUCENT; }
-            }
-        );
+        register(ModParticles.CONFETTI.get(), com.kingodogo.buildscape.client.particle.ConfettiParticle::provider);
 
         register(ModParticles.TINTABLE_HEART.get(), sprites ->
             (type, level, x, y, z, dx, dy, dz, random) -> new SingleQuadParticle(level, x, y, z, dx, dy, dz, sprites.first()) {

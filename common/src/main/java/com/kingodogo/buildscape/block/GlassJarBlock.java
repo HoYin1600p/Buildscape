@@ -99,6 +99,7 @@ public abstract class GlassJarBlock extends BaseEntityBlock implements SimpleWat
         if (!isSneaking) {
             if (GlassJarBlockEntity.isLiquidItem(held) && jarBE.canAcceptLiquid(held)) {
                 if (level.isClientSide()) {
+                    jarBE.triggerWobble();
                     return InteractionResult.SUCCESS;
                 }
                 boolean isBucket = held.getItem() instanceof BucketItem || held.is(Items.MILK_BUCKET);
@@ -122,6 +123,7 @@ public abstract class GlassJarBlock extends BaseEntityBlock implements SimpleWat
             }
             if (GlassJarBlockEntity.isFoodItem(held) && jarBE.canAcceptFood(held)) {
                 if (level.isClientSide()) {
+                    jarBE.triggerWobble();
                     return InteractionResult.SUCCESS;
                 }
                 ItemStack singleInsert = held.copy();
@@ -141,7 +143,10 @@ public abstract class GlassJarBlock extends BaseEntityBlock implements SimpleWat
             if (!jarBE.isEmpty() && !jarBE.hasLiquid()) {
                 ItemStack stored = jarBE.getStoredItem();
                 if (held.isEmpty()) {
-                    if (level.isClientSide()) return InteractionResult.SUCCESS;
+                    if (level.isClientSide()) {
+                        jarBE.triggerWobble();
+                        return InteractionResult.SUCCESS;
+                    }
                     ItemStack item = jarBE.extractFood(1);
                     if (!item.isEmpty()) {
                         player.setItemInHand(hand, item);
@@ -149,7 +154,10 @@ public abstract class GlassJarBlock extends BaseEntityBlock implements SimpleWat
                         return InteractionResult.SUCCESS;
                     }
                 } else if (com.kingodogo.buildscape.platform.Services.PLATFORM.isSameItemSameComponents(held, stored)) {
-                    if (level.isClientSide()) return InteractionResult.SUCCESS;
+                    if (level.isClientSide()) {
+                        jarBE.triggerWobble();
+                        return InteractionResult.SUCCESS;
+                    }
                     ItemStack item = jarBE.extractFood(1);
                     if (!item.isEmpty()) {
                         if (held.getCount() < held.getMaxStackSize()) {
@@ -172,7 +180,10 @@ public abstract class GlassJarBlock extends BaseEntityBlock implements SimpleWat
             if (jarBE.getLiquidLevel() >= required) {
                 ItemStack bucketRepresentation = jarBE.getBucketRepresentation();
                 if (!bucketRepresentation.isEmpty()) {
-                    if (level.isClientSide()) return InteractionResult.SUCCESS;
+                    if (level.isClientSide()) {
+                        jarBE.triggerWobble();
+                        return InteractionResult.SUCCESS;
+                    }
                     ItemStack filledBucket = jarBE.extractBucket();
                     if (!filledBucket.isEmpty()) {
                         if (!player.getAbilities().instabuild) {
@@ -190,7 +201,10 @@ public abstract class GlassJarBlock extends BaseEntityBlock implements SimpleWat
         if (held.is(Items.GLASS_BOTTLE) && jarBE.hasLiquid() && jarBE.getLiquidLevel() > 0) {
             ItemStack bottleRepresentation = jarBE.getBottleRepresentation();
             if (!bottleRepresentation.isEmpty()) {
-                if (level.isClientSide()) return InteractionResult.SUCCESS;
+                if (level.isClientSide()) {
+                    jarBE.triggerWobble();
+                    return InteractionResult.SUCCESS;
+                }
                 ItemStack filledBottle = jarBE.extractBottle();
                 if (!filledBottle.isEmpty()) {
                     if (!player.getAbilities().instabuild) {
@@ -207,7 +221,10 @@ public abstract class GlassJarBlock extends BaseEntityBlock implements SimpleWat
         if (!isSneaking && held.isEmpty()) {
             if (!jarBE.isEmpty() && !jarBE.hasLiquid()) {
                 if (player.canEat(false) || player.getAbilities().instabuild) {
-                    if (level.isClientSide()) return InteractionResult.SUCCESS;
+                    if (level.isClientSide()) {
+                        jarBE.triggerWobble();
+                        return InteractionResult.SUCCESS;
+                    }
 
                     ItemStack stored = jarBE.getStoredItem();
                     if (!stored.isEmpty()) {
@@ -230,7 +247,10 @@ public abstract class GlassJarBlock extends BaseEntityBlock implements SimpleWat
                         return InteractionResult.PASS;
                     }
 
-                    if (level.isClientSide()) return InteractionResult.SUCCESS;
+                    if (level.isClientSide()) {
+                        jarBE.triggerWobble();
+                        return InteractionResult.SUCCESS;
+                    }
 
                     if (liquidItem.getItem() instanceof PotionItem) {
                         com.kingodogo.buildscape.platform.Services.PLATFORM.applyPotionEffects(player, liquidItem);

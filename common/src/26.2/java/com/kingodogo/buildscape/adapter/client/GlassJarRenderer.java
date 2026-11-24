@@ -164,6 +164,8 @@ public final class GlassJarRenderer implements BlockEntityRenderer<GlassJarBlock
                 lo, bottom, lo, lo, bottom, hi, lo, top, hi, lo, top, lo);
         quad(state, pose, consumer, light, overlay, 1, 0, 0,
                 hi, top, lo, hi, top, hi, hi, bottom, hi, hi, bottom, lo);
+        quad(state, pose, consumer, light, overlay, 0, -1, 0,
+                lo, bottom, hi, lo, bottom, lo, hi, bottom, lo, hi, bottom, hi);
     }
 
     private static void quad(State state, PoseStack.Pose pose, VertexConsumer consumer, int light, int overlay,

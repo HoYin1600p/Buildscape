@@ -10,7 +10,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 public abstract class DataBlockEntity extends BlockEntity implements IDataSerializable {
     protected DataBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) { super(type, pos, state); }
-    protected boolean syncCustomData() { return false; }
+    protected boolean syncCustomData() { return true; }
     protected void writeUpdateData(IBlockEntityWriteData output) { writeData(output); }
 
     @Override public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider lookup) {

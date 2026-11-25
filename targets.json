@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "targets": [
+    {
+      "minecraft": "1.18.2",
+      "java": 17,
+      "loaders": {
+        "fabric": { "status": "verified" },
+        "forge": { "status": "verified" }
+      }
+    },
+    {
+      "minecraft": "1.19.2",
+      "java": 17,
+      "loaders": {
+        "fabric": { "status": "verified" },
+        "forge": { "status": "verified" }
+      }
+    },
+    {
+      "minecraft": "1.20.1",
+      "java": 17,
+      "loaders": {
+        "fabric": { "status": "verified" },
+        "forge": { "status": "verified" },
+        "neoforge": { "status": "verified" }
+      }
+    },
+    {
+      "minecraft": "1.20.4",
+      "java": 17,
+      "loaders": {
+        "fabric": { "status": "verified" },
+        "forge": { "status": "verified" },
+        "neoforge": { "status": "verified" }
+      }
+    },
+    {
+      "minecraft": "1.20.6",
+      "java": 21,
+      "loaders": {
+        "fabric": { "status": "verified" },
+        "forge": { "status": "verified" },
+        "neoforge": { "status": "verified" }
+      }
+    },
+    {
+      "minecraft": "1.21.1",
+      "java": 21,
+      "loaders": {
+        "fabric": { "status": "verified" },
+        "forge": { "status": "verified" },
+        "neoforge": { "status": "verified" }
+      }
+    },
+    {
+      "minecraft": "1.21.4",
+      "java": 21,
+      "loaders": {
+        "fabric": { "status": "verified" },
+        "forge": { "status": "verified" },
+        "neoforge": { "status": "verified" }
+      }
+    },
+    {
+      "minecraft": "26.2",
+      "java": 25,
+      "loaders": {
+        "fabric": { "status": "verified" },
+        "forge": { "status": "verified" },
+        "neoforge": { "status": "verified" }
+      }
+    },
+    {
+      "minecraft": "26.3",
+      "java": 25,
+      "loaders": {
+        "fabric": { "status": "verified" },
+        "forge": { "status": "verified" },
+        "neoforge": { "status": "verified" }
+      }
+    },
+    {
+      "minecraft": "26.4",
+      "java": 25,
+      "loaders": {
+        "fabric": { "status": "upcoming" },
+        "neoforge": { "status": "upcoming" }
+      }
+    }
+  ]
+}

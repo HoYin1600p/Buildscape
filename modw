@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -e
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if [ "${1:-}" = "setup-dev" ]; then
+    echo "Configuring recursive submodule updates and initializing submodules..."
+    git -C "$ROOT_DIR" config submodule.recurse true
+    git -C "$ROOT_DIR" submodule update --init --recursive
+    if [ -f "$ROOT_DIR/scripts/hooks/prepare-commit-msg" ]; then
+        mkdir -p "$ROOT_DIR/.git/hooks"
+        cp "$ROOT_DIR/scripts/hooks/prepare-commit-msg" "$ROOT_DIR/.git/hooks/prepare-commit-msg"
+        chmod +x "$ROOT_DIR/.git/hooks/prepare-commit-msg"
+        echo "Installed .git/hooks/prepare-commit-msg"
+    fi
+    echo "Developer setup complete."
+    exit 0
+fi
+
+MC="1.20.1"
+LOADER="fabric"
+ARGS=()
+
+for arg in "$@"; do
+    if [[ "$arg" == -Pmc=* ]]; then
+        MC="${arg#-Pmc=}"
+    elif [[ "$arg" == -Ploader=* ]]; then
+        LOADER="${arg#-Ploader=}"
+    else
+        ARGS+=("$arg")
+    fi
+done
+
+TARGET_DIR="$ROOT_DIR/.gradle/build-roots/$MC/$LOADER"
+mkdir -p "$TARGET_DIR"
+echo "rootProject.name = 'buildscape-$MC-$LOADER'" > "$TARGET_DIR/settings.gradle"
+cp "$ROOT_DIR/build-logic/target.gradle" "$TARGET_DIR/build.gradle"
+cp "$ROOT_DIR/gradle.properties" "$TARGET_DIR/gradle.properties"
+
+exec "$ROOT_DIR/gradlew" -p "$TARGET_DIR" -PtemplateRoot="$ROOT_DIR" -Pmc="$MC" -Ploader="$LOADER" "${ARGS[@]}"

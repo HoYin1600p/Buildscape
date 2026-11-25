@@ -1,95 +1,137 @@
 plugins {
     id 'base'
-    id 'idea'
-    id 'xyz.wagyourtail.unimined' version '1.4.41-kappa' apply false
 }
 
-defaultTasks 'build'
+ext.isWindows = System.getProperty('os.name').toLowerCase().contains('windows')
+ext.gradlewScript = file(ext.isWindows ? 'gradlew.bat' : 'gradlew').absolutePath
 
-// Migration builds are explicit; the default build continues to verify 26.2/1.18.2.
-if (findProject(':fabric:26.3') != null) {
-    tasks.register('build263') {
-        group = 'build'
-        description = 'Builds the opt-in Fabric and NeoForge 26.3 targets'
-        dependsOn ':fabric:26.3:build', ':neoforge:26.3:build'
+def configureJavaHome(Exec task, String loader = 'fabric') {
+    def localProps = new Properties()
+    def localFile = file('local.properties')
+    if (localFile.isFile()) {
+        localFile.withInputStream { localProps.load(it) }
     }
-}
-
-// Enabling the 1.21.1 loader also enables shared minecraft1211 verification, even when
-// buildscape.minecraft1211 was not supplied separately on the command line.
-if (findProject(':neoforge:1.21.1') != null || findProject(':fabric:1.21.1') != null || findProject(':forge:1.21.1') != null) {
-    project(':common').tasks.matching { it.name == 'check' }.configureEach {
-        dependsOn ':common:compileMinecraft1211Java'
-    }
-}
-
-subprojects {
-    if (childProjects.isEmpty()) {
-        apply plugin: 'java'
-        apply plugin: 'idea'
-        group = 'com.kingodogo.buildscape'
-        version = providers.gradleProperty('mod_version').get()
-
-        java.toolchain.languageVersion = JavaLanguageVersion.of(25)
-        repositories {
-            mavenCentral()
-            maven { url = 'https://libraries.minecraft.net/' }
-            maven { url = 'https://maven.fabricmc.net/' }
-            maven { url = 'https://maven.neoforged.net/releases/' }
-            maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
-        }
-        tasks.withType(JavaCompile).configureEach {
-            options.encoding = 'UTF-8'
-        }
-        if (path != ':common') {
-            base.archivesName = "buildscape-${parent.name}-${name}"
-            if (path in [':forge:1.18.2', ':fabric:1.18.2', ':forge:1.21.1', ':fabric:1.21.1', ':neoforge:1.21.1']) {
-                // The older version trees are complete snapshots; only opt in shared resources
-                // that are known to be compatible until those snapshots are fully reduced to overlays.
-                tasks.named('processResources', ProcessResources) {
-                    from(rootProject.file('common/src/main/resources')) {
-                        include 'assets/buildscape/textures/client/ui/**'
-                        include 'data/buildscape/config/default_pillar_properties.json'
-                    }
-                }
-            }
-            // These loaders already expand metadata in their module build scripts.
-            if (!(path in [':forge:1.18.2', ':fabric:1.18.2', ':fabric:1.21.1', ':neoforge:1.21.1', ':forge:1.21.1'])) {
-                tasks.named('processResources', ProcessResources) {
-                    inputs.property('mod_version', project.version)
-                    filesMatching(['fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml']) {
-                        expand(mod_version: project.version, version: project.version)
-                    }
-                }
-            }
+    def preferred = (loader == 'forge')
+        ? (localProps.getProperty('java.21.home') ?: System.getenv('JAVA_21_HOME') ?: localProps.getProperty('java.25.home') ?: System.getenv('JAVA_25_HOME'))
+        : (localProps.getProperty('java.25.home') ?: System.getenv('JAVA_25_HOME') ?: localProps.getProperty('java.21.home') ?: System.getenv('JAVA_21_HOME'))
+    def javaHome = preferred ?: System.getenv('JAVA_HOME') ?: System.getProperty('java.home')
+    if (javaHome) {
+        def dir = file(javaHome)
+        if (dir.isDirectory()) {
+            task.environment 'JAVA_HOME', dir.absolutePath
         }
     }
 }
 
-def loaderProjects = subprojects.findAll { it.path != ':common' && it.childProjects.isEmpty() }
-def collectModJars = tasks.register('collectModJars', Copy) {
-    group = 'build'
-    description = 'Collects the enabled loader mod jars into build/libs'
-    into layout.buildDirectory.dir('libs')
-    loaderProjects.each { loader ->
-        dependsOn loader.tasks.named('assemble')
-        from(loader.layout.buildDirectory.dir('libs')) {
-            include '*.jar'
-            exclude '*-dev.jar', '*-sources.jar'
-        }
+def prepareTargetRoot(File rootDir, String mc, String loader) {
+    def targetDir = new File(rootDir, ".gradle/build-roots/${mc}/${loader}")
+    targetDir.mkdirs()
+    new File(targetDir, 'settings.gradle').text = "rootProject.name = 'buildscape-${mc}-${loader}'\n"
+    new File(targetDir, 'build.gradle').text = new File(rootDir, 'build-logic/target.gradle').text
+    new File(targetDir, 'gradle.properties').text = new File(rootDir, 'gradle.properties').text
+    def localProps = new File(rootDir, 'local.properties')
+    if (localProps.isFile()) {
+        new File(targetDir, 'local.properties').text = localProps.text
+    }
+
+    def wrapperDir = new File(targetDir, 'gradle/wrapper')
+    wrapperDir.mkdirs()
+    def wrapperJar = new File(rootDir, 'gradle/wrapper/gradle-wrapper.jar')
+    if (wrapperJar.isFile()) {
+        new File(wrapperDir, 'gradle-wrapper.jar').bytes = wrapperJar.bytes
+    }
+    def gradlewBat = new File(rootDir, 'gradlew.bat')
+    if (gradlewBat.isFile()) {
+        new File(targetDir, 'gradlew.bat').text = gradlewBat.text
+    }
+    def gradlewSh = new File(rootDir, 'gradlew')
+    if (gradlewSh.isFile()) {
+        new File(targetDir, 'gradlew').text = gradlewSh.text
+        new File(targetDir, 'gradlew').setExecutable(true)
+    }
+
+    def gradleVer = (loader == 'forge') ? '8.10.2' : '9.6.0'
+    def daemonJvm = (loader == 'forge') ? '21' : '25'
+    new File(wrapperDir, 'gradle-wrapper.properties').text = """distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+distributionUrl=https\\://services.gradle.org/distributions/gradle-${gradleVer}-bin.zip
+networkTimeout=10000
+validateDistributionUrl=true
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists
+"""
+    new File(targetDir, 'gradle/gradle-daemon-jvm.properties').text = "toolchainVersion=${daemonJvm}\n"
+    return targetDir
+}
+
+def executeTarget(Project proj, String mc, String loader, String verb, List<String> extraArgs = []) {
+    def targetDir = prepareTargetRoot(proj.projectDir, mc, loader)
+    def script = proj.file(new File(targetDir, proj.ext.isWindows ? 'gradlew.bat' : 'gradlew')).absolutePath
+    def cmd = [script, '-p', targetDir.absolutePath, "-PtemplateRoot=${proj.projectDir.absolutePath}", "-Pmc=${mc}", "-Ploader=${loader}"]
+    cmd.addAll(extraArgs)
+    cmd.add(verb)
+    return cmd
+}
+
+tasks.register('buildTarget', Exec) {
+    def mc = project.findProperty('mc') ?: '1.20.1'
+    def loader = project.findProperty('loader') ?: 'fabric'
+    configureJavaHome(it, loader)
+    doFirst {
+        commandLine executeTarget(project, mc, loader, 'build')
     }
 }
 
-tasks.named('assemble') { dependsOn collectModJars }
 tasks.named('build') {
-    if (findProject(':common') != null) dependsOn ':common:build'
-    loaderProjects.each { loader ->
-        dependsOn loader.tasks.named('build')
+    dependsOn 'buildTarget'
+}
+
+tasks.register('cleanTarget', Exec) {
+    def mc = project.findProperty('mc') ?: '1.20.1'
+    def loader = project.findProperty('loader') ?: 'fabric'
+    configureJavaHome(it, loader)
+    doFirst {
+        commandLine executeTarget(project, mc, loader, 'clean')
     }
 }
 
-if (findProject(':forge:1.21.1') != null) {
-    project(':common').tasks.matching { it.name == 'check' }.configureEach {
-        dependsOn ':common:compileMinecraft1211Java', ':common:minecraft1211Test'
+tasks.named('clean') {
+    dependsOn 'cleanTarget'
+}
+
+tasks.register('runClient', Exec) {
+    group = 'minecraft run'
+    description = 'Runs the Minecraft client for the specified target (-Pmc=... -Ploader=...)'
+    def mc = project.findProperty('mc') ?: '1.20.1'
+    def loader = project.findProperty('loader') ?: 'fabric'
+    configureJavaHome(it, loader)
+    doFirst {
+        commandLine executeTarget(project, mc, loader, 'runClient')
+    }
+}
+
+tasks.register('runServer', Exec) {
+    group = 'minecraft run'
+    description = 'Runs the Minecraft server for the specified target (-Pmc=... -Ploader=...)'
+    def mc = project.findProperty('mc') ?: '1.20.1'
+    def loader = project.findProperty('loader') ?: 'fabric'
+    configureJavaHome(it, loader)
+    doFirst {
+        commandLine executeTarget(project, mc, loader, 'runServer')
+    }
+}
+
+
+tasks.register('collectModJars', Copy) {
+    group = 'build'
+    description = 'Collects the built target jars into build/libs'
+    into layout.buildDirectory.dir('libs')
+    from(file('build')) {
+        include '*/*/libs/*.jar'
+        exclude '*-dev.jar', '*-sources.jar'
+        eachFile {
+            path = name
+        }
+        includeEmptyDirs = false
     }
 }

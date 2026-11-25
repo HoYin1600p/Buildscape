@@ -1,0 +1,116 @@
+if (targetPins.getProperty('fabric.plugin') == 'xyz.wagyourtail.unimined') {
+    apply plugin: 'xyz.wagyourtail.unimined'
+
+    repositories {
+        maven { url = 'https://maven.fabricmc.net/' }
+        maven { url = 'https://maven.wagyourtail.xyz/releases' }
+    }
+
+    File apiWidener = null
+    if (targetPins.getProperty('fabric.api')) {
+        def fabricApiConfig = configurations.detachedConfiguration(
+                dependencies.create("net.fabricmc.fabric-api:fabric-api:${targetPins.getProperty('fabric.api')}"))
+        fabricApiConfig.transitive = false
+        apiWidener = layout.buildDirectory.file('generated/accessWideners/fabric-api.accesswidener').get().asFile
+        def apiJarFile = fabricApiConfig.singleFile
+        def apiZip = new java.util.zip.ZipFile(apiJarFile)
+        try {
+            def nestedEntry = apiZip.entries().find {
+                it.name.startsWith('META-INF/jars/fabric-transitive-access-wideners-v1-') && it.name.endsWith('.jar')
+            }
+            if (nestedEntry != null) {
+                def nested = new java.util.zip.ZipInputStream(apiZip.getInputStream(nestedEntry))
+                try {
+                    def entry
+                    def widenerText = null
+                    while ((entry = nested.nextEntry) != null) {
+                        if (entry.name.endsWith('.classtweaker') || entry.name.endsWith('.accesswidener')) {
+                            widenerText = new String(nested.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8)
+                            break
+                        }
+                    }
+                    if (widenerText != null && widenerText.startsWith('accessWidener v2 official')) {
+                        apiWidener.parentFile.mkdirs()
+                        if (!apiWidener.exists() || apiWidener.getText('UTF-8') != widenerText) {
+                            apiWidener.setText(widenerText, 'UTF-8')
+                        }
+                    }
+                } finally {
+                    nested.close()
+                }
+            }
+        } finally {
+            apiZip.close()
+        }
+    }
+
+    unimined.minecraft {
+        version targetMinecraft
+        defaultRemapJar = false
+        fabric {
+            loader targetPins.getProperty('fabric.version')
+            if (apiWidener != null && apiWidener.exists()) {
+                accessWidener apiWidener
+                skipInsertAw = true
+            }
+        }
+        mods.modImplementation {
+            catchAWNamespaceAssertion()
+        }
+    }
+
+    dependencies {
+        if (targetPins.getProperty('fabric.api')) {
+            modImplementation "net.fabricmc.fabric-api:fabric-api:${targetPins.getProperty('fabric.api')}"
+        }
+    }
+} else {
+    apply plugin: 'fabric-loom'
+
+    repositories {
+        maven { url = 'https://maven.fabricmc.net/' }
+    }
+
+    dependencies {
+        minecraft "com.mojang:minecraft:${targetMinecraft}"
+        if (targetPins.getProperty('fabric.mappings') == 'none') {
+            mappings loom.layered {}
+        } else {
+            mappings loom.officialMojangMappings()
+        }
+        modImplementation "net.fabricmc:fabric-loader:${targetPins.getProperty('fabric.version')}"
+        if (targetPins.getProperty('fabric.api')) {
+            modImplementation "net.fabricmc.fabric-api:fabric-api:${targetPins.getProperty('fabric.api')}"
+        }
+    }
+
+    loom {
+        def awFile = new File(templateRoot, "versions/${targetMinecraft}/fabric/src/main/resources/buildscape.accesswidener")
+        if (!awFile.isFile()) {
+            awFile = new File(templateRoot, "versions/${targetMinecraft}/common/src/main/resources/buildscape.accesswidener")
+        }
+        if (awFile.isFile()) {
+            accessWidenerPath = awFile
+        }
+        runs {
+            client {
+                client()
+                runDir(new File(templateRoot, "run/${targetMinecraft}/fabric/client").absolutePath)
+            }
+            server {
+                server()
+                runDir(new File(templateRoot, "run/${targetMinecraft}/fabric/server").absolutePath)
+            }
+        }
+    }
+}
+
+gradle.projectsEvaluated {
+    tasks.matching { it.name.startsWith('run') }.configureEach {
+        dependsOn tasks.named('processResources')
+        doFirst {
+            new File(templateRoot, "run/${targetMinecraft}/fabric/client").mkdirs()
+            new File(templateRoot, "run/${targetMinecraft}/fabric/server").mkdirs()
+        }
+    }
+}

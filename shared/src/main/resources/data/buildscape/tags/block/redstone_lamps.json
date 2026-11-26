@@ -1,0 +1,20 @@
+{
+  "values": [
+    "buildscape:white_redstone_lamp",
+    "buildscape:orange_redstone_lamp",
+    "buildscape:magenta_redstone_lamp",
+    "buildscape:light_blue_redstone_lamp",
+    "buildscape:yellow_redstone_lamp",
+    "buildscape:lime_redstone_lamp",
+    "buildscape:pink_redstone_lamp",
+    "buildscape:gray_redstone_lamp",
+    "buildscape:light_gray_redstone_lamp",
+    "buildscape:cyan_redstone_lamp",
+    "buildscape:purple_redstone_lamp",
+    "buildscape:blue_redstone_lamp",
+    "buildscape:brown_redstone_lamp",
+    "buildscape:green_redstone_lamp",
+    "buildscape:red_redstone_lamp",
+    "buildscape:black_redstone_lamp"
+  ]
+}

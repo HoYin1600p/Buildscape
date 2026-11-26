@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:tinted_glass",
+    { "id": "buildscape:tinted_glass_slab", "required": false },
+    { "id": "buildscape:tinted_glass_stairs", "required": false },
+    { "id": "buildscape:tinted_glass_vertical_slab", "required": false },
+    { "id": "buildscape:tinted_glass_ornament", "required": false },
+    { "id": "buildscape:big_tinted_glass_ornament", "required": false }
+  ]
+}

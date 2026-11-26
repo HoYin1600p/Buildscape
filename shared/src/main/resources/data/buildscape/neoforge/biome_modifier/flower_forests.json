@@ -1,0 +1,13 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#minecraft:buildscape/flower_forests",
+  "features": [
+    "buildscape:red_monets",
+    "buildscape:blue_monets",
+    "buildscape:purple_monets",
+    "buildscape:light_blue_monets",
+    "buildscape:pink_monets",
+    "buildscape:yellow_monets"
+  ],
+  "step": "vegetal_decoration"
+}

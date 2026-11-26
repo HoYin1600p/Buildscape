@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "buildscape:block/tall_dry_grass_top"
+  },
+  "render_type": "cutout"
+}

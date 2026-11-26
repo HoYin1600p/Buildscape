@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:cascade_block"
+    },
+    "title": {
+      "translate": "advancements.buildscape.let_it_cascade.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.let_it_cascade.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:root",
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

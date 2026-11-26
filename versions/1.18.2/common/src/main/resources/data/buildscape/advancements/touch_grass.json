@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:copper_biome_brush"
+    },
+    "title": {
+      "translate": "advancements.buildscape.touch_grass.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.touch_grass.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:root",
+  "criteria": {
+    "capture_biome": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

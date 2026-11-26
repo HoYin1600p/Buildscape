@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:iron_hammer"
+    },
+    "title": {
+      "translate": "advancements.buildscape.fixer_upper.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.fixer_upper.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:root",
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "values": [
+    "buildscape:bamboo_block",
+    "buildscape:bamboo_block_stairs",
+    "buildscape:bamboo_block_slab",
+    "buildscape:bamboo_block_wall",
+    "buildscape:bamboo_block_fence",
+    "buildscape:bamboo_block_fence_gate",
+    "buildscape:bamboo_block_button",
+    "buildscape:bamboo_block_pressure_plate",
+    "buildscape:stripped_bamboo_block",
+    "buildscape:stripped_bamboo_block_stairs",
+    "buildscape:stripped_bamboo_block_slab",
+    "buildscape:stripped_bamboo_block_wall",
+    "buildscape:stripped_bamboo_block_fence",
+    "buildscape:stripped_bamboo_block_fence_gate",
+    "buildscape:stripped_bamboo_block_button",
+    "buildscape:stripped_bamboo_block_pressure_plate"
+  ]
+}
+

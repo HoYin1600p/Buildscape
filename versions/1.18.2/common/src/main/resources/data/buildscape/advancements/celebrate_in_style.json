@@ -1,0 +1,30 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:confetti"
+    },
+    "title": {
+      "translate": "advancements.buildscape.celebrate_in_style.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.celebrate_in_style.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:grand_celebration",
+  "rewards": {
+    "items": [
+      {
+        "item": "buildscape:music_disc_celebration"
+      }
+    ]
+  },
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

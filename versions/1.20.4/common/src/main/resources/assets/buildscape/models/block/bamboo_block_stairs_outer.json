@@ -1,0 +1,9 @@
+{
+  "parent": "block/outer_stairs",
+  "textures": {
+    "bottom": "minecraft:block/bamboo_block",
+    "top": "minecraft:block/bamboo_block",
+    "side": "minecraft:block/bamboo_block",
+    "particle": "#side"
+  }
+}

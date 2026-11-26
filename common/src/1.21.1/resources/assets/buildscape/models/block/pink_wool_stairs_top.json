@@ -1,8 +1,0 @@
-{
-  "textures": {
-    "bottom": "minecraft:block/pink_wool",
-    "top": "minecraft:block/pink_wool",
-    "side": "minecraft:block/pink_wool"
-  },
-  "parent": "minecraft:block/stairs"
-}

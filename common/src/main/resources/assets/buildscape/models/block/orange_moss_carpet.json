@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/carpet",
-  "textures": {
-    "wool": "buildscape:block/orange_moss_block",
-    "particle": "buildscape:block/orange_moss_block"
-  },
-  "render_type": "cutout"
-}

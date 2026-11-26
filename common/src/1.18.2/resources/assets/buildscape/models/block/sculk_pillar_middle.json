@@ -1,7 +1,0 @@
-{
-  "parent": "buildscape:block/pillar_middle",
-  "textures": {
-    "1": "buildscape:block/sculk_pillar_middle",
-    "particle": "buildscape:block/sculk"
-  }
-}

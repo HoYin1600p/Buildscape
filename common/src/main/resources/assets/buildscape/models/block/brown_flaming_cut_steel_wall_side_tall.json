@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:block/template_wall_side_tall",
-  "textures": {
-    "wall": "buildscape:block/brown_flaming_cut_steel",
-    "particle": "buildscape:block/brown_flaming_cut_steel"
-  }
-}

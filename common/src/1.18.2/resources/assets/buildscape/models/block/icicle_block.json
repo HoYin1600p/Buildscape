@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "buildscape:block/icicle_block",
-    "particle": "#all"
-  },
-  "render_type": "minecraft:translucent"
-}

@@ -1,8 +1,0 @@
-{
-  "textures": {
-    "bottom": "buildscape:block/poplar_log",
-    "top": "buildscape:block/poplar_log",
-    "side": "buildscape:block/poplar_log"
-  },
-  "parent": "minecraft:block/slab"
-}

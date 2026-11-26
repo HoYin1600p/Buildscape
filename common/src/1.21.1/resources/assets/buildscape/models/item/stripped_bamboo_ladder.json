@@ -1,6 +1,0 @@
-{
-  "textures": {
-    "layer0": "buildscape:block/stripped_bamboo_ladder"
-  },
-  "parent": "minecraft:item/generated"
-}

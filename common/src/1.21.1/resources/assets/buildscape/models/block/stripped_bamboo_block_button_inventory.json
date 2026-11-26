@@ -1,7 +1,0 @@
-{
-  "parent": "block/button_inventory",
-  "textures": {
-    "texture": "minecraft:block/stripped_bamboo_block",
-    "particle": "#texture"
-  }
-}

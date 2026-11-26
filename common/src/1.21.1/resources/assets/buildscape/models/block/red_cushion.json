@@ -1,7 +1,0 @@
-{
-  "parent": "buildscape:block/cushion_base",
-  "textures": {
-    "cushion_texture": "buildscape:block/cushion/red",
-    "particle": "buildscape:block/cushion/red"
-  }
-}

@@ -1,8 +1,0 @@
-{
-  "parent": "block/cube_all",
-  "textures": {
-    "all": "buildscape:block/bit_weathered_copper_grate",
-    "particle": "#all"
-  },
-  "render_type": "translucent"
-}

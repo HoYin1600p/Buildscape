@@ -1,6 +1,0 @@
-{
-  "textures": {
-    "layer0": "buildscape:item/large_weathered_copper_chain"
-  },
-  "parent": "item/generated"
-}

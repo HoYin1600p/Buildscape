@@ -1,7 +1,0 @@
-{
-  "parent": "buildscape:block/pillar_bottom",
-  "textures": {
-    "2": "buildscape:block/tuff_pillar_bottom",
-    "particle": "buildscape:block/polished_tuff"
-  }
-}

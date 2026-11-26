@@ -1,9 +1,0 @@
-{
-  "parent": "buildscape:block/template_vertical_slab",
-  "textures": {
-    "bottom": "buildscape:block/dark_prismarine",
-    "top": "buildscape:block/dark_prismarine",
-    "side": "buildscape:block/dark_prismarine",
-    "particle": "#side"
-  }
-}

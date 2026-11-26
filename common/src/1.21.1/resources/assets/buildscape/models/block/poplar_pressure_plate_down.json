@@ -1,6 +1,0 @@
-{
-  "textures": {
-    "texture": "buildscape:block/poplar_planks"
-  },
-  "parent": "minecraft:block/pressure_plate_down"
-}

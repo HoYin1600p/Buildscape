@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=north,part=single": { "model": "buildscape:block/ashenking_emerald_pillar" },
+    "facing=south,part=single": { "model": "buildscape:block/ashenking_emerald_pillar", "y": 180 },
+    "facing=west,part=single":  { "model": "buildscape:block/ashenking_emerald_pillar", "y": 270 },
+    "facing=east,part=single":  { "model": "buildscape:block/ashenking_emerald_pillar", "y": 90 },
+    "facing=north,part=bottom": { "model": "buildscape:block/ashenking_emerald_pillar" },
+    "facing=south,part=bottom": { "model": "buildscape:block/ashenking_emerald_pillar", "y": 180 },
+    "facing=west,part=bottom":  { "model": "buildscape:block/ashenking_emerald_pillar", "y": 270 },
+    "facing=east,part=bottom":  { "model": "buildscape:block/ashenking_emerald_pillar", "y": 90 },
+    "facing=north,part=middle": { "model": "buildscape:block/ashenking_emerald_pillar" },
+    "facing=south,part=middle": { "model": "buildscape:block/ashenking_emerald_pillar", "y": 180 },
+    "facing=west,part=middle":  { "model": "buildscape:block/ashenking_emerald_pillar", "y": 270 },
+    "facing=east,part=middle":  { "model": "buildscape:block/ashenking_emerald_pillar", "y": 90 },
+    "facing=north,part=top":    { "model": "buildscape:block/ashenking_emerald_pillar" },
+    "facing=south,part=top":    { "model": "buildscape:block/ashenking_emerald_pillar", "y": 180 },
+    "facing=west,part=top":     { "model": "buildscape:block/ashenking_emerald_pillar", "y": 270 },
+    "facing=east,part=top":     { "model": "buildscape:block/ashenking_emerald_pillar", "y": 90 }
+  }
+}

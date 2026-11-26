@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "buildscape:block/big_blue_candle"
+    },
+    "lit=true": {
+      "model": "buildscape:block/big_blue_candle"
+    }
+  }
+}

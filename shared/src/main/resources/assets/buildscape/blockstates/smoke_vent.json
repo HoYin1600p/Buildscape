@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "part=single,powered=false": {
+      "model": "buildscape:block/smoke_vent_single"
+    },
+    "part=single,powered=true": {
+      "model": "buildscape:block/smoke_vent_single"
+    },
+    "part=bottom,powered=false": {
+      "model": "buildscape:block/smoke_vent_bottom"
+    },
+    "part=bottom,powered=true": {
+      "model": "buildscape:block/smoke_vent_bottom"
+    },
+    "part=middle,powered=false": {
+      "model": "buildscape:block/smoke_vent_middle"
+    },
+    "part=middle,powered=true": {
+      "model": "buildscape:block/smoke_vent_middle"
+    },
+    "part=top,powered=false": {
+      "model": "buildscape:block/smoke_vent_top"
+    },
+    "part=top,powered=true": {
+      "model": "buildscape:block/smoke_vent_top"
+    }
+  }
+}

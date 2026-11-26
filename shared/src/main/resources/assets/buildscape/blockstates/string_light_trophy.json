@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "buildscape:block/trophy/string_light_trophy"
+    },
+    "facing=south": {
+      "model": "buildscape:block/trophy/string_light_trophy",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "buildscape:block/trophy/string_light_trophy",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "buildscape:block/trophy/string_light_trophy",
+      "y": 90
+    }
+  }
+}

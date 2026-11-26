@@ -1,0 +1,174 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:builders_workbench"
+    },
+    "title": {
+      "translate": "advancements.buildscape.a_full_buildscape_cube.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.a_full_buildscape_cube.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:root",
+  "rewards": {
+    "items": [
+      {
+        "item": "buildscape:music_disc_builder"
+      }
+    ]
+  },
+  "criteria": {
+    "a_star_is_born": {
+      "trigger": "minecraft:impossible"
+    },
+    "a_very_buildscape_christmas": {
+      "trigger": "minecraft:impossible"
+    },
+    "a_white_christmas": {
+      "trigger": "minecraft:impossible"
+    },
+    "actually_one_last": {
+      "trigger": "minecraft:impossible"
+    },
+    "are_you_nuts": {
+      "trigger": "minecraft:impossible"
+    },
+    "art_collector": {
+      "trigger": "minecraft:impossible"
+    },
+    "bookworm": {
+      "trigger": "minecraft:impossible"
+    },
+    "brick_by_brick": {
+      "trigger": "minecraft:impossible"
+    },
+    "buildscape_museum": {
+      "trigger": "minecraft:impossible"
+    },
+    "can_i_interest_you_in_a_jar": {
+      "trigger": "minecraft:impossible"
+    },
+    "can_you_hear_me_now": {
+      "trigger": "minecraft:impossible"
+    },
+    "celebrate_in_style": {
+      "trigger": "minecraft:impossible"
+    },
+    "chill_out": {
+      "trigger": "minecraft:impossible"
+    },
+    "christmas_every_day": {
+      "trigger": "minecraft:impossible"
+    },
+    "colorful_smoke": {
+      "trigger": "minecraft:impossible"
+    },
+    "columnist": {
+      "trigger": "minecraft:impossible"
+    },
+    "fixer_upper": {
+      "trigger": "minecraft:impossible"
+    },
+    "grand_celebration": {
+      "trigger": "minecraft:impossible"
+    },
+    "hammer_time": {
+      "trigger": "minecraft:impossible"
+    },
+    "i_vented": {
+      "trigger": "minecraft:impossible"
+    },
+    "ice_to_meet_you": {
+      "trigger": "minecraft:impossible"
+    },
+    "its_beginning_to_look_a_lot_like_christmas": {
+      "trigger": "minecraft:impossible"
+    },
+    "jar_ring_display": {
+      "trigger": "minecraft:impossible"
+    },
+    "let_it_cascade": {
+      "trigger": "minecraft:impossible"
+    },
+    "let_it_out": {
+      "trigger": "minecraft:impossible"
+    },
+    "let_it_snow": {
+      "trigger": "minecraft:impossible"
+    },
+    "light_em_up": {
+      "trigger": "minecraft:impossible"
+    },
+    "light_reading": {
+      "trigger": "minecraft:impossible"
+    },
+    "metalhead": {
+      "trigger": "minecraft:impossible"
+    },
+    "okay_one_more": {
+      "trigger": "minecraft:impossible"
+    },
+    "one_last_one_i_promise": {
+      "trigger": "minecraft:impossible"
+    },
+    "one_more_block": {
+      "trigger": "minecraft:impossible"
+    },
+    "ornamental": {
+      "trigger": "minecraft:impossible"
+    },
+    "pocket_full_of_blocks": {
+      "trigger": "minecraft:impossible"
+    },
+    "put_it_on_display": {
+      "trigger": "minecraft:impossible"
+    },
+    "rainbow_mood_light": {
+      "trigger": "minecraft:impossible"
+    },
+    "reach_for_the_sky": {
+      "trigger": "minecraft:impossible"
+    },
+    "root": {
+      "trigger": "minecraft:impossible"
+    },
+    "santas_little_helper": {
+      "trigger": "minecraft:impossible"
+    },
+    "shear_genius": {
+      "trigger": "minecraft:impossible"
+    },
+    "string_me_along": {
+      "trigger": "minecraft:impossible"
+    },
+    "string_theory": {
+      "trigger": "minecraft:impossible"
+    },
+    "support_system": {
+      "trigger": "minecraft:impossible"
+    },
+    "thats_a_tall_order": {
+      "trigger": "minecraft:impossible"
+    },
+    "thats_one_hot_block": {
+      "trigger": "minecraft:impossible"
+    },
+    "the_entire_catalogue": {
+      "trigger": "minecraft:impossible"
+    },
+    "the_homemaker_cometh": {
+      "trigger": "minecraft:impossible"
+    },
+    "think_outside_the_box": {
+      "trigger": "minecraft:impossible"
+    },
+    "touch_grass": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

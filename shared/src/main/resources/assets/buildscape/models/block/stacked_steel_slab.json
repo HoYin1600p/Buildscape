@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "buildscape:block/stacked_steel",
+    "top": "buildscape:block/stacked_steel",
+    "side": "buildscape:block/stacked_steel",
+    "particle": "#side"
+  }
+}

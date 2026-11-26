@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "buildscape:block/pale_oak_planks",
+    "top": "buildscape:block/pale_oak_planks",
+    "side": "buildscape:block/pale_oak_planks",
+    "particle": "#side"
+  }
+}

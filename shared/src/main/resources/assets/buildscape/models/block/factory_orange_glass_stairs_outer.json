@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/glass_stairs_outer_template",
+  "textures": {
+    "bottom": "buildscape:block/factory_orange_glass",
+    "top": "buildscape:block/factory_orange_glass",
+    "side": "buildscape:block/factory_orange_glass"
+  },
+  "render_type": "minecraft:translucent"
+}

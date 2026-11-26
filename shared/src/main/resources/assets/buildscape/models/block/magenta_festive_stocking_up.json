@@ -1,0 +1,40 @@
+{
+  "textures": {
+    "texture": "buildscape:block/magenta_stocking",
+    "particle": "buildscape:block/magenta_stocking"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        1,
+        16
+      ],
+      "faces": {
+        "up": {
+          "texture": "#texture",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#texture",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      }
+    }
+  ]
+}

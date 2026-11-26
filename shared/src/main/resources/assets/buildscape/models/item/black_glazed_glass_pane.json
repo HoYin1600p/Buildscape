@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "buildscape:block/black_glazed_glass"
+  },
+  "render_type": "translucent"
+}

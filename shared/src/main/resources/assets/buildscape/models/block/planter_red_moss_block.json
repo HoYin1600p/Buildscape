@@ -1,0 +1,6 @@
+{
+  "parent": "buildscape:block/planter_dirt_template",
+  "textures": {
+    "dirt": "buildscape:block/red_moss_block"
+  }
+}

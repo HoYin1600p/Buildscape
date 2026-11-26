@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "buildscape:block/short_dry_grass"
+  }
+}

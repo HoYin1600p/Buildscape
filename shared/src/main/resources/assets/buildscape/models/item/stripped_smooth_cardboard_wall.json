@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/wall_inventory",
+  "textures": {
+    "wall": "buildscape:block/stripped_smooth_cardboard_block"
+  }
+}

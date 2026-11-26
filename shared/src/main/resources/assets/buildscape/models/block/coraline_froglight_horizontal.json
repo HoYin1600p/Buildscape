@@ -1,0 +1,7 @@
+{
+    "textures":  {
+                     "end":  "buildscape:block/coraline_froglight_top",
+                     "side":  "buildscape:block/coraline_froglight_side"
+                 },
+    "parent":  "minecraft:block/cube_column_horizontal"
+}

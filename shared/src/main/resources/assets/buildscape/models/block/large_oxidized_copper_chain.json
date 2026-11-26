@@ -1,0 +1,7 @@
+{
+    "textures":  {
+                     "particle":  "#texture",
+                     "texture":  "buildscape:block/large_oxidized_copper_chain"
+                 },
+    "parent":  "buildscape:block/large_chain"
+}

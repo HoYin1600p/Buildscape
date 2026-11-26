@@ -1,0 +1,141 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "hay_side": "minecraft:block/hay_block_side",
+    "hay_top": "minecraft:block/hay_block_top",
+    "pillow": "minecraft:block/white_wool",
+    "particle": "minecraft:block/hay_block_side"
+  },
+  "elements": [
+    {
+      "name": "mattress",
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        3,
+        16
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#hay_top",
+          "cullface": "down"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#hay_top"
+        },
+        "north": {
+          "uv": [
+            0,
+            13,
+            16,
+            16
+          ],
+          "texture": "#hay_side"
+        },
+        "south": {
+          "uv": [
+            0,
+            13,
+            16,
+            16
+          ],
+          "texture": "#hay_side"
+        },
+        "west": {
+          "uv": [
+            0,
+            13,
+            16,
+            16
+          ],
+          "texture": "#hay_side"
+        },
+        "east": {
+          "uv": [
+            0,
+            13,
+            16,
+            16
+          ],
+          "texture": "#hay_side"
+        }
+      }
+    },
+    {
+      "name": "pillow",
+      "from": [
+        2,
+        3,
+        2
+      ],
+      "to": [
+        14,
+        4.5,
+        6
+      ],
+      "faces": {
+        "up": {
+          "uv": [
+            2,
+            2,
+            14,
+            6
+          ],
+          "texture": "#pillow"
+        },
+        "north": {
+          "uv": [
+            2,
+            11.5,
+            14,
+            13
+          ],
+          "texture": "#pillow"
+        },
+        "south": {
+          "uv": [
+            2,
+            11.5,
+            14,
+            13
+          ],
+          "texture": "#pillow"
+        },
+        "west": {
+          "uv": [
+            2,
+            11.5,
+            6,
+            13
+          ],
+          "texture": "#pillow"
+        },
+        "east": {
+          "uv": [
+            2,
+            11.5,
+            6,
+            13
+          ],
+          "texture": "#pillow"
+        }
+      }
+    }
+  ]
+}

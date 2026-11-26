@@ -1,0 +1,7 @@
+{
+  "textures": {
+    "particle": "buildscape:block/orange_layered_wool",
+    "all": "buildscape:block/orange_layered_wool"
+  },
+  "parent": "minecraft:block/cube_all"
+}

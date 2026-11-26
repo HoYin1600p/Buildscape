@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "minecraft:block/cut_copper",
+    "top": "minecraft:block/cut_copper",
+    "side": "minecraft:block/cut_copper",
+    "particle": "#side"
+  }
+}

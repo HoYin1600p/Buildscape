@@ -1,0 +1,7 @@
+{
+  "textures": {
+    "wall": "buildscape:block/stripped_cherry_log",
+    "particle": "buildscape:block/stripped_cherry_log"
+  },
+  "parent": "minecraft:block/wall_inventory"
+}

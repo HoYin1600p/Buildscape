@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "minecraft:block/jungle_log_top",
+    "top": "minecraft:block/jungle_log_top",
+    "side": "minecraft:block/jungle_log",
+    "particle": "#side"
+  }
+}

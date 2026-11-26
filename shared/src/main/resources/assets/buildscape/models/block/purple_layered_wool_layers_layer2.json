@@ -1,0 +1,7 @@
+{
+  "textures": {
+    "particle": "buildscape:block/purple_layered_wool",
+    "texture": "buildscape:block/purple_layered_wool"
+  },
+  "parent": "minecraft:block/snow_height4"
+}

@@ -1,0 +1,8 @@
+{
+  "textures": {
+    "bottom": "buildscape:block/red_layered_wool",
+    "top": "buildscape:block/red_layered_wool",
+    "side": "buildscape:block/red_layered_wool"
+  },
+  "parent": "minecraft:block/outer_stairs"
+}

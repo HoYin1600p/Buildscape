@@ -38,7 +38,17 @@ jobs:
           elif [ "${{ github.ref_type }}" = "tag" ]; then
             TAG="${{ github.ref_name }}"
           else
-            MOD_VER=$(grep '^mod\.version=' properties/mod.properties | cut -d'=' -f2 | tr -d ' \r\n')
+            git submodule sync --recursive
+            git submodule update --init --depth 1 shared || {
+              rm -rf shared
+              branch=$(git config -f .gitmodules "submodule.shared.branch")
+              sha=$(git ls-tree HEAD shared | awk '{print $3}')
+              url=$(git config -f .gitmodules "submodule.shared.url")
+              git clone --depth 1 --branch "$branch" "$url" shared
+              git -C shared fetch --depth 1 origin "$sha" || git -C shared fetch --unshallow || true
+              git -C shared checkout "$sha"
+            }
+            MOD_VER=$(grep '^mod\.version=' shared/properties/mod.properties | cut -d'=' -f2 | tr -d ' \r\n')
             TAG="v${MOD_VER}"
           fi
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"

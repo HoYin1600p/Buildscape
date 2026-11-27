@@ -166,7 +166,17 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          MOD_VER=$(grep '^mod\.version=' properties/mod.properties | cut -d'=' -f2 | tr -d '\r\n[:space:]')
+          git submodule sync --recursive
+          git submodule update --init --depth 1 shared || {
+            rm -rf shared
+            branch=$(git config -f .gitmodules "submodule.shared.branch")
+            sha=$(git ls-tree HEAD shared | awk '{print $3}')
+            url=$(git config -f .gitmodules "submodule.shared.url")
+            git clone --depth 1 --branch "$branch" "$url" shared
+            git -C shared fetch --depth 1 origin "$sha" || git -C shared fetch --unshallow || true
+            git -C shared checkout "$sha"
+          }
+          MOD_VER=$(grep '^mod\.version=' shared/properties/mod.properties | cut -d'=' -f2 | tr -d '\r\n[:space:]')
           EFFECTIVE_VER="${MOD_VER}-dev.${{ github.run_number }}"
           TAG_NAME="v${EFFECTIVE_VER}"
           RELEASE_TITLE="[ Dev Build ${EFFECTIVE_VER} ]"

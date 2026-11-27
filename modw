@@ -33,7 +33,7 @@ done
 TARGET_DIR="$ROOT_DIR/.gradle/build-roots/$MC/$LOADER"
 mkdir -p "$TARGET_DIR"
 echo "rootProject.name = 'buildscape-$MC-$LOADER'" > "$TARGET_DIR/settings.gradle"
-cp "$ROOT_DIR/build-logic/target.gradle" "$TARGET_DIR/build.gradle"
+cp "$ROOT_DIR/shared/build-logic/target.gradle" "$TARGET_DIR/build.gradle"
 cp "$ROOT_DIR/gradle.properties" "$TARGET_DIR/gradle.properties"
 
 exec "$ROOT_DIR/gradlew" -p "$TARGET_DIR" -PtemplateRoot="$ROOT_DIR" -Pmc="$MC" -Ploader="$LOADER" "${ARGS[@]}"

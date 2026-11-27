@@ -45,7 +45,7 @@ def prepareTargetRoot(File rootDir, String mc, String loader) {
     def targetDir = new File(rootDir, ".gradle/build-roots/${mc}/${loader}")
     targetDir.mkdirs()
     new File(targetDir, 'settings.gradle').text = "rootProject.name = 'buildscape-${mc}-${loader}'\n"
-    new File(targetDir, 'build.gradle').text = new File(rootDir, 'build-logic/target.gradle').text
+    new File(targetDir, 'build.gradle').text = new File(rootDir, 'shared/build-logic/target.gradle').text
     def props = new File(rootDir, 'gradle.properties').text
     props += "\nmc=${mc}\nloader=${loader}\n"
     new File(targetDir, 'gradle.properties').text = props

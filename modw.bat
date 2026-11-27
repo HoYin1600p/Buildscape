@@ -57,7 +57,7 @@ if "%LOADER%"=="forge" (
 set "TARGET_DIR=%ROOT_DIR%\.gradle\build-roots\%MC%\%LOADER%"
 if not exist "%TARGET_DIR%\gradle\wrapper" mkdir "%TARGET_DIR%\gradle\wrapper"
 echo rootProject.name = 'buildscape-%MC%-%LOADER%' > "%TARGET_DIR%\settings.gradle"
-copy /y "%ROOT_DIR%\build-logic\target.gradle" "%TARGET_DIR%\build.gradle" >nul
+copy /y "%ROOT_DIR%\shared\build-logic\target.gradle" "%TARGET_DIR%\build.gradle" >nul
 copy /y "%ROOT_DIR%\gradle.properties" "%TARGET_DIR%\gradle.properties" >nul
 (
 echo mc=%MC%

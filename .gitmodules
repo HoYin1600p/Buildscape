@@ -1,0 +1,5 @@
+[submodule "shared"]
+	path = shared
+	url = ./
+	branch = shared
+

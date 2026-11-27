@@ -136,7 +136,7 @@ jobs:
           MOD_VER=$(grep '^mod\.version=' properties/mod.properties | cut -d'=' -f2 | tr -d '\r\n[:space:]')
           EFFECTIVE_VER="${MOD_VER}-dev.${{ github.run_number }}"
           TAG_NAME="v${MOD_VER}-Dev"
-          RELEASE_TITLE="[ Dev ] Buildscape ${MOD_VER} (Latest: ${EFFECTIVE_VER})"
+          RELEASE_TITLE="[ Dev Builds ${MOD_VER} ] (Latest: ${EFFECTIVE_VER})"
 
           mkdir -p release-jars
           find raw-jars -type f -name "*.jar" | while read -r f; do

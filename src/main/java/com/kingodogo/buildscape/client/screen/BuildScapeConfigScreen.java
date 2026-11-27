@@ -4227,10 +4227,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     private void renderConfigRowSlider(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, int percent, int mouseX, int mouseY, float alpha) {
         if (y < clipY || y + h > clipY + clipH) return;
-        renderRowCardBase(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, desc, mouseX, mouseY, alpha);
+        int sliderW = 138;
+        String visibleDescription = trimTextToWidth(font, desc, calculateCycleDescriptionWidth(w, sliderW), false);
+        renderRowCardBase(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, visibleDescription, mouseX, mouseY, alpha);
 
-        int sliderW = 100;
-        int sliderH = 14;
+        int sliderH = 15;
         int sliderX = x + w - sliderW - 8;
         int sliderY = y + (h - sliderH) / 2;
         previewOpacitySliderX = sliderX;
@@ -5121,8 +5122,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 curY += systemRowH + gap;
 
                 // Row 4: Preview Opacity Slider
-                int sliderW = 100;
-                int sliderH = 14;
+                int sliderW = 138;
+                int sliderH = 15;
                 int sliderX = x + w - sliderW - 8;
                 int sliderY = curY + (systemRowH - sliderH) / 2;
                 if (curY >= clipY && curY + systemRowH <= clipY + clipH

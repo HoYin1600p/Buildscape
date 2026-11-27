@@ -135,3 +135,10 @@ tasks.register('collectModJars', Copy) {
         includeEmptyDirs = false
     }
 }
+
+tasks.register('buildAll') {
+    group = 'build'
+    description = 'Assembles all available mod targets and collects jars into build/libs'
+    dependsOn subprojects.findAll { it.path != ':neoforge:26.4' }.collect { "${it.path}:assemble" }
+    finalizedBy 'collectModJars'
+}

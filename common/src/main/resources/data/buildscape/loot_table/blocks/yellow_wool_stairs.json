@@ -1,0 +1,18 @@
+{
+  "pools": [
+    {
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      },
+      "bonus_rolls": 0,
+      "rolls": 1,
+      "entries": [
+        {
+          "name": "buildscape:yellow_wool_stairs",
+          "type": "minecraft:item"
+        }
+      ]
+    }
+  ],
+  "type": "minecraft:block"
+}

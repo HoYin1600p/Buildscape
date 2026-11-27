@@ -1,0 +1,24 @@
+{
+  "pools": [
+    {
+      "entries": [
+        {
+          "condition": {
+            "type": "minecraft:match_block",
+            "blocks": "buildscape:poplar_door",
+            "state": {
+              "half": "lower"
+            }
+          },
+          "name": "buildscape:poplar_door",
+          "type": "minecraft:item"
+        }
+      ],
+      "rolls": 1,
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      }
+    }
+  ],
+  "type": "minecraft:block"
+}

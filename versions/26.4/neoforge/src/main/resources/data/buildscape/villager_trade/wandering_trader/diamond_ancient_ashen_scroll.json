@@ -1,0 +1,16 @@
+{
+  "gives": {
+    "id": "buildscape:ancient_ashen_scroll"
+  },
+  "max_uses": 1,
+  "merchant_predicate": {
+    "chance": 0.0002,
+    "type": "minecraft:random_chance"
+  },
+  "reputation_discount": 0.0,
+  "wants": {
+    "count": 12,
+    "id": "minecraft:diamond"
+  },
+  "xp": 1
+}

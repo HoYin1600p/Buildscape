@@ -152,7 +152,7 @@ public class ClientEvents {
         poseStack.translate(0.5, 0.5, 0.5);
         poseStack.scale(0.96875f, 0.96875f, 0.96875f);
         poseStack.translate(-0.5, -0.5, -0.5);
-        activePreviewAlpha = opacityPct / 100.0f;
+        activePreviewAlpha = computePreviewAlpha(opacityPct);
         try {
             com.kingodogo.buildscape.platform.Services.PLATFORM.renderFallingIcicleBlock(
                     mc.level, previewState, placePos, placePos, poseStack, bufferSource);
@@ -160,6 +160,17 @@ public class ClientEvents {
             activePreviewAlpha = 1.0f;
             poseStack.popPose();
         }
+    }
+
+    private static float computePreviewAlpha(int opacityPct) {
+        if (opacityPct <= 0) return 0.0f;
+        if (opacityPct >= 100) return 1.0f;
+        if (opacityPct <= 50) {
+            float t = (opacityPct - 1) / 49.0f;
+            return 0.18f + t * (0.50f - 0.18f);
+        }
+        float t = (opacityPct - 50) / 49.0f;
+        return 0.50f + t * (0.85f - 0.50f);
     }
 
     private static volatile float activePreviewAlpha = 1.0f;

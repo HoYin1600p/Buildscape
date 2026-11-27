@@ -2088,12 +2088,13 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int slideOffsetY = (int) Math.round((1.0f - transProgress) * 3 * slideDir);
         float tabAlpha = alpha * Math.min(1.0f, 0.65f + 0.35f * transProgress);
 
-        int catHeaderH = 22;
-        Services.PLATFORM.blitTinted(poseStackOrGraphics, uiIcon("nav_" + current.id), x + 8, y + 3,
+        int catHeaderH = 30;
+        int textY = y + (catHeaderH - 8) / 2;
+        Services.PLATFORM.blitTinted(poseStackOrGraphics, uiIcon("nav_" + current.id), x + 8, y + (catHeaderH - 16) / 2,
                 16, 16, 16, 16, applyAlpha(COLOR_ACCENT, tabAlpha));
         String title = current.title.toUpperCase(Locale.ROOT);
-        drawText(poseStackOrGraphics, font, title, x + 29, y + 6, applyAlpha(COLOR_TEXT_WHITE, tabAlpha));
-        drawText(poseStackOrGraphics, font, current.subtitle, x + 39 + font.width(title), y + 7, applyAlpha(COLOR_TEXT_MUTED, tabAlpha));
+        drawText(poseStackOrGraphics, font, title, x + 29, textY, applyAlpha(COLOR_TEXT_WHITE, tabAlpha));
+        drawText(poseStackOrGraphics, font, current.subtitle, x + 39 + font.width(title), textY + 1, applyAlpha(COLOR_TEXT_MUTED, tabAlpha));
         PillarParticleConfig.EditScope tabScope = "items".equals(current.id)
                 ? PillarParticleConfig.EditScope.LIMITED : PillarParticleConfig.EditScope.GENERAL;
         boolean restricted = ("items".equals(current.id) || "particles".equals(current.id)
@@ -2103,15 +2104,16 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         if (restricted || limited) {
             int badgeW = 62;
             int badgeX = x + w - badgeW - 7;
+            int badgeY = y + (catHeaderH - 14) / 2;
             float pulse = 0.80F + 0.20F * (float) Math.sin(System.currentTimeMillis() / 180.0D);
-            drawBeveledButton(poseStackOrGraphics, badgeX, y + 4, badgeW, 14, limited ? COLOR_BTN_BG_ACTIVE : 0xFF351616, false, true, tabAlpha);
-            drawCenteredText(poseStackOrGraphics, font, limited ? "LIMITED" : "READ ONLY", badgeX + badgeW / 2, y + 7,
+            drawBeveledButton(poseStackOrGraphics, badgeX, badgeY, badgeW, 14, limited ? COLOR_BTN_BG_ACTIVE : 0xFF351616, false, true, tabAlpha);
+            drawCenteredText(poseStackOrGraphics, font, limited ? "LIMITED" : "READ ONLY", badgeX + badgeW / 2, badgeY + 3,
                     applyAlpha(limited ? COLOR_ACCENT : 0xFFFF5A52, tabAlpha * pulse));
         } else if ("items".equals(current.id)) {
             int presetBtnW = 32;
-            int presetBtnH = catHeaderH;
+            int presetBtnH = 24;
             int presetBtnX = (x + w + 2) - presetBtnW;
-            int presetBtnY = y;
+            int presetBtnY = y + (catHeaderH - presetBtnH) / 2;
             boolean presetOpen = sidePanelProgress > 0.05f && sidePanelType == SidePanelType.PRESETS && !isSidePanelClosing;
             boolean hoverPresetBtn = mouseX >= presetBtnX && mouseX <= presetBtnX + presetBtnW && mouseY >= presetBtnY && mouseY <= presetBtnY + presetBtnH;
             drawInlinePresetsTab(poseStackOrGraphics, presetBtnX, presetBtnY, presetBtnW, presetBtnH, hoverPresetBtn, presetOpen, tabAlpha);
@@ -4589,7 +4591,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int contentW = (panelX + panelW - 7) - contentX;
         int contentH = navH;
 
-        int catHeaderH = 22;
+        int catHeaderH = 30;
         int viewY = contentY + catHeaderH + 4;
         int viewH = contentH - catHeaderH - 8;
 
@@ -4631,9 +4633,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         switch (current.id) {
             case "items" -> {
                 int presetBtnW = 32;
+                int presetBtnH = 24;
                 int presetBtnX = (contentX + contentW + 2) - presetBtnW;
+                int presetBtnY = contentY + (catHeaderH - presetBtnH) / 2;
                 if (mouseX >= presetBtnX && mouseX <= presetBtnX + presetBtnW
-                        && mouseY >= contentY && mouseY <= contentY + catHeaderH) {
+                        && mouseY >= presetBtnY && mouseY <= presetBtnY + presetBtnH) {
                     boolean presetOpen = sidePanelProgress > 0.05f && sidePanelType == SidePanelType.PRESETS && !isSidePanelClosing;
                     if (presetOpen) {
                         closeSidePanel();

@@ -446,6 +446,10 @@ public final class ClientPlatformHooks {
     }
 
     public static void renderFallingIcicleBlock(net.minecraft.world.level.Level level, net.minecraft.world.level.block.state.BlockState blockState, net.minecraft.core.BlockPos blockPos, net.minecraft.core.BlockPos startPos, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource) {
+        if (bufferSource instanceof ClientWorldHooks.OutlineState outlines) {
+            outlines.addBlock(blockState, blockPos, Services.PLATFORM.getLightColor(level, blockPos), poseStack.last().pose());
+            return;
+        }
         renderBlockModelWithTint(blockState, blockPos, level, poseStack, bufferSource,
                 Services.PLATFORM.getLightColor(level, blockPos), net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
     }

@@ -3191,6 +3191,7 @@ public class ModItems {
     }
 
     public static void init() {
+        com.kingodogo.buildscape.block.ModVerticalStairs.initItems();
         System.out.println("ModItems initialized: " + Services.REGISTRY.getRegisteredItems().size() + " items registered.");
     }
 }

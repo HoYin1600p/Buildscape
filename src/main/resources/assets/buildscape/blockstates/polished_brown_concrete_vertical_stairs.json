@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "buildscape:block/polished_brown_concrete_vertical_stairs"
+    },
+    "facing=east": {
+      "model": "buildscape:block/polished_brown_concrete_vertical_stairs",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "buildscape:block/polished_brown_concrete_vertical_stairs",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "buildscape:block/polished_brown_concrete_vertical_stairs",
+      "y": 270
+    }
+  }
+}

@@ -6392,6 +6392,7 @@ public class ModBlocks {
     }
 
     public static void init() {
+        ModVerticalStairs.init();
         System.out.println("ModBlocks initialized: " + Services.REGISTRY.getRegisteredBlocks().size() + " blocks registered with full properties.");
     }
 }

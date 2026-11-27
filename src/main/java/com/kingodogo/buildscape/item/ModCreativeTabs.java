@@ -428,7 +428,7 @@ public final class ModCreativeTabs {
     }
 
     private static List<String> loadOrderedItemIds() {
-        if (Services.isVersionCluster("minecraft1182")) return legacyItemOrder();
+        if (Services.isVersionCluster("minecraft1182")) return withVerticalStairs(legacyItemOrder());
         List<String> list = new ArrayList<>(3200);
         try (InputStream in = ModCreativeTabs.class.getResourceAsStream("/data/buildscape/creative_tab_order.txt")) {
             if (in != null) {
@@ -451,6 +451,27 @@ public final class ModCreativeTabs {
         int hazeIndex = list.indexOf("yellow_monets") + 1;
         for (String color : haze) list.add(hazeIndex++, color + "_haze_bush");
         list.add(list.indexOf("packed_icicle_block") + 1, "ice_crystal");
-        return list;
+        return withVerticalStairs(list);
+    }
+
+    private static List<String> withVerticalStairs(List<String> source) {
+        java.util.Set<String> sourceSet = new java.util.HashSet<>(source);
+        List<String> out = new ArrayList<>(source.size() + 450);
+        for (String id : source) {
+            out.add(id);
+            if (id.endsWith("_stairs")) {
+                String vId = id.substring(0, id.length() - "_stairs".length()) + "_vertical_stairs";
+                if (!sourceSet.contains(vId)) {
+                    out.add(vId);
+                }
+            } else if (id.endsWith("_vertical_slab")) {
+                String base = id.substring(0, id.length() - "_vertical_slab".length());
+                String vId = base + "_vertical_stairs";
+                if (!sourceSet.contains(base + "_stairs") && !sourceSet.contains(vId)) {
+                    out.add(vId);
+                }
+            }
+        }
+        return out;
     }
 }

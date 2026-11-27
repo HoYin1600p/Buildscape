@@ -80,7 +80,9 @@ public class BlockDefinition {
     public boolean isRedstoneLamp() { return typeIn("RedstoneLampBlock"); }
     public boolean isWeightedPressurePlate() { return typeIn("ModPressurePlateBlock"); }
 
-    public boolean isStair() { return typeIn("ModStairBlock", "StairBlock", "WeatheringStairBlock"); }
+    public boolean isStair() { return !isVerticalStair() && typeIn("ModStairBlock", "StairBlock", "WeatheringStairBlock"); }
+    public boolean isVerticalStair() { return typeIn("VerticalStairBlock", "WeatheringVerticalStairBlock"); }
+    public boolean isWeatheringVerticalStair() { return "WeatheringVerticalStairBlock".equals(blockType); }
     public boolean isVerticalSlab() { return typeIn("VerticalSlabBlock", "WeatheringVerticalSlabBlock"); }
     public boolean isGrassSlab() { return "GrassSlabBlock".equals(blockType) || "snowy_grass_block_slab".equals(id); }
     public boolean isHayBaleSlab() { return "HayBaleSlabBlock".equals(blockType) || id.contains("hay_bale_slab"); }
@@ -140,11 +142,11 @@ public class BlockDefinition {
     public boolean isHollowPipe() { return typeIn("HollowPipeBlock") || id.contains("hollow_pipe") || (id.startsWith("hollow_") && id.endsWith("_pipe")); }
     public boolean isPipe() { return !isHollowPipe() && (typeIn("PipeBlock") || id.endsWith("_pipe")); }
     public boolean isFroglight() { return typeIn("FroglightBlock") || id.contains("froglight"); }
-    public boolean isBambooBlock() { return !isSlab() && !isVerticalSlab() && !isWall() && !isStair() && ("bamboo_block".equals(id) || "stripped_bamboo_block".equals(id)); }
-    public boolean isCautionBlock() { return !isSlab() && !isVerticalSlab() && !isStair() && ("framed_caution".equals(id) || (id.startsWith("caution_") && !id.endsWith("_slab") && !id.endsWith("_vertical_slab") && !id.endsWith("_stairs"))); }
-    public boolean isLog() { return !isHollowLog() && !isSlab() && !isVerticalSlab() && !isStair() && !isWall() && (id.endsWith("_log") || "LogBlock".equals(blockType)); }
-    public boolean isWood() { return !isSlab() && !isVerticalSlab() && !isStair() && !isWall() && !id.contains("bamboo_wood") && (id.endsWith("_wood") || "WoodBlock".equals(blockType)); }
-    public boolean isRotatedPillar() { return !isHollowLog() && !isHollowPipe() && !isPipe() && !isPillar() && !isAshenKingPillar() && !isFroglight() && !isSlab() && !isVerticalSlab() && !isStair() && !isWall() && ("RotatedPillarBlock".equals(blockType) || isLog() || isWood() || isCautionBlock() || isBambooBlock()); }
+    public boolean isBambooBlock() { return !isSlab() && !isVerticalSlab() && !isWall() && !isStair() && !isVerticalStair() && ("bamboo_block".equals(id) || "stripped_bamboo_block".equals(id)); }
+    public boolean isCautionBlock() { return !isSlab() && !isVerticalSlab() && !isStair() && !isVerticalStair() && ("framed_caution".equals(id) || (id.startsWith("caution_") && !id.endsWith("_slab") && !id.endsWith("_vertical_slab") && !id.endsWith("_stairs"))); }
+    public boolean isLog() { return !isHollowLog() && !isSlab() && !isVerticalSlab() && !isStair() && !isVerticalStair() && !isWall() && (id.endsWith("_log") || "LogBlock".equals(blockType)); }
+    public boolean isWood() { return !isSlab() && !isVerticalSlab() && !isStair() && !isVerticalStair() && !isWall() && !id.contains("bamboo_wood") && (id.endsWith("_wood") || "WoodBlock".equals(blockType)); }
+    public boolean isRotatedPillar() { return !isHollowLog() && !isHollowPipe() && !isPipe() && !isPillar() && !isAshenKingPillar() && !isFroglight() && !isSlab() && !isVerticalSlab() && !isStair() && !isVerticalStair() && !isWall() && ("RotatedPillarBlock".equals(blockType) || isLog() || isWood() || isCautionBlock() || isBambooBlock()); }
     public boolean isTrappedDecoratedPot() { return typeIn("TrappedDecoratedPotBlock") || id.contains("trapped_decorated_pot"); }
     public boolean isDecoratedPot() { return !isTrappedDecoratedPot() && (typeIn("DecoratedPotBlock") || id.contains("decorated_pot")); }
     public boolean isFestiveStocking() { return typeIn("FestiveStockingBlock") || id.contains("festive_stocking"); }

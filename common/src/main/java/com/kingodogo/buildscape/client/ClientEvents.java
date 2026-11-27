@@ -79,6 +79,7 @@ public class ClientEvents {
         InvisibleFrameOverlayRenderer.renderOverlay(poseStack, camera, bufferSource);
         MuffBlockRenderer.renderMuffOutlines(poseStack, camera, bufferSource);
         PillarMarkerRenderer.renderPillarMarkers(poseStack, camera, bufferSource);
+        renderVerticalStairPlacementPreview(poseStack, camera, bufferSource);
     }
 
     public static boolean renderBlockHighlight(com.mojang.blaze3d.vertex.PoseStack poseStack, net.minecraft.client.Camera camera, Object bufferSource, net.minecraft.world.phys.HitResult target) {
@@ -97,6 +98,51 @@ public class ClientEvents {
             }
         }
         return HammerClientHandler.renderBlockHighlight(poseStack, camera, bufferSource, target);
+    }
+
+    private static void renderVerticalStairPlacementPreview(
+            com.mojang.blaze3d.vertex.PoseStack poseStack,
+            net.minecraft.client.Camera camera,
+            Object bufferSource
+    ) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null || mc.player == null || camera == null) return;
+        if (!(mc.hitResult instanceof net.minecraft.world.phys.BlockHitResult blockHit)
+                || mc.hitResult.getType() != net.minecraft.world.phys.HitResult.Type.BLOCK) {
+            return;
+        }
+        net.minecraft.world.InteractionHand hand = net.minecraft.world.InteractionHand.MAIN_HAND;
+        net.minecraft.world.item.ItemStack held = mc.player.getMainHandItem();
+        if (!(held.getItem() instanceof net.minecraft.world.item.BlockItem blockItem)
+                || !(blockItem.getBlock() instanceof com.kingodogo.buildscape.block.VerticalStairBlock)) {
+            hand = net.minecraft.world.InteractionHand.OFF_HAND;
+            held = mc.player.getOffhandItem();
+            if (!(held.getItem() instanceof net.minecraft.world.item.BlockItem offBlockItem)
+                    || !(offBlockItem.getBlock() instanceof com.kingodogo.buildscape.block.VerticalStairBlock)) {
+                return;
+            }
+        }
+        net.minecraft.world.item.context.BlockPlaceContext placeContext =
+                new net.minecraft.world.item.context.BlockPlaceContext(mc.player, hand, held, blockHit);
+        if (!placeContext.canPlace()) {
+            return;
+        }
+        BlockPos placePos = placeContext.getClickedPos();
+        net.minecraft.core.Direction facing = com.kingodogo.buildscape.block.VerticalStairBlock.getPlacementFacing(
+                placePos, blockHit.getDirection(), blockHit.getLocation());
+        com.kingodogo.buildscape.block.VerticalStairBlock stairBlock =
+                (com.kingodogo.buildscape.block.VerticalStairBlock) ((net.minecraft.world.item.BlockItem) held.getItem()).getBlock();
+        BlockState previewState = stairBlock.defaultBlockState()
+                .setValue(com.kingodogo.buildscape.block.VerticalStairBlock.FACING, facing);
+        net.minecraft.world.phys.Vec3 cameraPos = com.kingodogo.buildscape.platform.Services.PLATFORM.getCameraPosition(camera);
+        poseStack.pushPose();
+        poseStack.translate(placePos.getX() - cameraPos.x, placePos.getY() - cameraPos.y, placePos.getZ() - cameraPos.z);
+        poseStack.translate(0.5, 0.5, 0.5);
+        poseStack.scale(0.998f, 0.998f, 0.998f);
+        poseStack.translate(-0.5, -0.5, -0.5);
+        com.kingodogo.buildscape.platform.Services.PLATFORM.renderFallingIcicleBlock(
+                mc.level, previewState, placePos, placePos, poseStack, bufferSource);
+        poseStack.popPose();
     }
 
     public static boolean onKeyInput(int key, int action) {

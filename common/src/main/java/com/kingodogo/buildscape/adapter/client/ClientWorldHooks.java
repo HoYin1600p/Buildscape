@@ -24,14 +24,29 @@ public final class ClientWorldHooks {
 
     public record Fill(float[] box, float r, float g, float b, float a, Matrix4f transform) {}
 
+    public record BlockPreview(net.minecraft.world.level.block.state.BlockState state, BlockPos pos, int light, Matrix4f transform) {}
+
     /** Stores semantic boxes, never their line vertices or live world inputs. */
     public static final class OutlineState {
         private final java.util.List<Outline> outlines = new java.util.ArrayList<>();
         private final java.util.List<Fill> fills = new java.util.ArrayList<>();
+        private final java.util.List<BlockPreview> blocks = new java.util.ArrayList<>();
 
         public java.util.List<Outline> outlines() { return java.util.List.copyOf(outlines); }
 
+        public void addBlock(net.minecraft.world.level.block.state.BlockState state, BlockPos pos, int light, Matrix4f transform) {
+            blocks.add(new BlockPreview(state, pos, light, new Matrix4f(transform)));
+        }
+
         public void submit(PoseStack pose, SubmitNodeCollector collector) {
+            for (BlockPreview block : blocks) {
+                pose.pushPose();
+                try {
+                    pose.mulPose(block.transform());
+                    ClientPlatformHooks.renderBlockModelWithTint(block.state(), block.pos(), Minecraft.getInstance().level,
+                            pose, collector, block.light(), net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
+                } finally { pose.popPose(); }
+            }
             for (Fill fill : fills) {
                 pose.pushPose();
                 try {

@@ -149,13 +149,23 @@ public class ClientEvents {
         net.minecraft.world.phys.Vec3 cameraPos = com.kingodogo.buildscape.platform.Services.PLATFORM.getCameraPosition(camera);
         poseStack.pushPose();
         poseStack.translate(placePos.getX() - cameraPos.x, placePos.getY() - cameraPos.y, placePos.getZ() - cameraPos.z);
-        float scale = 0.996f - (100 - opacityPct) * 0.0005f;
         poseStack.translate(0.5, 0.5, 0.5);
-        poseStack.scale(scale, scale, scale);
+        poseStack.scale(0.998f, 0.998f, 0.998f);
         poseStack.translate(-0.5, -0.5, -0.5);
-        com.kingodogo.buildscape.platform.Services.PLATFORM.renderFallingIcicleBlock(
-                mc.level, previewState, placePos, placePos, poseStack, bufferSource);
-        poseStack.popPose();
+        activePreviewAlpha = opacityPct / 100.0f;
+        try {
+            com.kingodogo.buildscape.platform.Services.PLATFORM.renderFallingIcicleBlock(
+                    mc.level, previewState, placePos, placePos, poseStack, bufferSource);
+        } finally {
+            activePreviewAlpha = 1.0f;
+            poseStack.popPose();
+        }
+    }
+
+    private static volatile float activePreviewAlpha = 1.0f;
+
+    public static float getActivePreviewAlpha() {
+        return activePreviewAlpha;
     }
 
     private static boolean isPreviewableBlockItem(net.minecraft.world.item.ItemStack stack) {

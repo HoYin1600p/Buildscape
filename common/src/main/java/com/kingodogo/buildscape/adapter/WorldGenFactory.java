@@ -56,18 +56,23 @@ public final class WorldGenFactory {
 
     private static net.minecraft.world.level.block.grower.TreeGrower grower(String name,
             net.minecraft.resources.ResourceKey<Feature> tree) {
-        return new net.minecraft.world.level.block.grower.TreeGrower("buildscape:" + name,
-                net.minecraft.util.random.WeightedList.of(tree), net.minecraft.util.random.WeightedList.of(), net.minecraft.util.random.WeightedList.of(), tree);
+        return new net.minecraft.world.level.block.grower.TreeGrower(
+                net.minecraft.util.random.WeightedList.of(tree),
+                net.minecraft.util.random.WeightedList.<net.minecraft.resources.ResourceKey<Feature>>of(),
+                net.minecraft.util.random.WeightedList.<net.minecraft.resources.ResourceKey<Feature>>of(),
+                tree);
     }
 
     public static final net.minecraft.world.level.block.grower.TreeGrower POPLAR_GROWER = grower("poplar", POPLAR);
     public static final net.minecraft.world.level.block.grower.TreeGrower CHERRY_GROWER = grower("cherry", CHERRY);
     public static final net.minecraft.world.level.block.grower.TreeGrower PALE_OAK_GROWER = grower("pale_oak", PALE_OAK);
     public static final net.minecraft.world.level.block.grower.TreeGrower MANGROVE_GROWER =
-            new net.minecraft.world.level.block.grower.TreeGrower("buildscape:mangrove",
+            new net.minecraft.world.level.block.grower.TreeGrower(
                     net.minecraft.util.random.WeightedList.<net.minecraft.resources.ResourceKey<Feature>>builder()
                             .add(TALL_MANGROVE, 85).add(MANGROVE, 15).build(),
-                    net.minecraft.util.random.WeightedList.of(), net.minecraft.util.random.WeightedList.of(), MANGROVE);
+                    net.minecraft.util.random.WeightedList.<net.minecraft.resources.ResourceKey<Feature>>of(),
+                    net.minecraft.util.random.WeightedList.<net.minecraft.resources.ResourceKey<Feature>>of(),
+                    MANGROVE);
 
     public static net.minecraft.world.level.block.grower.TreeGrower saplingGrower(String id) {
         return switch (id) {
@@ -290,7 +295,7 @@ public final class WorldGenFactory {
         private MossBlockCeilingPlacement() {}
 
         @Override public void modify(PlacementContext context, RandomSource random, BlockPos pos, java.util.function.Consumer<BlockPos> output) {
-            WorldGenLevel level = context.getLevel();
+            WorldGenLevel level = context.level();
             BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
             for (int y = pos.getY(); y < pos.getY() + 64; y++) {
                 cursor.set(pos.getX(), y, pos.getZ());
@@ -304,6 +309,8 @@ public final class WorldGenFactory {
                 }
             }
         }
+
+        @Override public net.minecraft.util.InclusiveRange<Integer> modifyXzDomain(net.minecraft.util.InclusiveRange<Integer> range) { return range; }
 
         @Override public MapCodec<MossBlockCeilingPlacement> codec() { return CODEC; }
     }

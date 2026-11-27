@@ -30,7 +30,7 @@ public final class PipeSpillOutput implements FluidRenderer.Output {
     }
 
     @Override
-    public VertexConsumer getBuilder(ChunkSectionLayer layer) {
-        return new PipeSpillVertexConsumer(delegate.getBuilder(layer), pos, outlets);
+    public void put(ChunkSectionLayer layer, float x, float y, float z, net.minecraft.client.resources.model.geometry.BakedQuad quad, int light, int color, int overlay) {
+        delegate.put(layer, x, y, z, quad, light, color, overlay);
     }
 }

@@ -72,7 +72,10 @@ public final class ClientPillarEntities {
 
     public static Entity createMob(ItemStack egg, Level level, BlockPos pos, Object argument) {
         MobState state = (MobState) argument;
-        EntityType<?> eggType = SpawnEggItem.getType(egg);
+        EntityType<?> eggType = null;
+        for (EntityType<?> candidate : net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE) {
+            if (SpawnEggItem.spawnsEntity(egg, candidate)) { eggType = candidate; break; }
+        }
         if (eggType == null) return null;
         EntityType<?> displayType = state.parsedStates.contains("giant")
                 && (eggType == EntityTypes.ZOMBIE || eggType == EntityTypes.HUSK || eggType == EntityTypes.DROWNED)

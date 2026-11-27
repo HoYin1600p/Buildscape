@@ -63,7 +63,7 @@ public final class GuiProvider {
                             }
 
                             @Override
-                            protected void extractLabels(net.minecraft.client.gui.GuiGraphicsExtractor extractor, int mouseX, int mouseY) {
+                            protected void extractLabels(net.minecraft.client.gui.GuiGraphicsExtractor extractor) {
                             }
 
                             @Override
@@ -73,21 +73,15 @@ public final class GuiProvider {
                             }
 
                             @Override
-                            public void extractContents(net.minecraft.client.gui.GuiGraphicsExtractor extractor,
-                                                        int mouseX, int mouseY, float partialTick) {
+                            public void extractContents(net.minecraft.client.gui.GuiGraphicsExtractor extractor) {
+                                int mouseX = extractor.mouseX();
+                                int mouseY = extractor.mouseY();
                                 com.kingodogo.buildscape.adapter.client.ClientGuiHooks.withGraphics(extractor,
-                                        () -> delegate.renderBg(extractor, partialTick, mouseX, mouseY, delegateLeft(), this.topPos));
-                                super.extractContents(extractor, mouseX, mouseY, partialTick);
+                                        () -> delegate.renderBg(extractor, 0.0f, mouseX, mouseY, delegateLeft(), this.topPos));
+                                super.extractContents(extractor);
                                 com.kingodogo.buildscape.adapter.client.ClientGuiHooks.withGraphics(extractor,
                                         () -> delegate.renderRerollControls(extractor, mouseX, mouseY, delegateLeft(), this.topPos));
-                            }
-
-                            @Override
-                            protected void extractTooltip(net.minecraft.client.gui.GuiGraphicsExtractor extractor,
-                                                          int mouseX, int mouseY) {
-                                if (!delegate.renderCustomTooltip(extractor, mouseX, mouseY, delegateLeft(), this.topPos)) {
-                                    super.extractTooltip(extractor, mouseX, mouseY);
-                                }
+                                delegate.renderCustomTooltip(extractor, mouseX, mouseY, delegateLeft(), this.topPos);
                             }
 
                             @Override
@@ -120,15 +114,14 @@ public final class GuiProvider {
                             }
 
                             @Override
-                            protected void extractLabels(net.minecraft.client.gui.GuiGraphicsExtractor extractor, int mouseX, int mouseY) {
+                            protected void extractLabels(net.minecraft.client.gui.GuiGraphicsExtractor extractor) {
                             }
 
                             @Override
-                            public void extractContents(net.minecraft.client.gui.GuiGraphicsExtractor extractor,
-                                                        int mouseX, int mouseY, float partialTick) {
+                            public void extractContents(net.minecraft.client.gui.GuiGraphicsExtractor extractor) {
                                 com.kingodogo.buildscape.adapter.client.ClientGuiHooks.withGraphics(extractor,
-                                        () -> delegate.renderBg(extractor, partialTick, mouseX, mouseY, this.leftPos, this.topPos));
-                                super.extractContents(extractor, mouseX, mouseY, partialTick);
+                                        () -> delegate.renderBg(extractor, 0.0f, extractor.mouseX(), extractor.mouseY(), this.leftPos, this.topPos));
+                                super.extractContents(extractor);
                             }
                         };
     }
@@ -142,11 +135,13 @@ public final class GuiProvider {
             }
 
             @Override
-            public void extractRenderState(net.minecraft.client.gui.GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTick) {
-                super.extractRenderState(extractor, mouseX, mouseY, partialTick);
+            public void extractRenderState(net.minecraft.client.gui.GuiGraphicsExtractor extractor) {
+                super.extractRenderState(extractor);
+                int mouseX = extractor.mouseX();
+                int mouseY = extractor.mouseY();
                 com.kingodogo.buildscape.adapter.client.ClientGuiHooks.withGraphics(extractor, () -> {
-                    delegate.render(extractor, mouseX, mouseY, partialTick);
-                    delegate.renderAfterWidgets(extractor, mouseX, mouseY, partialTick);
+                    delegate.render(extractor, mouseX, mouseY, 0.0f);
+                    delegate.renderAfterWidgets(extractor, mouseX, mouseY, 0.0f);
                 });
             }
 
@@ -249,25 +244,25 @@ public final class GuiProvider {
     public static net.minecraft.client.gui.components.Button createCustomButton(int x, int y, int width, int height, net.minecraft.network.chat.Component message, net.minecraft.client.gui.components.Button.OnPress onPress, com.kingodogo.buildscape.client.screen.widget.CustomButtonRenderer renderer) {
         return new net.minecraft.client.gui.components.Button(x, y, width, height, message, onPress, supplier -> supplier.get()) {
             @Override
-            protected void extractContents(net.minecraft.client.gui.GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTick) {
+            protected void extractContents(net.minecraft.client.gui.GuiGraphicsExtractor extractor) {
                 com.kingodogo.buildscape.adapter.client.ClientGuiHooks.withGraphics(extractor,
-                        () -> renderer.render(this, extractor, mouseX, mouseY, partialTick));
+                        () -> renderer.render(this, extractor, extractor.mouseX(), extractor.mouseY(), 0.0f));
             }
         };
     }
 
     public static void renderWidget(Object poseStackOrGraphics, net.minecraft.client.gui.components.AbstractWidget widget, int mouseX, int mouseY, float partialTick) {
         if (widget != null && poseStackOrGraphics instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor) {
-            widget.extractRenderState(extractor, mouseX, mouseY, partialTick);
+            widget.extractRenderState(extractor);
         }
     }
 
     public static net.minecraft.client.gui.components.AbstractWidget wrapCustomWidget(int x, int y, int width, int height, net.minecraft.network.chat.Component message, com.kingodogo.buildscape.client.screen.widget.ICustomWidget customWidget) {
         return new net.minecraft.client.gui.components.AbstractWidget(x, y, width, height, message) {
             @Override
-            protected void extractWidgetRenderState(net.minecraft.client.gui.GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTick) {
+            protected void extractWidgetRenderState(net.minecraft.client.gui.GuiGraphicsExtractor extractor) {
                 com.kingodogo.buildscape.adapter.client.ClientGuiHooks.withGraphics(extractor,
-                        () -> customWidget.render(extractor, mouseX, mouseY, partialTick));
+                        () -> customWidget.render(extractor, extractor.mouseX(), extractor.mouseY(), 0.0f));
             }
 
             @Override

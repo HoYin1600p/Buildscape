@@ -25,10 +25,8 @@ import java.util.Optional;
 
 /** Loader-neutral 26.2 equivalent of the reference ForgeFlowingFluid. */
 public abstract class ExperienceFluid extends FlowingFluid {
-    @Override public Fluid getSource() { return ExperienceFluids.still(); }
-    @Override public Fluid getFlowing() { return ExperienceFluids.flowing(); }
-    @Override public Item getBucket() { return Services.PLATFORM.getItem(new CommonId("buildscape", "experience_bucket")); }
-    @Override public boolean isSame(Fluid other) { return other == getSource() || other == getFlowing(); }
+    protected ExperienceFluid() { super(Fluid.Properties.of().bucketItem(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("buildscape", "experience_bucket")))); }
+    public boolean isSame(Fluid other) { return other == ExperienceFluids.still() || other == ExperienceFluids.flowing(); }
     @Override protected boolean canConvertToSource(ServerLevel level) { return ExperienceFluidProperties.CONVERTS_TO_SOURCE; }
     @Override public int getSlopeFindDistance(LevelReader level) { return ExperienceFluidProperties.SLOPE_FIND_DISTANCE; }
     @Override public int getDropOff(LevelReader level) { return ExperienceFluidProperties.DROP_OFF; }
@@ -48,14 +46,16 @@ public abstract class ExperienceFluid extends FlowingFluid {
     }
 
     @Override
-    public boolean canBeReplacedWith(FluidState state, BlockGetter level, BlockPos pos, Fluid other, Direction direction) {
+    public boolean canBeReplacedWith(FluidState state, BlockGetter level, BlockPos pos, FluidState other, Direction direction) {
         // The reference forbids experience/lava mixing, in either direction.
-        return direction == Direction.DOWN && !isSame(other) && !Fluids.LAVA.isSame(other);
+        Fluid f = other.getType();
+        return direction == Direction.DOWN && !isSame(f) && f != Fluids.LAVA;
     }
 
     @Override
     protected void spreadTo(LevelAccessor level, BlockPos pos, BlockState state, Direction direction, FluidState fluid) {
-        if (!Fluids.LAVA.isSame(level.getFluidState(pos).getType())) {
+        Fluid existing = level.getFluidState(pos).getType();
+        if (existing != Fluids.LAVA) {
             super.spreadTo(level, pos, state, direction, fluid);
         }
     }

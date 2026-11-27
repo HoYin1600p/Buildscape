@@ -69,7 +69,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.SoundType;
+import com.kingodogo.buildscape.block.CustomSoundType;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -123,7 +123,7 @@ public final class ClientPlatformHooks {
     }
 
     public static boolean widgetKeyPressed(net.minecraft.client.gui.components.AbstractWidget widget, int keyCode, int scanCode, int modifiers) {
-        return widget != null && widget.keyPressed(new net.minecraft.client.input.KeyEvent(keyCode, scanCode, modifiers));
+        return widget != null && widget.keyPressed(new net.minecraft.client.input.KeyEvent(keyCode, scanCode, modifiers, false));
     }
 
     public static boolean widgetCharTyped(net.minecraft.client.gui.components.AbstractWidget widget, char codePoint, int modifiers) {
@@ -157,9 +157,10 @@ public final class ClientPlatformHooks {
         if (graphics instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor) extractor.disableScissor();
     }
 
-    public static CommonId registerDynamicTexture(String name, net.minecraft.client.renderer.texture.DynamicTexture texture) {
+    public static CommonId registerDynamicTexture(String name, DynamicTextureCompat texture) {
         net.minecraft.resources.Identifier id = net.minecraft.resources.Identifier.fromNamespaceAndPath("buildscape", name);
-        net.minecraft.client.Minecraft.getInstance().getTextureManager().register(id, texture);
+        texture.attachId(id);
+        texture.upload();
         return CommonId.of(id.getNamespace(), id.getPath());
     }
 
@@ -170,16 +171,15 @@ public final class ClientPlatformHooks {
                 image.close();
                 return null;
             }
-            var texture = new net.minecraft.client.renderer.texture.DynamicTexture(() -> name, image);
-            texture.upload();
+            var texture = new DynamicTextureCompat(name, image);
             return registerDynamicTexture(name, texture);
         } catch (Throwable error) {
             return null;
         }
     }
 
-    public static net.minecraft.client.renderer.texture.DynamicTexture createDynamicTexture(String name, int width, int height, boolean clear) {
-        return new net.minecraft.client.renderer.texture.DynamicTexture(name, width, height, clear);
+    public static DynamicTextureCompat createDynamicTexture(String name, int width, int height, boolean clear) {
+        return new DynamicTextureCompat(name, width, height, clear);
     }
 
     public static boolean hasPlayerPermissions(net.minecraft.world.entity.player.Player player, int level) {
@@ -321,12 +321,12 @@ public final class ClientPlatformHooks {
                                   int textureWidth, int textureHeight, int color) {
         if (texture == null || !(graphics instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor)) return;
         net.minecraft.resources.Identifier id = net.minecraft.resources.Identifier.fromNamespaceAndPath(texture.getNamespace(), texture.getPath());
-        extractor.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, id, x, y, 0, 0,
+        extractor.blit(net.minecraft.client.gui.GuiPipeline.TEXTURED, id, x, y, 0, 0,
                 width, height, textureWidth, textureHeight, textureWidth, textureHeight, ClientGuiHooks.color(color));
     }
 
     public static void renderScreen(net.minecraft.client.gui.screens.Screen screen, Object graphics, int mouseX, int mouseY, float partialTick) {
-        if (graphics instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor) screen.extractRenderState(extractor, mouseX, mouseY, partialTick);
+        if (graphics instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor) screen.extractRenderState(extractor);
     }
 
     public static void renderComponentTooltip(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, java.util.List<net.minecraft.network.chat.Component> components, int mouseX, int mouseY) {
@@ -405,17 +405,17 @@ public final class ClientPlatformHooks {
 
     public static void playButtonClick() {
         net.minecraft.client.Minecraft.getInstance().getSoundManager().play(
-                net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F, 1.0F));
     }
 
     public static void playNoteBlockBell() {
         net.minecraft.client.Minecraft.getInstance().getSoundManager().play(
-                net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_BELL, 1.0F));
+                net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_BELL, 1.0F, 1.0F));
     }
 
     public static void playNoteBlockDidgeridoo() {
         net.minecraft.client.Minecraft.getInstance().getSoundManager().play(
-                net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_DIDGERIDOO, 1.0F));
+                net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_DIDGERIDOO, 1.0F, 1.0F));
     }
 
     public static void renderModelPart(net.minecraft.client.model.geom.ModelPart part, com.mojang.blaze3d.vertex.PoseStack poseStack, com.mojang.blaze3d.vertex.VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {

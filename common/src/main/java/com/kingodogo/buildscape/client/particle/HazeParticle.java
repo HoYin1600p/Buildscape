@@ -44,8 +44,8 @@ public final class HazeParticle extends SingleQuadParticle {
         this.oRoll = roll;
         if (r > .01 || g > .01 || b > .01) {
             float variation = (random.nextFloat() - .5F) * .03F;
-            setColor(Mth.clamp((float) r + variation, 0, 1), Mth.clamp((float) g + variation, 0, 1),
-                    Mth.clamp((float) b + variation, 0, 1));
+            setColor(Math.clamp((float) r + variation, 0, 1), Math.clamp((float) g + variation, 0, 1),
+                    Math.clamp((float) b + variation, 0, 1));
         } else {
             float tint = .94F + random.nextFloat() * .06F;
             setColor(tint, tint, tint);

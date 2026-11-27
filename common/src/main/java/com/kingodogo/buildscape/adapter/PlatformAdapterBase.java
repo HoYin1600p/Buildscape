@@ -66,7 +66,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.SoundType;
+import com.kingodogo.buildscape.block.CustomSoundType;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -285,10 +285,10 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
 
     @Override public void disableScissor(Object graphics) { com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.disableScissor(graphics); }
 
-    @Override public CommonId registerDynamicTexture(String name, net.minecraft.client.renderer.texture.DynamicTexture texture) { return com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.registerDynamicTexture(name, texture); }
+    @Override public CommonId registerDynamicTexture(String name, com.kingodogo.buildscape.adapter.client.DynamicTextureCompat texture) { return com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.registerDynamicTexture(name, texture); }
     @Override public CommonId registerExternalTexture(String name, java.io.InputStream stream) { return com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.registerExternalTexture(name, stream); }
 
-    @Override public net.minecraft.client.renderer.texture.DynamicTexture createDynamicTexture(String name, int width, int height, boolean clear) { return com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.createDynamicTexture(name, width, height, clear); }
+    @Override public com.kingodogo.buildscape.adapter.client.DynamicTextureCompat createDynamicTexture(String name, int width, int height, boolean clear) { return com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.createDynamicTexture(name, width, height, clear); }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -306,7 +306,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
         net.minecraft.world.level.gamerules.GameRule<Boolean> rule = new net.minecraft.world.level.gamerules.GameRule<>(
                 net.minecraft.world.level.gamerules.GameRuleCategory.MISC,
                 net.minecraft.world.level.gamerules.GameRuleType.BOOL,
-                com.mojang.brigadier.arguments.BoolArgumentType.bool(),
+                net.minecraft.commands.arguments.BooleanArgument.INSTANCE,
                 net.minecraft.world.level.gamerules.GameRuleTypeVisitor::visitBoolean,
                 com.mojang.serialization.Codec.BOOL, value -> value ? 1 : 0,
                 definition.defaultValue(), net.minecraft.world.flag.FeatureFlagSet.of());
@@ -538,7 +538,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     @Override
     public Item createHomemakerSpawnEggItem(Item.Properties properties, boolean festive) {
         EntityType<?> type = festive ? getFestiveWanderingHomemakerEntityType() : getWanderingHomemakerEntityType();
-        return new net.minecraft.world.item.SpawnEggItem(properties.spawnEgg(type)) {
+        return new net.minecraft.world.item.SpawnEggItem(properties.spawns(type)) {
             @Override
             public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
                 super.appendHoverText(stack, context, display, tooltip, flag);
@@ -936,7 +936,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
                 .setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK,
                         Identifier.fromNamespaceAndPath(com.kingodogo.buildscape.BuildscapeCommon.MOD_ID, definition.getId())))
                 .strength(definition.getHardness(), definition.getResistance())
-                .sound(definition.getSoundType())
+                .sound(definition.getSoundType().soundSetKey())
                 .lightLevel(state -> definition.getLightEmission())
                 .emissiveRendering(state -> true)
                 .noOcclusion()) {
@@ -1293,7 +1293,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
         CommonId id = getItemId(stack.getItem());
         if (id == null) return 0;
         for (net.minecraft.world.item.DyeColor color : net.minecraft.world.item.DyeColor.values()) {
-            if ((color.getSerializedName() + "_dye").equals(id.getPath())) return color.getFireworkColor();
+            if ((color.getSerializedName() + "_dye").equals(id.getPath())) return switch (color) { case WHITE -> 15790320; case ORANGE -> 15435844; case MAGENTA -> 12801229; case LIGHT_BLUE -> 6719955; case YELLOW -> 14602026; case LIME -> 4312372; case PINK -> 14188952; case GRAY -> 4408131; case LIGHT_GRAY -> 11250603; case CYAN -> 2651799; case PURPLE -> 8073150; case BLUE -> 2437522; case BROWN -> 5320730; case GREEN -> 3887386; case RED -> 11743532; case BLACK -> 1973019; };
         }
         return 0;
     }
@@ -1421,7 +1421,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
             holders.add(holder);
         }
         return holders.isEmpty()
-                ? net.minecraft.world.item.crafting.Ingredient.of()
+                ? net.minecraft.world.item.crafting.Ingredient.of(new net.minecraft.world.level.ItemLike[0])
                 : net.minecraft.world.item.crafting.Ingredient.of(net.minecraft.core.HolderSet.direct(holders));
     }
 
@@ -1609,7 +1609,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
 
     @Override
     public void spawnMobFromEgg(net.minecraft.server.level.ServerLevel level, net.minecraft.core.BlockPos pos, net.minecraft.world.item.ItemStack eggStack) {
-        net.minecraft.world.entity.EntityType<?> entityType = net.minecraft.world.item.SpawnEggItem.getType(eggStack);
+        net.minecraft.world.entity.EntityType<?> entityType = java.util.stream.StreamSupport.stream(BuiltInRegistries.ENTITY_TYPE.spliterator(), false).filter(t -> net.minecraft.world.item.SpawnEggItem.spawnsEntity(eggStack, t)).findFirst().orElse(null);
         if (entityType != null) {
             net.minecraft.world.phys.Vec3 spawnPos = net.minecraft.world.phys.Vec3.atCenterOf(pos).add(0, 0.5, 0);
             spawnMob(level, entityType, eggStack, new net.minecraft.core.BlockPos((int) spawnPos.x, (int) spawnPos.y, (int) spawnPos.z));
@@ -2228,7 +2228,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
 
     @Override
     public void playWoolBreak(Level level, double x, double y, double z) {
-        level.playSound(null, x, y, z, SoundEvents.WOOL_BREAK, SoundSource.PLAYERS, 1.0f, 1.2f);
+        level.playSound(null, x, y, z, com.kingodogo.buildscape.block.CustomSoundType.WOOL.getBreakSound(), SoundSource.PLAYERS, 1.0f, 1.2f);
     }
 
     @Override
@@ -2283,7 +2283,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
 
     @Override
     public void playPowderSnowStep(Level level, BlockPos pos) {
-        level.playSound(null, pos, SoundEvents.POWDER_SNOW_STEP, SoundSource.BLOCKS, 0.5F, 1.0F);
+        level.playSound(null, pos, com.kingodogo.buildscape.block.CustomSoundType.POWDER_SNOW.getStepSound(), SoundSource.BLOCKS, 0.5F, 1.0F);
     }
 
     @Override
@@ -2388,19 +2388,19 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
 
     @Override
     public void playEyeblossomTransition(Level level, BlockPos pos, boolean night) {
-        level.playSound(null, pos, night ? SoundEvents.AMETHYST_BLOCK_CHIME : SoundEvents.AZALEA_LEAVES_BREAK, SoundSource.BLOCKS, night ? 1.0F : 0.8F, night ? 1.2F : 0.9F);
+        level.playSound(null, pos, night ? SoundEvents.AMETHYST_BLOCK_CHIME : com.kingodogo.buildscape.block.CustomSoundType.AZALEA_LEAVES.getBreakSound(), SoundSource.BLOCKS, night ? 1.0F : 0.8F, night ? 1.2F : 0.9F);
     }
 
     @Override
     public void playBoneDiceSet(Level level, BlockPos pos) {
         level.playSound(null, pos, SoundEvents.WOODEN_BUTTON_CLICK_ON, SoundSource.BLOCKS, 0.8F, 1.2F);
-        level.playSound(null, pos, SoundEvents.BONE_BLOCK_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
+        level.playSound(null, pos, com.kingodogo.buildscape.block.CustomSoundType.BONE_BLOCK.getPlaceSound(), SoundSource.BLOCKS, 1.0F, 1.0F);
     }
 
     @Override
     public void playBoneDiceRoll(Level level, BlockPos pos) {
         level.playSound(null, pos, SoundEvents.WOODEN_BUTTON_CLICK_ON, SoundSource.BLOCKS, 0.8F, 1.2F);
-        level.playSound(null, pos, SoundEvents.BONE_BLOCK_HIT, SoundSource.BLOCKS, 1.0F, 1.2F);
+        level.playSound(null, pos, com.kingodogo.buildscape.block.CustomSoundType.BONE_BLOCK.getHitSound(), SoundSource.BLOCKS, 1.0F, 1.2F);
     }
 
     @Override
@@ -2410,27 +2410,27 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
 
     @Override
     public void playGlassPlace(Level level, BlockPos pos) {
-        level.playSound(null, pos, SoundEvents.GLASS_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
+        level.playSound(null, pos, com.kingodogo.buildscape.block.CustomSoundType.GLASS.getPlaceSound(), SoundSource.BLOCKS, 1.0F, 1.0F);
     }
 
     @Override
     public void playGrassPlace(Level level, BlockPos pos) {
-        level.playSound(null, pos, SoundEvents.GRASS_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
+        level.playSound(null, pos, com.kingodogo.buildscape.block.CustomSoundType.GRASS.getPlaceSound(), SoundSource.BLOCKS, 1.0F, 1.0F);
     }
 
     @Override
     public void playStonePlace(Level level, BlockPos pos) {
-        level.playSound(null, pos, SoundEvents.STONE_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
+        level.playSound(null, pos, com.kingodogo.buildscape.block.CustomSoundType.STONE.getPlaceSound(), SoundSource.BLOCKS, 1.0F, 1.0F);
     }
 
     @Override
     public void playGlassBreak(Level level, BlockPos pos) {
-        level.playSound(null, pos, SoundEvents.GLASS_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F);
+        level.playSound(null, pos, com.kingodogo.buildscape.block.CustomSoundType.GLASS.getBreakSound(), SoundSource.BLOCKS, 1.0F, 1.0F);
     }
 
     @Override
     public void playGrassBreak(Level level, BlockPos pos) {
-        level.playSound(null, pos, SoundEvents.GRASS_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F);
+        level.playSound(null, pos, com.kingodogo.buildscape.block.CustomSoundType.GRASS.getBreakSound(), SoundSource.BLOCKS, 1.0F, 1.0F);
     }
 
     @Override
@@ -2445,7 +2445,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     @Override public void playNoteBlockDidgeridoo() { com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.playNoteBlockDidgeridoo(); }
 
     @Override
-    public void playVegetationStepSound(Level level, BlockPos pos, Entity entity, SoundType sounds) {
+    public void playVegetationStepSound(Level level, BlockPos pos, Entity entity, CustomSoundType sounds) {
         if (entity instanceof Player player && player.onGround() && level.isClientSide()) {
             float stepInterval = 2.0f;
             int currentStep = (int) (player.moveDist / stepInterval);
@@ -2522,7 +2522,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
 
     @Override
     public float[] getDyeDiffuseColors(net.minecraft.world.item.DyeColor dyeColor) {
-        int color = dyeColor.getTextureDiffuseColor();
+        int color = switch (dyeColor) { case WHITE -> 0xFFF9FFFE; case ORANGE -> 0xFFF9801D; case MAGENTA -> 0xFFC74EBD; case LIGHT_BLUE -> 0xFF3AB3DA; case YELLOW -> 0xFFFED83D; case LIME -> 0xFF80C71F; case PINK -> 0xFFF38BAA; case GRAY -> 0xFF474F52; case LIGHT_GRAY -> 0xFF9D9D97; case CYAN -> 0xFF169C9C; case PURPLE -> 0xFF8932B8; case BLUE -> 0xFF3C44AA; case BROWN -> 0xFF835432; case GREEN -> 0xFF5E7C16; case RED -> 0xFFB02E26; case BLACK -> 0xFF1D1D21; };
         return new float[]{((color >> 16) & 0xFF) / 255.0F, ((color >> 8) & 0xFF) / 255.0F, (color & 0xFF) / 255.0F};
     }
 
@@ -3041,7 +3041,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
             itemEntity.setDefaultPickUpDelay();
             this.level().addFreshEntity(itemEntity);
 
-            this.level().playSound(null, this.blockPosition(), blockState.getSoundType().getBreakSound(), net.minecraft.sounds.SoundSource.BLOCKS, 1.0f, 1.0f);
+            this.level().playSound(null, this.blockPosition(), com.kingodogo.buildscape.block.CustomSoundType.STONE.getBreakSound(), net.minecraft.sounds.SoundSource.BLOCKS, 1.0f, 1.0f);
             this.level().levelEvent(2001, this.blockPosition(), Block.getId(blockState));
         }
 
@@ -3338,7 +3338,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
 
         @Override
         public boolean survives() {
-            if (this.hasLevelCollision(this.getPopBox())) {
+            if (this.level().noCollision(this, this.getPopBox()) == false) {
                 return false;
             } else {
                 BlockPos blockpos = this.pos.relative(this.getDirection().getOpposite());
@@ -3703,7 +3703,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     }
     // 26.x spawn eggs are plain items carrying the spawn_egg data, not SpawnEggItem instances.
     @Override public boolean isSpawnEgg(ItemStack stack) {
-        return net.minecraft.world.item.SpawnEggItem.getType(stack) != null;
+        return java.util.stream.StreamSupport.stream(BuiltInRegistries.ENTITY_TYPE.spliterator(), false).filter(t -> net.minecraft.world.item.SpawnEggItem.spawnsEntity(stack, t)).findFirst().orElse(null) != null;
     }
     @Override public boolean isArmor(ItemStack stack) {
         return com.kingodogo.buildscape.adapter.client.ClientPillarEntities.isArmor(stack);

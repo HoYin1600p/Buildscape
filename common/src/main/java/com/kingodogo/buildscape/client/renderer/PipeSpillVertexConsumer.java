@@ -55,16 +55,16 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
         }
         BlockPos above = pos.above();
         BlockState pipeAbove = level.getBlockState(above);
-        if (fluid.getValue(net.minecraft.world.level.material.FlowingFluid.FALLING)
+        if (!fluid.getValue(net.minecraft.world.level.material.FlowingFluid.SOURCE)
                 && PipeFluidTransport.isHollowPipe(pipeAbove)
                 && level.getBlockEntity(above) instanceof HollowLogBlockEntity entity
                 && entity.getPipeFlowState().hasFluid()
-                && WorldPipeTopologyAccess.fluidById(entity.getPipeFlowState().getFluidId()).isSame(fluid.getType())
+                && WorldPipeTopologyAccess.fluidById(entity.getPipeFlowState().getFluidId()) == fluid.getType()
                 && PipeFluidTransport.isOpenEndpoint(pipeAbove, Direction.DOWN)
                 && entity.getPipeFlowState().hasFlowDirection(Direction.DOWN)) {
             return List.of(new Outlet(Direction.UP, 1.0));
         }
-        if (level.getFluidState(pos.above()).getType().isSame(fluid.getType())) {
+        if (level.getFluidState(pos.above()).getType() == fluid.getType()) {
             return List.of();
         }
         List<Outlet> outlets = null;
@@ -80,7 +80,7 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
                 }
                 PipeFlowState flow = entity.getPipeFlowState();
                 Fluid containedFluid = flow != null && flow.hasFluid() ? WorldPipeTopologyAccess.fluidById(flow.getFluidId()) : Fluids.EMPTY;
-                boolean fluidMatches = containedFluid.isSame(fluid.getType())
+                boolean fluidMatches = containedFluid == fluid.getType()
                         || (com.kingodogo.buildscape.fluid.ModFluids.isExperience(containedFluid)
                             && com.kingodogo.buildscape.fluid.ModFluids.isExperience(fluid.getType()));
                 if (flow == null || !flow.hasFluid()

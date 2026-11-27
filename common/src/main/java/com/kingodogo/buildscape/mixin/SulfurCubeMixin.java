@@ -24,7 +24,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
@@ -108,7 +107,7 @@ public abstract class SulfurCubeMixin extends AbstractCubeMob {
                 if (!this.level().isClientSide()) {
                     this.setItemSlot(EquipmentSlot.HEAD, held.copyWithCount(1));
                     held.consume(1, player);
-                    this.playSound(SoundType.WOOL.getPlaceSound());
+                    this.playSound(com.kingodogo.buildscape.block.CustomSoundType.WOOL.getPlaceSound());
                     this.gameEvent(GameEvent.ENTITY_INTERACT);
                 }
                 cir.setReturnValue(this.level().isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER);

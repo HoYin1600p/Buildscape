@@ -11,7 +11,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleProviderRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.SpriteSet;
@@ -67,11 +67,17 @@ public class BuildscapeFabricClient implements ClientModInitializer {
                 com.kingodogo.buildscape.adapter.client.ExperienceFluidModel.create());
         com.kingodogo.buildscape.adapter.client.SpecialItemRenderers.registerFabric();
         GuiProvider.registerMenuScreens(new GuiProvider.Registrar() {
+            @SuppressWarnings("unchecked")
             public void registerWorkbench() {
-                MenuScreens.register(ModMenuTypes.BUILDERS_WORKBENCH_MENU, GuiProvider::createWorkbenchScreen);
+                MenuScreens.register(
+                        (net.minecraft.core.WritableRegistry<MenuScreens.ScreenConstructor<?, ?>>) (Object) net.minecraft.client.core.registries.BuiltInClientRegistries.MENU_SCREEN,
+                        ModMenuTypes.BUILDERS_WORKBENCH_MENU, GuiProvider::createWorkbenchScreen);
             }
+            @SuppressWarnings("unchecked")
             public void registerPouch() {
-                MenuScreens.register(ModMenuTypes.BUILDERS_POUCH_MENU, GuiProvider::createPouchScreen);
+                MenuScreens.register(
+                        (net.minecraft.core.WritableRegistry<MenuScreens.ScreenConstructor<?, ?>>) (Object) net.minecraft.client.core.registries.BuiltInClientRegistries.MENU_SCREEN,
+                        ModMenuTypes.BUILDERS_POUCH_MENU, GuiProvider::createPouchScreen);
             }
         });
         ParticleFactory.registerProviders(new ParticleFactory.Registrar() {
@@ -86,10 +92,24 @@ public class BuildscapeFabricClient implements ClientModInitializer {
                 ParticleProviderRegistry.getInstance().register(type, provider);
             }
         });
-        RenderFactory.registerRenderers(EntityRendererRegistry::register);
-        RenderFactory.registerBlockEntityRenderers(net.minecraft.client.renderer.blockentity.BlockEntityRenderers::register);
+        RenderFactory.registerRenderers(new RenderFactory.EntityRegistrar() {
+            @SuppressWarnings("unchecked")
+            public <T extends net.minecraft.world.entity.Entity> void register(net.minecraft.world.entity.EntityType<? extends T> type, net.minecraft.client.renderer.entity.EntityRendererProvider<T> provider) {
+                EntityRenderers.register(
+                        (net.minecraft.core.WritableRegistry<net.minecraft.client.renderer.entity.EntityRendererProvider<?>>) (Object) net.minecraft.client.core.registries.BuiltInClientRegistries.ENTITY_RENDERER,
+                        type, provider);
+            }
+        });
+        RenderFactory.registerBlockEntityRenderers(new RenderFactory.BlockEntityRegistrar() {
+            @SuppressWarnings("unchecked")
+            public <T extends net.minecraft.world.level.block.entity.BlockEntity, S extends net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState> void register(net.minecraft.world.level.block.entity.BlockEntityType<? extends T> type, net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider<T, S> provider) {
+                net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
+                        (net.minecraft.core.WritableRegistry<net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider<?, ?>>) (Object) net.minecraft.client.core.registries.BuiltInClientRegistries.BLOCK_ENTITY_RENDERER,
+                        type, provider);
+            }
+        });
         net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry.addLast(
-                Identifier.fromNamespaceAndPath("buildscape", "overlay"), (graphics, delta) ->
+                Identifier.fromNamespaceAndPath("buildscape", "overlay"), graphics ->
                         com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.renderClientOverlay(
                                 graphics, graphics.guiWidth(), graphics.guiHeight()));
         net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents.COLLECT_SUBMITS.register(context ->

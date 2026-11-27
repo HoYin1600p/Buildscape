@@ -17,7 +17,7 @@ public class FabricPlatformAdapter extends PlatformAdapterBase {
         if (player.isCreative() || !level.getGameRules().get(net.minecraft.world.level.gamerules.GameRules.BLOCK_DROPS)) return;
         net.minecraft.world.item.ItemStack tool = new net.minecraft.world.item.ItemStack(tier.getHarvestToolItem());
         tool.set(net.minecraft.core.component.DataComponents.ENCHANTMENTS, hammer.getEnchantments());
-        oldState.spawnAfterBreak(level, pos, tool, true);
+        oldState.spawnAfterBreak(level, pos, tool, true, player);
     }
 
     @Override public boolean canPlayerBreakBlock(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos) {

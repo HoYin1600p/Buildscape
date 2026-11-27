@@ -13,7 +13,7 @@ public abstract class DataBlockEntity extends BlockEntity implements IDataSerial
     protected boolean syncCustomData() { return true; }
     protected void writeUpdateData(IBlockEntityWriteData output) { writeData(output); }
 
-    @Override public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider lookup) {
+    @Override public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderGetter.Provider lookup) {
         return syncCustomData() ? saveCustomOnly(lookup) : super.getUpdateTag(lookup);
     }
 

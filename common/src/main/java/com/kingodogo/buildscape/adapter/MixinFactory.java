@@ -257,7 +257,7 @@ public class MixinFactory implements IMixinFactory {
 
     @Override
     public void playComposterPlanterSound(net.minecraft.world.level.Level level, BlockPos pos, Block block) {
-        net.minecraft.world.level.block.SoundType soundType = block.defaultBlockState().getSoundType();
+        com.kingodogo.buildscape.block.CustomSoundType soundType = com.kingodogo.buildscape.block.CustomSoundType.STONE;
         level.playSound(null, pos, soundType.getPlaceSound(), net.minecraft.sounds.SoundSource.BLOCKS, (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
     }
 
@@ -438,7 +438,25 @@ public class MixinFactory implements IMixinFactory {
     }
 
     private static net.minecraft.network.chat.Component getFireworkColorName(int color) {
-        net.minecraft.world.item.DyeColor dyecolor = net.minecraft.world.item.DyeColor.byFireworkColor(color);
+        net.minecraft.world.item.DyeColor dyecolor = switch (color) {
+            case 15790320 -> net.minecraft.world.item.DyeColor.WHITE;
+            case 15435844 -> net.minecraft.world.item.DyeColor.ORANGE;
+            case 12801229 -> net.minecraft.world.item.DyeColor.MAGENTA;
+            case 6719955 -> net.minecraft.world.item.DyeColor.LIGHT_BLUE;
+            case 14602026 -> net.minecraft.world.item.DyeColor.YELLOW;
+            case 4312372 -> net.minecraft.world.item.DyeColor.LIME;
+            case 14188952 -> net.minecraft.world.item.DyeColor.PINK;
+            case 4408131 -> net.minecraft.world.item.DyeColor.GRAY;
+            case 11250603 -> net.minecraft.world.item.DyeColor.LIGHT_GRAY;
+            case 2651799 -> net.minecraft.world.item.DyeColor.CYAN;
+            case 8073150 -> net.minecraft.world.item.DyeColor.PURPLE;
+            case 2437522 -> net.minecraft.world.item.DyeColor.BLUE;
+            case 5320730 -> net.minecraft.world.item.DyeColor.BROWN;
+            case 3887386 -> net.minecraft.world.item.DyeColor.GREEN;
+            case 11743532 -> net.minecraft.world.item.DyeColor.RED;
+            case 1973019 -> net.minecraft.world.item.DyeColor.BLACK;
+            default -> null;
+        };
         if (dyecolor == null) {
             return net.minecraft.network.chat.Component.translatable("item.minecraft.firework_star.custom_color");
         } else {

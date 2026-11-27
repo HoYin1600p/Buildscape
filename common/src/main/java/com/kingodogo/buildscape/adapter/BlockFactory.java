@@ -164,7 +164,9 @@ import net.minecraft.world.level.block.sounds.AmbientLeavesBlockSoundPlayer;
 import net.minecraft.world.level.block.PointedDripstoneBlock;
 import net.minecraft.world.level.block.PressurePlateBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
-import net.minecraft.world.level.block.SoundType;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.block.sounds.BlockSoundSet;
+import net.minecraft.world.level.block.sounds.BlockSoundSets;
 import net.minecraft.world.level.block.SporeBlossomBlock;
 import net.minecraft.world.level.block.TorchBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
@@ -215,7 +217,7 @@ public class BlockFactory implements IBlockFactory {
 
         if ("HazeBushBlock".equals(def.getBlockType())) {
             var color = net.minecraft.world.item.DyeColor.byName(def.getId().replace("_haze_bush", ""), null);
-            return new com.kingodogo.buildscape.block.HazeBushBlock(color, props.noCollision().instabreak().sound(SoundType.GRASS)) {
+            return new com.kingodogo.buildscape.block.HazeBushBlock(color, props.noCollision().instabreak().sound(BlockSoundSets.GRASS)) {
                 @Override public net.minecraft.world.item.BlockItem createHazeItem(net.minecraft.world.item.Item.Properties properties) {
                     return new HazeBushItem(this, properties);
                 }
@@ -265,13 +267,13 @@ public class BlockFactory implements IBlockFactory {
             };
         }
         if ("IceCrystalBlock".equals(def.getBlockType())) {
-            return new com.kingodogo.buildscape.block.IceCrystalBlock(props.sound(SoundType.AMETHYST_CLUSTER)) {
+            return new com.kingodogo.buildscape.block.IceCrystalBlock(props.sound(BlockSoundSets.AMETHYST_CLUSTER)) {
             };
         }
 
         if ("SaplingBlock".equals(def.getBlockType())) {
             return new net.minecraft.world.level.block.SaplingBlock(WorldGenFactory.saplingGrower(def.getId()),
-                    props.noCollision().instabreak().sound(SoundType.GRASS).randomTicks()) {};
+                    props.noCollision().instabreak().sound(BlockSoundSets.GRASS).randomTicks()) {};
         }
 
         if (def.isLargeChain()) {
@@ -320,14 +322,12 @@ public class BlockFactory implements IBlockFactory {
                 @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { WeatheringBlockLogic.randomTick(state, level, pos); }
             };
         } else if (def.isWeatheringButton()) {
-            return new ButtonBlock(BlockSetType.STONE, 20, props.randomTicks()) {
-                @Override protected SoundType getSoundType(BlockState state) { return SoundType.COPPER; }
+            return new ButtonBlock(BlockSetType.STONE, 20, props.randomTicks().sound(BlockSoundSets.COPPER)) {
                 @Override public boolean isRandomlyTicking(BlockState state) { return true; }
                 @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { WeatheringBlockLogic.randomTick(state, level, pos); }
             };
         } else if (def.isWeatheringPressurePlate()) {
-            return new net.minecraft.world.level.block.WeightedPressurePlateBlock(WeatheringBlockLogic.PRESSURE_PLATE_MAX_WEIGHT, BlockSetType.OAK, props.randomTicks()) {
-                @Override protected SoundType getSoundType(BlockState state) { return SoundType.COPPER; }
+            return new net.minecraft.world.level.block.WeightedPressurePlateBlock(WeatheringBlockLogic.PRESSURE_PLATE_MAX_WEIGHT, BlockSetType.STONE, props.randomTicks().sound(BlockSoundSets.COPPER)) {
                 @Override public boolean isRandomlyTicking(BlockState state) { return true; }
                 @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
                     WeatheringBlockLogic.randomTick(state, level, pos);
@@ -526,36 +526,28 @@ public class BlockFactory implements IBlockFactory {
                 @Override protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { onScheduledTick(state, level, pos); }
             };
         } else if (def.isCopperDoor()) {
-            return new DoorBlock(BlockSetType.COPPER, props) {
-                @Override protected SoundType getSoundType(BlockState state) { return def.getId().startsWith("flaming_steel") ? SoundType.NETHERITE_BLOCK : SoundType.COPPER; }
-            };
+            return new DoorBlock(BlockSetType.COPPER, props.sound(def.getId().startsWith("flaming_steel") ? BlockSoundSets.NETHERITE_BLOCK : BlockSoundSets.COPPER));
         } else if (def.isDoor()) {
-            return new DoorBlock(BlockSetType.OAK, props) {};
+            return new DoorBlock(BlockSetType.STONE, props) {};
         } else if (def.isCopperTrapdoor()) {
-            return new TrapDoorBlock(BlockSetType.COPPER, props) {
-                @Override protected SoundType getSoundType(BlockState state) { return def.getId().startsWith("flaming_steel") ? SoundType.NETHERITE_BLOCK : SoundType.COPPER; }
-            };
+            return new TrapDoorBlock(BlockSetType.COPPER, props.sound(def.getId().startsWith("flaming_steel") ? BlockSoundSets.NETHERITE_BLOCK : BlockSoundSets.COPPER));
         } else if (def.isTrapdoor()) {
-            return new TrapDoorBlock(BlockSetType.OAK, props) {};
+            return new TrapDoorBlock(BlockSetType.STONE, props) {};
         } else if (def.isButton()) {
             if (def.getBlockType().equals("ModButtonBlock")) {
                 return new ButtonBlock(BlockSetType.STONE, 20, props) {};
             }
-            return new ButtonBlock(BlockSetType.OAK, 30, props) {};
+            return new ButtonBlock(BlockSetType.STONE, 30, props) {};
         } else if (def.isWeightedPressurePlate()) {
             // 1.18.2 ModPressurePlateBlock: a weighted plate (max weight 150) with the 'power' property.
-            return new net.minecraft.world.level.block.WeightedPressurePlateBlock(150, BlockSetType.OAK, props) {
-                @Override protected SoundType getSoundType(BlockState state) { return def.getId().contains("flaming_steel") ? SoundType.NETHERITE_BLOCK : SoundType.COPPER; }
-            };
+            return new net.minecraft.world.level.block.WeightedPressurePlateBlock(150, BlockSetType.STONE, props.sound(def.getId().contains("flaming_steel") ? BlockSoundSets.NETHERITE_BLOCK : BlockSoundSets.COPPER));
         } else if (def.isRedstoneLamp()) {
             return new net.minecraft.world.level.block.RedstoneLampBlock(props.lightLevel(
                     state -> state.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT) ? 15 : 0));
         } else if (def.isLightningRod()) {
             return new net.minecraft.world.level.block.LightningRodBlock(props);
         } else if (def.isPressurePlate()) {
-            return new PressurePlateBlock(BlockSetType.OAK, props) {
-                @Override protected SoundType getSoundType(BlockState state) { return referenceControlSound(def); }
-            };
+            return new PressurePlateBlock(BlockSetType.STONE, props.sound(referenceControlSound(def)));
         } else if (def.isMushroomShelves()) {
             return new MushroomShelvesBlock(props) {
                 @Override
@@ -696,7 +688,7 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isMangroveLeaves()) {
             class NativeMangroveLeavesBlock extends LeavesBlock implements BonemealableBlock {
                 public NativeMangroveLeavesBlock(BlockBehaviour.Properties properties) {
-                    super(AmbientLeavesBlockSoundPlayer.noAmbientSound(), properties);
+                    super(java.util.Optional.empty(), properties);
                 }
                 @Override
                 public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, BonemealSource source) {
@@ -715,7 +707,7 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isMangrovePropagule()) {
             class NativeMangrovePropaguleBlock extends MangrovePropaguleBlock implements BonemealableBlock {
                 public NativeMangrovePropaguleBlock(BlockBehaviour.Properties properties) {
-                    super(properties.noCollision().instabreak().sound(SoundType.GRASS).randomTicks());
+                    super(properties.noCollision().instabreak().sound(BlockSoundSets.GRASS).randomTicks());
                 }
                 @Override
                 public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, BonemealSource source) {
@@ -755,10 +747,10 @@ public class BlockFactory implements IBlockFactory {
                 }
             };
         } else if (def.isLeaves()) {
-            return new LeavesBlock(AmbientLeavesBlockSoundPlayer.noAmbientSound(), props) {
+            return new LeavesBlock(java.util.Optional.empty(), props) {
             };
         } else if (def.isSnowyLeaves()) {
-            return new LeavesBlock(AmbientLeavesBlockSoundPlayer.noAmbientSound(), props) {
+            return new LeavesBlock(java.util.Optional.empty(), props) {
                 @Override
                 public VoxelShape getVisualShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
                     return net.minecraft.world.phys.shapes.Shapes.empty();
@@ -1013,9 +1005,7 @@ public class BlockFactory implements IBlockFactory {
                     }
                 }
                 @Override
-                public boolean canPlaceLiquid(@Nullable LivingEntity entity, BlockGetter level, BlockPos pos, BlockState state, Fluid fluid) {
-                    return canPlaceLiquid(level, pos, state, fluid);
-                }
+                public boolean canPlaceLiquid(@Nullable LivingEntity entity, BlockGetter level, BlockPos pos, BlockState state, net.minecraft.world.level.material.FluidState fluid) { return canPlaceLiquid(level, pos, state, fluid.getType()); }
                 @Override
                 public ItemStack pickupBlock(@Nullable LivingEntity entity, LevelAccessor level, BlockPos pos, BlockState state) {
                     return pickupBlock(level, pos, state);
@@ -1065,9 +1055,7 @@ public class BlockFactory implements IBlockFactory {
                     onBlockTick(level, pos, state);
                 }
                 @Override
-                public boolean canPlaceLiquid(@Nullable LivingEntity entity, BlockGetter level, BlockPos pos, BlockState state, Fluid fluid) {
-                    return canPlaceLiquid(level, pos, state, fluid);
-                }
+                public boolean canPlaceLiquid(@Nullable LivingEntity entity, BlockGetter level, BlockPos pos, BlockState state, net.minecraft.world.level.material.FluidState fluid) { return canPlaceLiquid(level, pos, state, fluid.getType()); }
                 @Override
                 public ItemStack pickupBlock(@Nullable LivingEntity entity, LevelAccessor level, BlockPos pos, BlockState state) {
                     return pickupBlock(level, pos, state);
@@ -1124,7 +1112,7 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isRotatedPillar() || def.isLog() || def.isWood() || def.isCautionBlock() || def.isBambooBlock()) {
             return new RotatedPillarBlock(props);
         } else if (def.isTrappedDecoratedPot()) {
-            props.strength(0.0F).sound(com.kingodogo.buildscape.sound.ModSounds.DECORATED_POT_SOUNDS()).noOcclusion();
+            props.strength(0.0F).sound(com.kingodogo.buildscape.sound.ModSounds.DECORATED_POT_SOUNDS().soundSetKey()).noOcclusion();
             return new TrappedDecoratedPotBlock(props) {
                 @Override
                 protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) {
@@ -1155,7 +1143,7 @@ public class BlockFactory implements IBlockFactory {
                 }
             };
         } else if (def.isDecoratedPot()) {
-            props.strength(0.0F).sound(com.kingodogo.buildscape.sound.ModSounds.DECORATED_POT_SOUNDS()).noOcclusion();
+            props.strength(0.0F).sound(com.kingodogo.buildscape.sound.ModSounds.DECORATED_POT_SOUNDS().soundSetKey()).noOcclusion();
             return new DecoratedPotBlock(props) {
                 @Override
                 protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) {
@@ -1697,7 +1685,7 @@ public class BlockFactory implements IBlockFactory {
             }
             return new NativeHangingMossBlock(props);
         } else if (def.isClover()) {
-            props.instabreak().sound(com.kingodogo.buildscape.sound.ModSounds.FLOWER_BED_SOUNDS());
+            props.instabreak().sound(com.kingodogo.buildscape.sound.ModSounds.FLOWER_BED_SOUNDS().soundSetKey());
             class NativeCloverBlock extends CloverBlock implements BonemealableBlock {
                 public NativeCloverBlock(BlockBehaviour.Properties properties) {
                     super(properties);
@@ -1738,7 +1726,7 @@ public class BlockFactory implements IBlockFactory {
             }
             return new NativeCloverBlock(props);
         } else if (def.isPetal()) {
-            props.instabreak().sound(com.kingodogo.buildscape.sound.ModSounds.FLOWER_BED_SOUNDS());
+            props.instabreak().sound(com.kingodogo.buildscape.sound.ModSounds.FLOWER_BED_SOUNDS().soundSetKey());
             class NativePetalBlock extends PetalBlock implements BonemealableBlock {
                 public NativePetalBlock(BlockBehaviour.Properties properties) {
                     super(properties);
@@ -1779,7 +1767,7 @@ public class BlockFactory implements IBlockFactory {
             }
             return new NativePetalBlock(props);
         } else if (def.isWildflowers()) {
-            props.sound(SoundType.GRASS).noCollision();
+            props.sound(BlockSoundSets.GRASS).noCollision();
             class NativeWildflowersBlock extends WildflowersBlock implements BonemealableBlock {
                 public NativeWildflowersBlock(BlockBehaviour.Properties properties) {
                     super(properties);
@@ -2333,37 +2321,37 @@ public class BlockFactory implements IBlockFactory {
         }
         return props;
     }
-    private SoundType referenceControlSound(BlockDefinition def) {
+    private ResourceKey<BlockSoundSet> referenceControlSound(BlockDefinition def) {
         String id = def.getId();
-        if (id.startsWith("flaming_steel")) return SoundType.NETHERITE_BLOCK;
-        if (id.startsWith("steel_")) return SoundType.COPPER;
-        if (id.contains("glass")) return SoundType.GLASS;
-        if (id.contains("leaves")) return SoundType.GRASS;
-        if (id.contains("ladder")) return SoundType.LADDER;
-        if (id.startsWith("pale_oak_") || id.startsWith("poplar_")) return SoundType.WOOD;
+        if (id.startsWith("flaming_steel")) return BlockSoundSets.NETHERITE_BLOCK;
+        if (id.startsWith("steel_")) return BlockSoundSets.COPPER;
+        if (id.contains("glass")) return BlockSoundSets.GLASS;
+        if (id.contains("leaves")) return BlockSoundSets.GRASS;
+        if (id.contains("ladder")) return BlockSoundSets.LADDER;
+        if (id.startsWith("pale_oak_") || id.startsWith("poplar_")) return BlockSoundSets.WOOD;
         return resolveSoundType(def.getProperties().getSound());
     }
-    private SoundType resolveSoundType(String sound) {
-        if (sound == null) return SoundType.STONE;
+    private ResourceKey<BlockSoundSet> resolveSoundType(String sound) {
+        if (sound == null) return BlockSoundSets.STONE;
         return switch (sound.toUpperCase()) {
-            case "WOOD" -> SoundType.WOOD;
-            case "GRAVEL" -> SoundType.GRAVEL;
-            case "GRASS" -> SoundType.GRASS;
-            case "METAL" -> SoundType.METAL;
-            case "GLASS" -> SoundType.GLASS;
-            case "WOOL" -> SoundType.WOOL;
-            case "SAND" -> SoundType.SAND;
-            case "SNOW" -> SoundType.SNOW;
-            case "LADDER" -> SoundType.LADDER;
-            case "ANVIL" -> SoundType.ANVIL;
-            case "SLIME" -> SoundType.SLIME_BLOCK;
-            case "HONEY" -> SoundType.HONEY_BLOCK;
-            case "COPPER" -> SoundType.COPPER;
-            case "BAMBOO" -> SoundType.BAMBOO;
-            case "BONE" -> SoundType.BONE_BLOCK;
-            case "CHAIN" -> SoundType.CHAIN;
-            case "CANDLE" -> SoundType.CANDLE;
-            default -> SoundType.STONE;
+            case "WOOD" -> BlockSoundSets.WOOD;
+            case "GRAVEL" -> BlockSoundSets.GRAVEL;
+            case "GRASS" -> BlockSoundSets.GRASS;
+            case "METAL" -> BlockSoundSets.METAL;
+            case "GLASS" -> BlockSoundSets.GLASS;
+            case "WOOL" -> BlockSoundSets.WOOL;
+            case "SAND" -> BlockSoundSets.SAND;
+            case "SNOW" -> BlockSoundSets.SNOW;
+            case "LADDER" -> BlockSoundSets.LADDER;
+            case "ANVIL" -> BlockSoundSets.ANVIL;
+            case "SLIME" -> BlockSoundSets.SLIME_BLOCK;
+            case "HONEY" -> BlockSoundSets.HONEY_BLOCK;
+            case "COPPER" -> BlockSoundSets.COPPER;
+            case "BAMBOO" -> BlockSoundSets.BAMBOO;
+            case "BONE" -> BlockSoundSets.BONE_BLOCK;
+            case "CHAIN" -> BlockSoundSets.CHAIN;
+            case "CANDLE" -> BlockSoundSets.CANDLE;
+            default -> BlockSoundSets.STONE;
         };
     }
     private MapColor resolveMapColor(String color) {

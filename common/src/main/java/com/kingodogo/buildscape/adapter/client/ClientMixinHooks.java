@@ -430,7 +430,7 @@ public final class ClientMixinHooks {
 
     private static void previewTile(net.minecraft.client.gui.GuiGraphicsExtractor graphics, net.minecraft.resources.Identifier texture,
             int x, int y, int u, int v, int width, int height, int color) {
-        graphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, texture, x, y, (float) u, (float) v, width, height, 32, 32, color);
+        graphics.blit(net.minecraft.client.gui.GuiPipeline.TEXTURED, texture, x, y, (float) u, (float) v, width, height, 32, 32, color);
     }
 
     private record FireworkMetadata(net.minecraft.nbt.ListTag explosions, float yaw) {}

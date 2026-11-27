@@ -1,10 +1,10 @@
 package com.kingodogo.buildscape.mixinsupport;
 
 import com.kingodogo.buildscape.client.renderer.FestiveGlintHandler;
-import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.renderpearl.api.textures.GpuSampler;
 import net.minecraft.client.renderer.feature.ItemFeatureRenderer;
-import net.minecraft.client.renderer.oit.OitPipelineSet;
+import net.minecraft.client.renderer.oit.OitStage;
 import net.minecraft.client.renderer.rendertype.LayeringTransform;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /** Carries stack identity through deferred extraction, submission and glint preparation. */
@@ -85,9 +86,8 @@ public final class FestiveSubmission {
         try {
             RenderSetup setup = (RenderSetup) field(original, "state");
             Map<?, ?> textures = (Map<?, ?>) field(setup, "textures");
-            RenderSetup.RenderSetupBuilder builder = RenderSetup.builder((RenderPipeline) field(setup, "pipeline"));
-            OitPipelineSet oitPipelineSet = (OitPipelineSet) field(setup, "oitPipelineSet");
-            if (oitPipelineSet != null) builder.setOitPipelines(oitPipelineSet);
+            RenderSetup.RenderSetupBuilder builder = RenderSetup.builder(
+                    (Function<OitStage, RenderPipeline>) field(setup, "pipelineProvider"));
             for (var entry : textures.entrySet()) {
                 Object binding = entry.getValue();
                 Identifier location = (Identifier) field(binding, "location");

@@ -1,15 +1,45 @@
 pluginManagement {
     repositories {
-        gradlePluginPortal()
-        mavenCentral()
+        maven {
+            url = 'https://maven.wagyourtail.xyz/releases'
+            content { includeGroupByRegex 'xyz\\.wagyourtail.*' }
+        }
         maven { url = 'https://maven.fabricmc.net/' }
         maven { url = 'https://maven.neoforged.net/releases/' }
         maven { url = 'https://maven.minecraftforge.net/' }
         maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+        gradlePluginPortal()
+        mavenCentral {
+            content {
+                excludeGroupByRegex 'xyz\\.wagyourtail.*'
+                excludeGroupByRegex 'net\\.fabricmc.*'
+                excludeGroupByRegex 'net\\.neoforged.*'
+                excludeGroupByRegex 'net\\.minecraftforge.*'
+            }
+        }
+        maven {
+            url = 'https://maven-central.storage-download.googleapis.com/maven2/'
+            content {
+                excludeGroupByRegex 'xyz\\.wagyourtail.*'
+                excludeGroupByRegex 'net\\.fabricmc.*'
+                excludeGroupByRegex 'net\\.neoforged.*'
+                excludeGroupByRegex 'net\\.minecraftforge.*'
+            }
+        }
     }
 }
 
 rootProject.name = 'Buildscape'
+
+if (System.getenv('CI') == null && file('.githooks').isDirectory() && file('.git').exists()) {
+    try {
+        def p = new ProcessBuilder('git', 'config', '--get', 'core.hooksPath').directory(rootDir).start()
+        def out = p.inputStream.text.trim()
+        if (p.waitFor() != 0 || out != '.githooks') {
+            new ProcessBuilder('git', 'config', 'core.hooksPath', '.githooks').directory(rootDir).start().waitFor()
+        }
+    } catch (Exception ignored) {}
+}
 
 def prepareTargetRoot(File rootDir, String mc, String loader) {
     def targetDir = new File(rootDir, ".gradle/build-roots/${mc}/${loader}")

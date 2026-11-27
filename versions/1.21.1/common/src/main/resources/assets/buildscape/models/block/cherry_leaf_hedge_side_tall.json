@@ -1,0 +1,8 @@
+{
+  "parent": "buildscape:block/template_wall_side_tall_tinted",
+  "textures": {
+    "wall": "minecraft:block/cherry_leaves",
+    "tint": "minecraft:block/cherry_leaves",
+    "particle": "minecraft:block/cherry_leaves"
+  }
+}

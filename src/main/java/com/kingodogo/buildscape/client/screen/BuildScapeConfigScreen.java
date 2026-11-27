@@ -2110,7 +2110,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         } else if ("items".equals(current.id)) {
             int presetBtnW = 32;
             int presetBtnH = catHeaderH;
-            int presetBtnX = x + w - 5 - presetBtnW;
+            int presetBtnX = (x + w + 2) - presetBtnW;
             int presetBtnY = y;
             boolean presetOpen = sidePanelProgress > 0.05f && sidePanelType == SidePanelType.PRESETS && !isSidePanelClosing;
             boolean hoverPresetBtn = mouseX >= presetBtnX && mouseX <= presetBtnX + presetBtnW && mouseY >= presetBtnY && mouseY <= presetBtnY + presetBtnH;
@@ -4631,7 +4631,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         switch (current.id) {
             case "items" -> {
                 int presetBtnW = 32;
-                int presetBtnX = contentX + contentW - 5 - presetBtnW;
+                int presetBtnX = (contentX + contentW + 2) - presetBtnW;
                 if (mouseX >= presetBtnX && mouseX <= presetBtnX + presetBtnW
                         && mouseY >= contentY && mouseY <= contentY + catHeaderH) {
                     boolean presetOpen = sidePanelProgress > 0.05f && sidePanelType == SidePanelType.PRESETS && !isSidePanelClosing;

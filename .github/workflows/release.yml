@@ -23,7 +23,24 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          submodules: recursive
+          submodules: false
+
+      - name: Initialize Submodules
+        run: |
+          if [ -f .gitmodules ]; then
+            git submodule sync --recursive
+            git submodule update --init --recursive || {
+              for mod in $(git config -f .gitmodules --get-regexp path | awk '{print $2}'); do
+                rm -rf "$mod"
+                branch=$(git config -f .gitmodules "submodule.${mod}.branch")
+                sha=$(git ls-tree HEAD "$mod" | awk '{print $3}')
+                url=$(git config -f .gitmodules "submodule.${mod}.url")
+                git clone --depth 1 --branch "$branch" "$url" "$mod"
+                git -C "$mod" fetch --depth 1 origin "$sha" || git -C "$mod" fetch --unshallow || true
+                git -C "$mod" checkout "$sha"
+              done
+            }
+          fi
 
       - name: Determine Release Tag
         id: vars
@@ -56,7 +73,7 @@ jobs:
 
       - name: Assemble All Targets
         run: |
-          ./gradlew assemble --console=plain || true
+          ./gradlew assembleAll --console=plain || ./gradlew assemble --console=plain || true
 
       - name: Collect Jars
         id: collect

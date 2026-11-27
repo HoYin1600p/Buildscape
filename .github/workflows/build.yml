@@ -2,9 +2,9 @@ name: build
 
 on:
   pull_request:
-    branches: [ main, dev/** ]
+    branches: [ main, 'dev/**', 'backport_*' ]
   push:
-    branches: [ main, dev/** ]
+    branches: [ main, 'dev/**', 'backport_*' ]
   workflow_dispatch:
 
 permissions:
@@ -21,6 +21,7 @@ jobs:
   build:
     name: "${{ matrix.minecraft }} (${{ matrix.loader }})"
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental == true }}
     strategy:
       fail-fast: false
       matrix:
@@ -116,6 +117,7 @@ jobs:
           - minecraft: '26.4'
             loader: 'neoforge'
             java: 25
+            experimental: true
 
     steps:
       - name: Checkout Repository
@@ -127,7 +129,18 @@ jobs:
       - name: Initialize Target Submodules
         run: |
           if [ -f .gitmodules ]; then
-            git submodule update --init --depth 1 shared "versions/${{ matrix.minecraft }}"
+            git submodule sync --recursive
+            git submodule update --init --depth 1 shared "versions/${{ matrix.minecraft }}" || {
+              for mod in shared "versions/${{ matrix.minecraft }}"; do
+                rm -rf "$mod"
+                branch=$(git config -f .gitmodules "submodule.${mod}.branch")
+                sha=$(git ls-tree HEAD "$mod" | awk '{print $3}')
+                url=$(git config -f .gitmodules "submodule.${mod}.url")
+                git clone --depth 1 --branch "$branch" "$url" "$mod"
+                git -C "$mod" fetch --depth 1 origin "$sha" || git -C "$mod" fetch --unshallow || true
+                git -C "$mod" checkout "$sha"
+              done
+            }
           fi
 
       - name: Set up Java ${{ matrix.java }}

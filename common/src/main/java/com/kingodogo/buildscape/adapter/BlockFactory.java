@@ -294,6 +294,8 @@ public class BlockFactory implements IBlockFactory {
             };
         } else if (def.isVerticalSlab()) {
             return new VerticalSlabBlock(getBaseBlock(def), props);
+        } else if (def.isVerticalStair()) {
+            return new com.kingodogo.buildscape.block.VerticalStairBlock(getBaseBlock(def), props);
         } else if (def.isGrassSlab()) {
             props.randomTicks();
             Supplier<Block> dirtSlabSupplier = resolveBlockSupplier("dirt_slab");

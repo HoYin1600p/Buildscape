@@ -1,0 +1,63 @@
+pluginManagement {
+    repositories {
+        maven {
+            url = 'https://maven.wagyourtail.xyz/releases'
+            content { includeGroupByRegex 'xyz\\.wagyourtail.*' }
+        }
+        maven { url = 'https://maven.fabricmc.net/' }
+        maven { url = 'https://maven.neoforged.net/releases/' }
+        maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+        gradlePluginPortal()
+        mavenCentral {
+            content {
+                excludeGroupByRegex 'xyz\\.wagyourtail.*'
+                excludeGroupByRegex 'net\\.fabricmc.*'
+                excludeGroupByRegex 'net\\.neoforged.*'
+                excludeGroupByRegex 'net\\.minecraftforge.*'
+            }
+        }
+        maven {
+            url = 'https://maven-central.storage-download.googleapis.com/maven2/'
+            content {
+                excludeGroupByRegex 'xyz\\.wagyourtail.*'
+                excludeGroupByRegex 'net\\.fabricmc.*'
+                excludeGroupByRegex 'net\\.neoforged.*'
+                excludeGroupByRegex 'net\\.minecraftforge.*'
+            }
+        }
+    }
+}
+
+if (!file('shared/properties').isDirectory() && file('.git').exists()) {
+    try {
+        new ProcessBuilder('git', 'submodule', 'update', '--init', '--recursive', 'shared').directory(rootDir).start().waitFor()
+    } catch (Exception ignored) {}
+}
+
+def mc = providers.gradleProperty('mc').get()
+rootProject.name = "buildscape-${mc}"
+
+def pins = new Properties()
+def pinFile = file("shared/properties/${mc}.properties")
+if (!pinFile.isFile()) {
+    throw new GradleException("Missing shared/properties/${mc}.properties (run git submodule update --init --recursive)")
+}
+pinFile.withInputStream { pins.load(it) }
+
+def loaders = pins.getProperty('loaders', '').split(',').collect { it.trim() }.findAll { it }
+loaders.each { loader ->
+    def targetDir = new File(rootDir, ".gradle/build-roots/${mc}/${loader}")
+    targetDir.mkdirs()
+    new File(targetDir, 'settings.gradle').text = "rootProject.name = 'buildscape-${mc}-${loader}'\n"
+    new File(targetDir, 'build.gradle').text = file('shared/build-logic/target.gradle').text
+    def props = file('gradle.properties').text
+    props += "\nmc=${mc}\nloader=${loader}\n"
+    new File(targetDir, 'gradle.properties').text = props
+    def localProps = file('local.properties')
+    if (localProps.isFile()) {
+        new File(targetDir, 'local.properties').text = localProps.text
+    }
+    include ":${loader}"
+    project(":${loader}").projectDir = targetDir
+}

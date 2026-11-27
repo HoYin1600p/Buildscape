@@ -45,7 +45,7 @@ if (targetPins.getProperty('fabric.plugin') == 'xyz.wagyourtail.unimined') {
     }
 
     unimined.minecraft {
-        version targetMinecraft
+        version targetPins.getProperty('minecraft.version', targetMinecraft)
         defaultRemapJar = false
         fabric {
             loader targetPins.getProperty('fabric.version')

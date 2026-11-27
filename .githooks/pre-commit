@@ -1,0 +1,26 @@
+#!/usr/bin/env sh
+# Auto-commit dirty submodules and stage updated gitlinks before root commit.
+set -e
+
+[ -f .gitmodules ] || exit 0
+[ "${BUILDSCAPE_SKIP_SUBMODULE_AUTOCOMMIT:-0}" = "1" ] && exit 0
+
+PARENT_INDEX="${GIT_INDEX_FILE:-}"
+# Clear parent git env vars before invoking git inside submodules.
+unset GIT_DIR GIT_INDEX_FILE GIT_WORK_TREE GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_COMMON_DIR
+
+for mod in $(git config -f .gitmodules --get-regexp '^submodule\..*\.path$' | awk '{print $2}'); do
+    [ -d "$mod" ] || continue
+    if [ -n "$(git -C "$mod" status --porcelain 2>/dev/null)" ]; then
+        echo "[pre-commit] Auto-committing changes in submodule $mod..."
+        git -C "$mod" add -A
+        if ! git -C "$mod" diff --cached --quiet; then
+            git -C "$mod" commit -m "Update $mod"
+            if [ -n "$PARENT_INDEX" ]; then
+                GIT_INDEX_FILE="$PARENT_INDEX" git add "$mod"
+            else
+                git add "$mod"
+            fi
+        fi
+    fi
+done

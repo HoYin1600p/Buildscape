@@ -26,8 +26,8 @@
     "buildscape-fabric.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.19.5 <0.20",
-    "minecraft": "~26.4",
+    "fabricloader": ">=0.19.5",
+    "minecraft": ">=26.4- <26.5-",
     "fabric-api": ">=0.160.5+26.3",
     "java": ">=25"
   }

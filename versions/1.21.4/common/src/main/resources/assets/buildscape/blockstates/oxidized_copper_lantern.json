@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "hanging=false": {
+      "model": "buildscape:block/oxidized_copper_lantern"
+    },
+    "hanging=true": {
+      "model": "buildscape:block/oxidized_copper_lantern_hanging"
+    }
+  }
+}

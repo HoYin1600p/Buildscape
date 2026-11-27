@@ -317,13 +317,13 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isWeatheringBlock()) {
             return new Block(props.randomTicks()) {
                 @Override public boolean isRandomlyTicking(BlockState state) { return true; }
-                @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { WeatheringBlockLogic.randomTick(state, level, pos); }
+                @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { WeatheringBlockLogic.randomTick(state, level, pos); }
             };
         } else if (def.isWeatheringButton()) {
             return new ButtonBlock(BlockSetType.STONE, 20, props.randomTicks()) {
                 @Override protected SoundType getSoundType(BlockState state) { return SoundType.COPPER; }
                 @Override public boolean isRandomlyTicking(BlockState state) { return true; }
-                @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { WeatheringBlockLogic.randomTick(state, level, pos); }
+                @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { WeatheringBlockLogic.randomTick(state, level, pos); }
             };
         } else if (def.isWeatheringPressurePlate()) {
             return new net.minecraft.world.level.block.WeightedPressurePlateBlock(WeatheringBlockLogic.PRESSURE_PLATE_MAX_WEIGHT, BlockSetType.OAK, props.randomTicks()) {
@@ -342,24 +342,29 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isWeatheringSlab()) {
             return new net.minecraft.world.level.block.SlabBlock(props.randomTicks()) {
                 @Override public boolean isRandomlyTicking(BlockState state) { return true; }
-                @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { WeatheringBlockLogic.randomTick(state, level, pos); }
+                @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { WeatheringBlockLogic.randomTick(state, level, pos); }
             };
         } else if (def.isWeatheringStair()) {
             return new ModStairBlock(getBaseState(def), props.randomTicks()) {
                 @Override public boolean isRandomlyTicking(BlockState state) { return true; }
-                @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { WeatheringBlockLogic.randomTick(state, level, pos); }
+                @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { WeatheringBlockLogic.randomTick(state, level, pos); }
             };
         } else if (def.isWeatheringVerticalSlab()) {
             return new VerticalSlabBlock(getBaseBlock(def), props.randomTicks()) {
                 @Override public boolean isRandomlyTicking(BlockState state) { return true; }
-                @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { WeatheringBlockLogic.randomTick(state, level, pos); }
+                @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { WeatheringBlockLogic.randomTick(state, level, pos); }
             };
         } else if (def.isStair()) {
             return new ModStairBlock(getBaseState(def), props);
         } else if (def.isVerticalSlab()) {
             return new VerticalSlabBlock(getBaseBlock(def), props);
+        } else if (def.isWeatheringVerticalStair()) {
+            return new com.kingodogo.buildscape.block.VerticalStairBlock(getBaseBlock(def), props.randomTicks()) {
+                @Override public boolean isRandomlyTicking(BlockState state) { return true; }
+                @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { WeatheringBlockLogic.randomTick(state, level, pos); }
+            };
         } else if (def.isVerticalStair()) {
-            return new com.kingodogo.buildscape.block.VerticalStairBlock(getBaseBlock(def), props);
+            return new com.kingodogo.buildscape.block.VerticalStairBlock(getBaseBlock(def), def.getId().contains("glass") ? props.noOcclusion() : props);
         } else if (def.isGrassSlab()) {
             props.randomTicks();
             Supplier<Block> dirtSlabSupplier = resolveBlockSupplier("dirt_slab");

@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "buildscape:packed_mud_slab",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "condition": {
+              "type": "minecraft:match_block",
+              "blocks": "buildscape:packed_mud_slab",
+              "state": {
+                "type": "double"
+              }
+            },
+            "count": 2
+          }
+        }
+      ]
+    }
+  ]
+}

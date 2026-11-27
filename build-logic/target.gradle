@@ -48,12 +48,17 @@ buildscript {
             content { includeGroupByRegex 'xyz\\.wagyourtail.*' }
         }
         maven { url = 'https://maven.outlands.top/releases' }
-        if (loader == 'fabric') {
-            maven { url = 'https://maven.fabricmc.net/' }
-        } else if (loader == 'forge') {
-            maven { url = 'https://maven.minecraftforge.net/' }
-        } else if (loader == 'neoforge') {
-            maven { url = 'https://maven.neoforged.net/releases/' }
+        maven {
+            url = 'https://maven.fabricmc.net/'
+            content { includeGroupByRegex 'net\\.fabricmc.*' }
+        }
+        maven {
+            url = 'https://maven.minecraftforge.net/'
+            content { includeGroupByRegex 'net\\.minecraftforge.*' }
+        }
+        maven {
+            url = 'https://maven.neoforged.net/releases/'
+            content { includeGroupByRegex 'net\\.neoforged.*' }
         }
         mavenCentral {
             content {

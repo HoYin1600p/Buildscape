@@ -22,6 +22,16 @@ pluginManagement {
 
 rootProject.name = 'Buildscape'
 
+if (System.getenv('CI') == null && file('.githooks').isDirectory() && file('.git').exists()) {
+    try {
+        def p = new ProcessBuilder('git', 'config', '--get', 'core.hooksPath').directory(rootDir).start()
+        def out = p.inputStream.text.trim()
+        if (p.waitFor() != 0 || out != '.githooks') {
+            new ProcessBuilder('git', 'config', 'core.hooksPath', '.githooks').directory(rootDir).start().waitFor()
+        }
+    } catch (Exception ignored) {}
+}
+
 def prepareTargetRoot(File rootDir, String mc, String loader) {
     def targetDir = new File(rootDir, ".gradle/build-roots/${mc}/${loader}")
     targetDir.mkdirs()

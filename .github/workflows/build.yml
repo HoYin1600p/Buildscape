@@ -19,105 +19,42 @@ env:
 
 jobs:
   build:
-    name: "${{ matrix.minecraft }} (${{ matrix.loader }})"
+    name: "MC ${{ matrix.minecraft }}"
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.experimental == true }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          # 1.18.2 (Java 17)
           - minecraft: '1.18.2'
-            loader: 'fabric'
-            java: 17
-          - minecraft: '1.18.2'
-            loader: 'forge'
-            java: 17
-          # 1.19.2 (Java 17)
-          - minecraft: '1.19.2'
-            loader: 'fabric'
+            tasks: ':fabric:1.18.2:assemble :forge:1.18.2:assemble'
             java: 17
           - minecraft: '1.19.2'
-            loader: 'forge'
-            java: 17
-          # 1.20.1 (Java 17)
-          - minecraft: '1.20.1'
-            loader: 'fabric'
+            tasks: ':fabric:1.19.2:assemble :forge:1.19.2:assemble'
             java: 17
           - minecraft: '1.20.1'
-            loader: 'forge'
-            java: 17
-          - minecraft: '1.20.1'
-            loader: 'neoforge'
-            java: 17
-          # 1.20.4 (Java 17)
-          - minecraft: '1.20.4'
-            loader: 'fabric'
+            tasks: ':fabric:1.20.1:assemble :forge:1.20.1:assemble :neoforge:1.20.1:assemble'
             java: 17
           - minecraft: '1.20.4'
-            loader: 'forge'
+            tasks: ':fabric:1.20.4:assemble :forge:1.20.4:assemble :neoforge:1.20.4:assemble'
             java: 17
-          - minecraft: '1.20.4'
-            loader: 'neoforge'
-            java: 17
-          # 1.20.6 (Java 21)
           - minecraft: '1.20.6'
-            loader: 'fabric'
-            java: 21
-          - minecraft: '1.20.6'
-            loader: 'forge'
-            java: 21
-          - minecraft: '1.20.6'
-            loader: 'neoforge'
-            java: 21
-          # 1.21.1 (Java 21)
-          - minecraft: '1.21.1'
-            loader: 'fabric'
+            tasks: ':fabric:1.20.6:assemble :forge:1.20.6:assemble :neoforge:1.20.6:assemble'
             java: 21
           - minecraft: '1.21.1'
-            loader: 'forge'
-            java: 21
-          - minecraft: '1.21.1'
-            loader: 'neoforge'
-            java: 21
-          # 1.21.4 (Java 21)
-          - minecraft: '1.21.4'
-            loader: 'fabric'
+            tasks: ':fabric:1.21.1:assemble :forge:1.21.1:assemble :neoforge:1.21.1:assemble'
             java: 21
           - minecraft: '1.21.4'
-            loader: 'forge'
+            tasks: ':fabric:1.21.4:assemble :forge:1.21.4:assemble :neoforge:1.21.4:assemble'
             java: 21
-          - minecraft: '1.21.4'
-            loader: 'neoforge'
-            java: 21
-          # 26.2 (Java 25)
           - minecraft: '26.2'
-            loader: 'fabric'
-            java: 25
-          - minecraft: '26.2'
-            loader: 'forge'
-            java: 25
-          - minecraft: '26.2'
-            loader: 'neoforge'
-            java: 25
-          # 26.3 (Java 25)
-          - minecraft: '26.3'
-            loader: 'fabric'
+            tasks: ':fabric:26.2:assemble :forge:26.2:assemble :neoforge:26.2:assemble'
             java: 25
           - minecraft: '26.3'
-            loader: 'forge'
-            java: 25
-          - minecraft: '26.3'
-            loader: 'neoforge'
-            java: 25
-          # 26.4 (Java 25)
-          - minecraft: '26.4'
-            loader: 'fabric'
+            tasks: ':fabric:26.3:assemble :forge:26.3:assemble :neoforge:26.3:assemble'
             java: 25
           - minecraft: '26.4'
-            loader: 'neoforge'
+            tasks: ':fabric:26.4:assemble'
             java: 25
-            experimental: true
 
     steps:
       - name: Checkout Repository
@@ -155,16 +92,16 @@ jobs:
       - name: Make Gradle Wrapper Executable
         run: chmod +x ./gradlew
 
-      - name: Build Target
+      - name: Build Targets
         run: |
-          ./gradlew ":${{ matrix.loader }}:${{ matrix.minecraft }}:assemble" --no-daemon --console=plain
+          ./gradlew ${{ matrix.tasks }} --parallel --no-daemon --console=plain
 
       - name: Upload Target Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: "buildscape-${{ matrix.minecraft }}-${{ matrix.loader }}"
+          name: "buildscape-${{ matrix.minecraft }}"
           path: |
-            build/${{ matrix.minecraft }}/${{ matrix.loader }}/libs/*.jar
-            !build/${{ matrix.minecraft }}/${{ matrix.loader }}/libs/*-dev.jar
-            !build/${{ matrix.minecraft }}/${{ matrix.loader }}/libs/*-sources.jar
+            build/${{ matrix.minecraft }}/*/libs/*.jar
+            !build/${{ matrix.minecraft }}/*/libs/*-dev.jar
+            !build/${{ matrix.minecraft }}/*/libs/*-sources.jar
           if-no-files-found: ignore

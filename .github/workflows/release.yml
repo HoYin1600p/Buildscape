@@ -93,7 +93,7 @@ jobs:
         if: steps.vars.outputs.should_release == 'true'
         run: |
           ./gradlew buildAll --parallel --no-daemon --console=plain || \
-          (sleep 10 && ./gradlew buildAll --parallel --no-daemon --console=plain)
+          (sleep 10 && ./gradlew buildAll --parallel --no-daemon --console=plain --refresh-dependencies)
 
       - name: Collect Jars
         if: steps.vars.outputs.should_release == 'true'

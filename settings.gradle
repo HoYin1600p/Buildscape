@@ -17,6 +17,15 @@ pluginManagement {
                 excludeGroupByRegex 'net\\.minecraftforge.*'
             }
         }
+        maven {
+            url = 'https://maven-central.storage-download.googleapis.com/maven2/'
+            content {
+                excludeGroupByRegex 'xyz\\.wagyourtail.*'
+                excludeGroupByRegex 'net\\.fabricmc.*'
+                excludeGroupByRegex 'net\\.neoforged.*'
+                excludeGroupByRegex 'net\\.minecraftforge.*'
+            }
+        }
     }
 }
 

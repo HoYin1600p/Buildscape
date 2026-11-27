@@ -121,7 +121,7 @@ jobs:
       - name: Build Targets
         run: |
           ./gradlew ${{ matrix.tasks }} --parallel --no-daemon --console=plain || \
-          (sleep 10 && ./gradlew ${{ matrix.tasks }} --parallel --no-daemon --console=plain)
+          (sleep 10 && ./gradlew ${{ matrix.tasks }} --parallel --no-daemon --console=plain --refresh-dependencies)
 
       - name: Upload Target Artifacts
         uses: actions/upload-artifact@v4

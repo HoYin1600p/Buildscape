@@ -177,7 +177,8 @@ public final class GuiProvider {
 
             @Override
             public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
-                if (delegate.keyPressed(event.key(), event.scancode(), event.modifiers())) return true;
+                int key = event.isEscape() ? 256 : event.key();
+                if (delegate.keyPressed(key, event.scancode(), event.modifiers())) return true;
                 return super.keyPressed(event);
             }
 
@@ -190,6 +191,7 @@ public final class GuiProvider {
             @Override
             public void onClose() {
                 delegate.onClose();
+                super.onClose();
             }
 
             @Override

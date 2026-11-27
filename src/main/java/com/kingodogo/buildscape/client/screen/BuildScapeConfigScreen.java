@@ -3442,8 +3442,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         Services.PLATFORM.fill(poseStackOrGraphics, btnX, btnY, btnRight, btnY + 1, black);
         Services.PLATFORM.fill(poseStackOrGraphics, btnX, btnY + btnH - 1, btnRight, btnY + btnH, black);
 
-        Services.PLATFORM.fill(poseStackOrGraphics, btnX + 1, btnY + 1, btnX + 2, btnY + btnH - 1, bevelHighlight);
-        Services.PLATFORM.fill(poseStackOrGraphics, btnX + 1, btnY + 1, btnRight, btnY + 2, bevelHighlight);
+        drawVerticalGradientLine(poseStackOrGraphics, btnX + 1, btnY + 1, btnH - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
+        drawHorizontalGradientLine(poseStackOrGraphics, btnX + 1, btnY + 1, btnW - 1, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
         Services.PLATFORM.fill(poseStackOrGraphics, btnX + 1, btnY + btnH - 2, btnRight, btnY + btnH - 1, shadow);
 
         Services.PLATFORM.fill(poseStackOrGraphics, btnX + 2, btnY + 2, btnX + 3, btnY + btnH - 2, band);

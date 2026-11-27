@@ -85,9 +85,9 @@ if (targetPins.getProperty('fabric.plugin') == 'xyz.wagyourtail.unimined') {
     }
 
     loom {
-        def awFile = new File(templateRoot, "versions/${targetMinecraft}/fabric/src/main/resources/buildscape.accesswidener")
+        def awFile = new File(versionRoot, 'fabric/src/main/resources/buildscape.accesswidener')
         if (!awFile.isFile()) {
-            awFile = new File(templateRoot, "versions/${targetMinecraft}/common/src/main/resources/buildscape.accesswidener")
+            awFile = new File(versionRoot, 'common/src/main/resources/buildscape.accesswidener')
         }
         if (awFile.isFile()) {
             accessWidenerPath = awFile

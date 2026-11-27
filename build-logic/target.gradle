@@ -37,6 +37,7 @@ buildscript {
     project.ext.targetPins = pins
     project.ext.targetMinecraft = mc
     project.ext.targetLoader = loader
+    project.ext.versionRoot = new File(template, "versions/${mc}").isDirectory() ? new File(template, "versions/${mc}") : template
 
     repositories {
         maven {

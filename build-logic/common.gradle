@@ -39,8 +39,8 @@ java {
 }
 
 def commonJava = new File(templateRoot, 'shared/src/main/java')
-def versionCommonJava = new File(templateRoot, "versions/${targetMinecraft}/common/src/main/java")
-def versionLoaderJava = new File(templateRoot, "versions/${targetMinecraft}/${targetLoader}/src/main/java")
+def versionCommonJava = new File(versionRoot, 'common/src/main/java')
+def versionLoaderJava = new File(versionRoot, "${targetLoader}/src/main/java")
 def overriddenCommonFiles = [] as Set
 def overriddenVersionCommonFiles = [] as Set
 [versionCommonJava, versionLoaderJava].each { dir ->
@@ -69,11 +69,15 @@ if (versionLoaderJava.isDirectory() && versionCommonJava.isDirectory()) {
 sourceSets {
     main {
         java.setSrcDirs([commonJava, versionCommonJava, versionLoaderJava].findAll { it.isDirectory() })
-        resources.setSrcDirs(["versions/${targetMinecraft}/${targetLoader}/src/main/resources", "versions/${targetMinecraft}/common/src/main/resources", 'shared/src/main/resources'].collect { new File(templateRoot, it) }.findAll { it.isDirectory() })
+        resources.setSrcDirs(([
+            new File(versionRoot, "${targetLoader}/src/main/resources"),
+            new File(versionRoot, 'common/src/main/resources'),
+            new File(templateRoot, 'shared/src/main/resources')
+        ]).findAll { it.isDirectory() })
     }
     test {
-        java.setSrcDirs(["versions/${targetMinecraft}/common/src/test/java"].collect { new File(templateRoot, it) })
-        resources.setSrcDirs(["versions/${targetMinecraft}/common/src/test/resources"].collect { new File(templateRoot, it) })
+        java.setSrcDirs([new File(versionRoot, 'common/src/test/java')])
+        resources.setSrcDirs([new File(versionRoot, 'common/src/test/resources')])
     }
 }
 
@@ -88,7 +92,7 @@ test {
     useJUnitPlatform()
     maxParallelForks = Math.max(1, (int) (Runtime.runtime.availableProcessors() / 2))
     systemProperty 'templateRoot', templateRoot.absolutePath
-    def mixinJson = new File(templateRoot, "versions/${targetMinecraft}/common/src/main/resources/buildscape.mixins.json")
+    def mixinJson = new File(versionRoot, 'common/src/main/resources/buildscape.mixins.json')
     if (mixinJson.isFile()) {
         systemProperty 'buildscape.minecraft1182MixinConfig', mixinJson.absolutePath
     }

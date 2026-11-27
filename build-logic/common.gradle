@@ -123,7 +123,8 @@ processResources {
         mod_version: version.toString(),
         version: version.toString(),
         mod_description: metadata.getProperty('mod.description'),
-        mod_authors: metadata.getProperty('mod.authors', 'Kingodogo, KyroXova'),
+        mod_authors: metadata.getProperty('mod.authors', 'Kingodogo'),
+        mod_homepage: metadata.getProperty('mod.homepage', 'https://buildscape.online'),
         mod_license: metadata.getProperty('mod.license'),
         minecraft_version: targetMinecraft,
         java_release: targetPins.getProperty('java.release'),
@@ -141,7 +142,7 @@ jar {
         attributes(
             'Implementation-Title': metadata.getProperty('mod.name'),
             'Implementation-Version': project.version,
-            'Implementation-Vendor': metadata.getProperty('mod.authors', 'Kingodogo, KyroXova')
+            'Implementation-Vendor': metadata.getProperty('mod.authors', 'Kingodogo')
         )
     }
 }

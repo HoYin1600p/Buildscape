@@ -55,6 +55,9 @@ jobs:
           - minecraft: '26.3'
             tasks: ':fabric:26.3:assemble :forge:26.3:assemble :neoforge:26.3:assemble'
             java: 25
+          - minecraft: '26.4'
+            tasks: ':fabric:26.4:assemble'
+            java: 25
 
     steps:
       - name: Checkout Repository

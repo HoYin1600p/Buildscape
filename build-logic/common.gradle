@@ -134,6 +134,11 @@ processResources {
     filesMatching(['fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml']) {
         expand(values)
     }
+    if (targetMinecraft in ['1.18.2', '1.19.2']) {
+        exclude 'data/buildscape/loot_table/**'
+        exclude 'data/buildscape/tags/block/**'
+        exclude 'data/buildscape/tags/item/**'
+    }
 }
 
 jar {

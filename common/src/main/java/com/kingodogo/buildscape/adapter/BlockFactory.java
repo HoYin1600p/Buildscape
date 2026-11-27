@@ -456,7 +456,7 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isWeatheringVerticalStair()) {
             return new com.kingodogo.buildscape.block.VerticalStairBlock(getBaseBlock(def), props.randomTicks()) {
                 @Override public boolean isRandomlyTicking(BlockState state) { return true; }
-                @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { WeatheringBlockLogic.randomTick(state, level, pos); }
+                @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, java.util.Random random) { WeatheringBlockLogic.randomTick(state, level, pos); }
             };
         } else if (def.isVerticalStair()) {
             return new com.kingodogo.buildscape.block.VerticalStairBlock(getBaseBlock(def), def.getId().contains("glass") ? props.noOcclusion() : props);

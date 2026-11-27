@@ -1,0 +1,6 @@
+{
+  "parent": "buildscape:block/template_leaf_litter_4",
+  "textures": {
+    "texture": "buildscape:block/leaf_litter"
+  }
+}

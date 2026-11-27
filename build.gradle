@@ -50,8 +50,8 @@ def prepareTargetRoot(File rootDir, String mc, String loader) {
         new File(targetDir, 'gradlew').setExecutable(true)
     }
 
-    def gradleVer = (loader == 'forge') ? '8.10.2' : '9.6.0'
-    def daemonJvm = (loader == 'forge') ? '21' : '25'
+    def gradleVer = (loader == 'forge' && !mc.startsWith('26.')) ? '8.10.2' : '9.6.0'
+    def daemonJvm = (loader == 'forge' && !mc.startsWith('26.')) ? '21' : '25'
     new File(wrapperDir, 'gradle-wrapper.properties').text = """distributionBase=GRADLE_USER_HOME
 distributionPath=wrapper/dists
 distributionUrl=https\\://services.gradle.org/distributions/gradle-${gradleVer}-bin.zip

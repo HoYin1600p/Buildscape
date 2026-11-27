@@ -157,7 +157,7 @@ jobs:
 
       - name: Build Target
         run: |
-          ./gradlew -Pmc=${{ matrix.minecraft }} -Ploader=${{ matrix.loader }} build --console=plain
+          ./gradlew ":${{ matrix.loader }}:${{ matrix.minecraft }}:assemble" --no-daemon --console=plain
 
       - name: Upload Target Artifacts
         uses: actions/upload-artifact@v4

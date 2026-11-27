@@ -447,7 +447,8 @@ public final class ClientPlatformHooks {
 
     public static void renderFallingIcicleBlock(net.minecraft.world.level.Level level, net.minecraft.world.level.block.state.BlockState blockState, net.minecraft.core.BlockPos blockPos, net.minecraft.core.BlockPos startPos, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource) {
         if (bufferSource instanceof ClientWorldHooks.OutlineState outlines) {
-            outlines.addBlock(blockState, blockPos, Services.PLATFORM.getLightColor(level, blockPos), poseStack.last().pose());
+            outlines.addBlock(blockState, blockPos, Services.PLATFORM.getLightColor(level, blockPos),
+                    com.kingodogo.buildscape.client.ClientEvents.getActivePreviewAlpha(), poseStack.last().pose());
             return;
         }
         renderBlockModelWithTint(blockState, blockPos, level, poseStack, bufferSource,
@@ -628,6 +629,64 @@ public final class ClientPlatformHooks {
             tints.add(level != null && pos != null ? source.colorInWorld(state, view, pos) : source.color(state));
         }
         model.submit(poseStack, collector, light, overlay, 0);
+    }
+
+    private static final com.mojang.blaze3d.vertex.QuadInstance CACHED_QUAD_INSTANCE = new com.mojang.blaze3d.vertex.QuadInstance();
+
+    public static void renderBlockModelWithTintAlpha(net.minecraft.world.level.block.state.BlockState state, net.minecraft.core.BlockPos pos, net.minecraft.world.level.Level level, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int light, int overlay, float alpha) {
+        if (alpha >= 0.999f) {
+            renderBlockModelWithTint(state, pos, level, poseStack, bufferSource, light, overlay);
+            return;
+        }
+        if (!(bufferSource instanceof net.minecraft.client.renderer.SubmitNodeCollector collector) || state.isAir()) return;
+        var client = net.minecraft.client.Minecraft.getInstance();
+        var modelManager = client.getModelManager();
+        if (cachedModelResolver == null || cachedModelManager != modelManager) {
+            cachedModelManager = modelManager;
+            cachedModelResolver = new net.minecraft.client.renderer.block.BlockModelResolver(modelManager);
+        }
+        var model = CACHED_BLOCK_MODEL_STATE;
+        cachedModelResolver.update(model, state, net.minecraft.client.renderer.block.model.BlockDisplayContext.create());
+        var tints = model.tintLayers();
+        tints.clear();
+        var view = CACHED_MOVING_STATE;
+        if (level != null && pos != null) {
+            view.blockState = state;
+            view.blockPos = pos;
+            view.randomSeedPos = pos;
+            view.biome = level.getBiome(pos);
+        }
+        for (var source : client.getBlockColors().getTintSources(state)) {
+            tints.add(level != null && pos != null ? source.colorInWorld(state, view, pos) : source.color(state));
+        }
+        var parts = model.setupModel(new org.joml.Matrix4f(), false);
+        if (parts == null || parts.isEmpty()) return;
+        final int alphaByte = Math.max(1, Math.min(255, Math.round(alpha * 255.0f)));
+        final int[] tintCopy = tints.isEmpty() ? new int[0] : tints.toIntArray();
+        collector.submitCustomGeometry(poseStack, net.minecraft.client.renderer.rendertype.RenderTypes.translucentMovingBlock(), (transform, consumer) -> {
+            CACHED_QUAD_INSTANCE.setLightCoords(light);
+            CACHED_QUAD_INSTANCE.setOverlayCoords(overlay);
+            for (var part : parts) {
+                emitPartQuads(transform, consumer, part, null, alphaByte, tintCopy);
+                for (var dir : net.minecraft.core.Direction.values()) {
+                    emitPartQuads(transform, consumer, part, dir, alphaByte, tintCopy);
+                }
+            }
+        });
+    }
+
+    private static void emitPartQuads(com.mojang.blaze3d.vertex.PoseStack.Pose transform,
+                                      com.mojang.blaze3d.vertex.VertexConsumer consumer,
+                                      net.minecraft.client.renderer.block.dispatch.BlockStateModelPart part,
+                                      net.minecraft.core.Direction dir,
+                                      int alphaByte,
+                                      int[] tintCopy) {
+        for (var quad : part.getQuads(dir)) {
+            int ti = quad.materialInfo().tintIndex();
+            int rgb = (ti >= 0 && ti < tintCopy.length) ? (tintCopy[ti] & 0x00FFFFFF) : 0x00FFFFFF;
+            CACHED_QUAD_INSTANCE.setColor((alphaByte << 24) | rgb);
+            consumer.putBakedQuad(transform, quad, CACHED_QUAD_INSTANCE);
+        }
     }
 
     public static void renderColoredQuad(com.mojang.blaze3d.vertex.PoseStack poseStack, Object buffer,

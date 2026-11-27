@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:sculk_pillar"
+    },
+    "title": {
+      "translate": "advancements.buildscape.thats_a_tall_order.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.thats_a_tall_order.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:support_system",
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

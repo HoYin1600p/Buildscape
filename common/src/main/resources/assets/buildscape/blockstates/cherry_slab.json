@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/cherry_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/cherry_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/cherry_planks"
+    }
+  }
+}

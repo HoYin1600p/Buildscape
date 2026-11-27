@@ -2112,7 +2112,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         } else if ("items".equals(current.id)) {
             int presetBtnW = 32;
             int presetBtnH = 24;
-            int presetBtnX = (x + w + 2) - presetBtnW;
+            int presetBtnX = (x + w + 3) - presetBtnW;
             int presetBtnY = y + (catHeaderH - presetBtnH) / 2;
             boolean presetOpen = sidePanelProgress > 0.05f && sidePanelType == SidePanelType.PRESETS && !isSidePanelClosing;
             boolean hoverPresetBtn = mouseX >= presetBtnX && mouseX <= presetBtnX + presetBtnW && mouseY >= presetBtnY && mouseY <= presetBtnY + presetBtnH;
@@ -3451,29 +3451,28 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         Services.PLATFORM.fill(poseStackOrGraphics, btnX + 2, btnY + btnH - 3, btnRight, btnY + btnH - 2, band);
 
         Services.PLATFORM.fill(poseStackOrGraphics, btnX + 3, btnY + 3, btnX + 4, btnY + btnH - 3, bevelShadow);
-        Services.PLATFORM.fill(poseStackOrGraphics, btnX + 3, btnY + 3, btnRight - 1, btnY + 4, bevelShadow);
-        Services.PLATFORM.fill(poseStackOrGraphics, btnX + 3, btnY + btnH - 4, btnRight - 1, btnY + btnH - 3, bevelHighlight);
-        Services.PLATFORM.fill(poseStackOrGraphics, btnRight - 1, btnY + 3, btnRight, btnY + btnH - 3, bevelHighlight);
+        Services.PLATFORM.fill(poseStackOrGraphics, btnX + 3, btnY + 3, btnRight, btnY + 4, bevelShadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, btnX + 3, btnY + btnH - 4, btnRight, btnY + btnH - 3, bevelHighlight);
 
         int faceX = btnX + 4;
         int faceY = btnY + 4;
-        int faceW = (btnRight - 1) - faceX;
+        int faceW = btnRight - faceX;
         int faceH = btnH - 8;
         int bgCol = active
                 ? (hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG_ACTIVE)
                 : (hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG);
-        Services.PLATFORM.fill(poseStackOrGraphics, faceX, faceY, btnRight - 1, faceY + faceH, applyAlpha(bgCol, alpha));
+        Services.PLATFORM.fill(poseStackOrGraphics, faceX, faceY, btnRight, faceY + faceH, applyAlpha(bgCol, alpha));
 
         if (active) {
             int accentGlow = applyAlpha(COLOR_ACCENT, (hover ? 0.90f : 0.70f) * alpha);
             Services.PLATFORM.fill(poseStackOrGraphics, faceX, faceY, faceX + 1, faceY + faceH, accentGlow);
-            Services.PLATFORM.fill(poseStackOrGraphics, faceX, faceY, btnRight - 1, faceY + 1, accentGlow);
-            Services.PLATFORM.fill(poseStackOrGraphics, faceX, faceY + faceH - 1, btnRight - 1, faceY + faceH, accentGlow);
+            Services.PLATFORM.fill(poseStackOrGraphics, faceX, faceY, btnRight, faceY + 1, accentGlow);
+            Services.PLATFORM.fill(poseStackOrGraphics, faceX, faceY + faceH - 1, btnRight, faceY + faceH, accentGlow);
         } else if (hover) {
             int hoverGlow = applyAlpha(COLOR_ROW_BORDER_HOVER, alpha * 0.75f);
             Services.PLATFORM.fill(poseStackOrGraphics, faceX, faceY, faceX + 1, faceY + faceH, hoverGlow);
-            Services.PLATFORM.fill(poseStackOrGraphics, faceX, faceY, btnRight - 1, faceY + 1, hoverGlow);
-            Services.PLATFORM.fill(poseStackOrGraphics, faceX, faceY + faceH - 1, btnRight - 1, faceY + faceH, hoverGlow);
+            Services.PLATFORM.fill(poseStackOrGraphics, faceX, faceY, btnRight, faceY + 1, hoverGlow);
+            Services.PLATFORM.fill(poseStackOrGraphics, faceX, faceY + faceH - 1, btnRight, faceY + faceH, hoverGlow);
         }
 
         int cx = faceX + faceW / 2;
@@ -4634,7 +4633,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             case "items" -> {
                 int presetBtnW = 32;
                 int presetBtnH = 24;
-                int presetBtnX = (contentX + contentW + 2) - presetBtnW;
+                int presetBtnX = (contentX + contentW + 3) - presetBtnW;
                 int presetBtnY = contentY + (catHeaderH - presetBtnH) / 2;
                 if (mouseX >= presetBtnX && mouseX <= presetBtnX + presetBtnW
                         && mouseY >= presetBtnY && mouseY <= presetBtnY + presetBtnH) {

@@ -2107,6 +2107,19 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             drawBeveledButton(poseStackOrGraphics, badgeX, y + 4, badgeW, 14, limited ? COLOR_BTN_BG_ACTIVE : 0xFF351616, false, true, tabAlpha);
             drawCenteredText(poseStackOrGraphics, font, limited ? "LIMITED" : "READ ONLY", badgeX + badgeW / 2, y + 7,
                     applyAlpha(limited ? COLOR_ACCENT : 0xFFFF5A52, tabAlpha * pulse));
+        } else if ("items".equals(current.id)) {
+            int presetBtnW = 32;
+            int presetBtnH = catHeaderH;
+            int presetBtnX = x + w - 5 - presetBtnW;
+            int presetBtnY = y;
+            boolean presetOpen = sidePanelProgress > 0.05f && sidePanelType == SidePanelType.PRESETS && !isSidePanelClosing;
+            boolean hoverPresetBtn = mouseX >= presetBtnX && mouseX <= presetBtnX + presetBtnW && mouseY >= presetBtnY && mouseY <= presetBtnY + presetBtnH;
+            drawInlinePresetsTab(poseStackOrGraphics, presetBtnX, presetBtnY, presetBtnW, presetBtnH, hoverPresetBtn, presetOpen, tabAlpha);
+            if (hoverPresetBtn) {
+                deferredTooltip = Collections.singletonList(ComponentHelper.literal(presetOpen ? "Presets (Click to Close)" : "Presets (Click to Open)"));
+                deferredTooltipX = rawMouseX + 12;
+                deferredTooltipY = rawMouseY;
+            }
         }
         drawGroove(poseStackOrGraphics, x + 2, y + catHeaderH, w - 4, true, alpha);
 
@@ -2202,10 +2215,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         int curY = y + catHeaderH + 4;
 
-        // Row 1: Sub-View Switcher + Presets Drawer Button
+        // Row 1: Sub-View Switcher (Display Items vs Display Tags)
         int row1H = 18;
-        int presetsBtnW = 60;
-        int subBtnW = (w - 20 - presetsBtnW) / 2;
+        int subBtnW = (w - 16) / 2;
         int subBtnH = 15;
         int subY = curY + 1;
 
@@ -2228,13 +2240,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         Services.PLATFORM.blitTinted(poseStackOrGraphics, uiIcon("subtab_tags"), sub1Start, subY + 1,
                 12, 12, 16, 16, applyAlpha(isSub1 ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
         drawText(poseStackOrGraphics, font, sub1Label, sub1Start + 16, subY + 3, applyAlpha(isSub1 ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
-
-        int presetBtnX = sub1X + subBtnW + 4;
-        boolean isPresetsOpen = (sidePanelType == SidePanelType.PRESETS && (isSidePanelOpening || sidePanelProgress > 0.05f));
-        boolean hoverPreset = mouseX >= presetBtnX && mouseX <= presetBtnX + presetsBtnW && mouseY >= subY && mouseY <= subY + subBtnH;
-        drawBeveledButton(poseStackOrGraphics, presetBtnX, subY, presetsBtnW, subBtnH, isPresetsOpen ? COLOR_BTN_BG_ACTIVE : COLOR_BTN_BG, hoverPreset, isPresetsOpen, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "▤ Presets", presetBtnX + presetsBtnW / 2, subY + 3,
-                applyAlpha(isPresetsOpen ? COLOR_TEXT_WHITE : (hoverPreset ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER), alpha));
 
         curY += row1H + 2;
 
@@ -3388,7 +3393,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int manageY = curY + 19;
         boolean hoverSave = mouseX >= selectorX && mouseX <= selectorX + selectorW && mouseY >= manageY && mouseY <= manageY + btnH;
         drawBeveledButton(poseStackOrGraphics, selectorX, manageY, selectorW, btnH, hoverSave ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverSave, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "▣ Save Changes", selectorX + selectorW / 2, manageY + 5, applyAlpha(hoverSave ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "Save Changes", selectorX + selectorW / 2, manageY + 5, applyAlpha(hoverSave ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
         int visibleDeleteH = Math.round(btnH * deleteReveal);
         if (visibleDeleteH > 0) {
             int deleteY = manageY + btnH + 4;
@@ -3418,7 +3423,78 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         boolean hoverReset = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
         drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverReset ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverReset, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "↻ Reset to Defaults", rowX + rowW / 2, curY + 5, applyAlpha(hoverReset ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "Reset to Defaults", rowX + rowW / 2, curY + 5, applyAlpha(hoverReset ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+    }
+
+    private void drawInlinePresetsTab(Object poseStackOrGraphics, int btnX, int btnY, int btnW, int btnH, boolean hover, boolean active, float alpha) {
+        int btnRight = btnX + btnW;
+        Services.PLATFORM.fill(poseStackOrGraphics, btnX, btnY, btnRight, btnY + btnH, applyAlpha(COLOR_CHASSIS_BODY, alpha));
+
+        int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
+        int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
+        int band = applyAlpha(COLOR_CHASSIS_BAND, alpha);
+        int bevelShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
+        int bevelHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
+
+        Services.PLATFORM.fill(poseStackOrGraphics, btnX, btnY, btnX + 1, btnY + btnH, black);
+        Services.PLATFORM.fill(poseStackOrGraphics, btnX, btnY, btnRight, btnY + 1, black);
+        Services.PLATFORM.fill(poseStackOrGraphics, btnX, btnY + btnH - 1, btnRight, btnY + btnH, black);
+
+        Services.PLATFORM.fill(poseStackOrGraphics, btnX + 1, btnY + 1, btnX + 2, btnY + btnH - 1, bevelHighlight);
+        Services.PLATFORM.fill(poseStackOrGraphics, btnX + 1, btnY + 1, btnRight, btnY + 2, bevelHighlight);
+        Services.PLATFORM.fill(poseStackOrGraphics, btnX + 1, btnY + btnH - 2, btnRight, btnY + btnH - 1, shadow);
+
+        Services.PLATFORM.fill(poseStackOrGraphics, btnX + 2, btnY + 2, btnX + 3, btnY + btnH - 2, band);
+        Services.PLATFORM.fill(poseStackOrGraphics, btnX + 2, btnY + 2, btnRight, btnY + 3, band);
+        Services.PLATFORM.fill(poseStackOrGraphics, btnX + 2, btnY + btnH - 3, btnRight, btnY + btnH - 2, band);
+
+        Services.PLATFORM.fill(poseStackOrGraphics, btnX + 3, btnY + 3, btnX + 4, btnY + btnH - 3, bevelShadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, btnX + 3, btnY + 3, btnRight - 1, btnY + 4, bevelShadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, btnX + 3, btnY + btnH - 4, btnRight - 1, btnY + btnH - 3, bevelHighlight);
+        Services.PLATFORM.fill(poseStackOrGraphics, btnRight - 1, btnY + 3, btnRight, btnY + btnH - 3, bevelHighlight);
+
+        int faceX = btnX + 4;
+        int faceY = btnY + 4;
+        int faceW = (btnRight - 1) - faceX;
+        int faceH = btnH - 8;
+        int bgCol = active
+                ? (hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG_ACTIVE)
+                : (hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG);
+        Services.PLATFORM.fill(poseStackOrGraphics, faceX, faceY, btnRight - 1, faceY + faceH, applyAlpha(bgCol, alpha));
+
+        if (active) {
+            int accentGlow = applyAlpha(COLOR_ACCENT, (hover ? 0.90f : 0.70f) * alpha);
+            Services.PLATFORM.fill(poseStackOrGraphics, faceX, faceY, faceX + 1, faceY + faceH, accentGlow);
+            Services.PLATFORM.fill(poseStackOrGraphics, faceX, faceY, btnRight - 1, faceY + 1, accentGlow);
+            Services.PLATFORM.fill(poseStackOrGraphics, faceX, faceY + faceH - 1, btnRight - 1, faceY + faceH, accentGlow);
+        } else if (hover) {
+            int hoverGlow = applyAlpha(COLOR_ROW_BORDER_HOVER, alpha * 0.75f);
+            Services.PLATFORM.fill(poseStackOrGraphics, faceX, faceY, faceX + 1, faceY + faceH, hoverGlow);
+            Services.PLATFORM.fill(poseStackOrGraphics, faceX, faceY, btnRight - 1, faceY + 1, hoverGlow);
+            Services.PLATFORM.fill(poseStackOrGraphics, faceX, faceY + faceH - 1, btnRight - 1, faceY + faceH, hoverGlow);
+        }
+
+        int cx = faceX + faceW / 2;
+        int cy = btnY + btnH / 2;
+        int trkCol = applyAlpha(active ? COLOR_ACCENT : (hover ? COLOR_ROW_BORDER_HOVER : COLOR_CHASSIS_BAND), alpha);
+        int knobCol = applyAlpha(active || hover ? COLOR_ACCENT : COLOR_TEXT_WHITE, alpha);
+        int knobHl = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha * (active ? 0.95f : 0.75f));
+        int knobShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha * 0.65f);
+
+        Services.PLATFORM.fill(poseStackOrGraphics, cx - 7, cy - 4, cx + 7, cy - 3, trkCol);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx - 5, cy - 6, cx - 2, cy - 1, knobCol);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx - 5, cy - 6, cx - 2, cy - 5, knobHl);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx - 3, cy - 5, cx - 2, cy - 1, knobShadow);
+
+        Services.PLATFORM.fill(poseStackOrGraphics, cx - 7, cy, cx + 7, cy + 1, trkCol);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx + 2, cy - 2, cx + 5, cy + 3, knobCol);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx + 2, cy - 2, cx + 5, cy - 1, knobHl);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx + 4, cy - 1, cx + 5, cy + 3, knobShadow);
+
+        Services.PLATFORM.fill(poseStackOrGraphics, cx - 7, cy + 4, cx + 7, cy + 5, trkCol);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx - 2, cy + 2, cx + 1, cy + 7, knobCol);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx - 2, cy + 2, cx + 1, cy + 3, knobHl);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx, cy + 3, cx + 1, cy + 7, knobShadow);
     }
 
     private void drawPresetsSideTab(Object poseStackOrGraphics, Font font, int frameRight, int tabY, int mouseX, int mouseY, float alpha) {
@@ -4554,13 +4630,26 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         switch (current.id) {
             case "items" -> {
+                int presetBtnW = 32;
+                int presetBtnX = contentX + contentW - 5 - presetBtnW;
+                if (mouseX >= presetBtnX && mouseX <= presetBtnX + presetBtnW
+                        && mouseY >= contentY && mouseY <= contentY + catHeaderH) {
+                    boolean presetOpen = sidePanelProgress > 0.05f && sidePanelType == SidePanelType.PRESETS && !isSidePanelClosing;
+                    if (presetOpen) {
+                        closeSidePanel();
+                        try { BuildscapeClientConfig.get().setSidePanelExpanded(false); } catch (Exception ignored) {}
+                    } else {
+                        openSidePanel(SidePanelType.PRESETS);
+                    }
+                    return true;
+                }
+
                 PillarParticleConfig cfg = PillarParticleConfig.get();
                 int curY = contentY + catHeaderH + 4;
 
-                // Row 1: Sub-View Switcher + Presets Drawer Button
+                // Row 1: Sub-View Switcher (Display Items vs Display Tags)
                 int row1H = 18;
-                int presetsBtnW = 60;
-                int subBtnW = (contentW - 20 - presetsBtnW) / 2;
+                int subBtnW = (contentW - 16) / 2;
                 int subBtnH = 15;
                 int subY = curY + 1;
 
@@ -4584,16 +4673,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                         startItemContentTransition();
                     }
                     scrollOffset = 0;
-                    return true;
-                }
-
-                int presetBtnX = sub1X + subBtnW + 4;
-                if (mouseX >= presetBtnX && mouseX <= presetBtnX + presetsBtnW && mouseY >= subY && mouseY <= subY + subBtnH) {
-                    if (sidePanelType == SidePanelType.PRESETS && (isSidePanelOpening || sidePanelProgress > 0.05f)) {
-                        closeSidePanel();
-                    } else {
-                        openSidePanel(SidePanelType.PRESETS);
-                    }
                     return true;
                 }
 

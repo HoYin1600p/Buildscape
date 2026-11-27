@@ -9,7 +9,8 @@ pluginManagement {
         maven { url = 'https://maven.minecraftforge.net/' }
         maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
         gradlePluginPortal()
-        mavenCentral {
+        maven {
+            url = 'https://maven-central.storage-download.googleapis.com/maven2/'
             content {
                 excludeGroupByRegex 'xyz\\.wagyourtail.*'
                 excludeGroupByRegex 'net\\.fabricmc.*'
@@ -17,8 +18,7 @@ pluginManagement {
                 excludeGroupByRegex 'net\\.minecraftforge.*'
             }
         }
-        maven {
-            url = 'https://maven-central.storage-download.googleapis.com/maven2/'
+        mavenCentral {
             content {
                 excludeGroupByRegex 'xyz\\.wagyourtail.*'
                 excludeGroupByRegex 'net\\.fabricmc.*'

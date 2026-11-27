@@ -150,7 +150,7 @@ public class ClientEvents {
         poseStack.pushPose();
         poseStack.translate(placePos.getX() - cameraPos.x, placePos.getY() - cameraPos.y, placePos.getZ() - cameraPos.z);
         poseStack.translate(0.5, 0.5, 0.5);
-        poseStack.scale(0.998f, 0.998f, 0.998f);
+        poseStack.scale(0.96875f, 0.96875f, 0.96875f);
         poseStack.translate(-0.5, -0.5, -0.5);
         activePreviewAlpha = opacityPct / 100.0f;
         try {

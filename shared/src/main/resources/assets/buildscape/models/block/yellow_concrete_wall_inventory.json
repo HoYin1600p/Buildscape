@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:block/wall_inventory",
-  "textures": {
-    "wall": "minecraft:block/yellow_concrete",
-    "particle": "minecraft:block/yellow_concrete"
-  }
-}

@@ -1,7 +1,0 @@
-{
-  "parent": "buildscape:block/template_shelf_left",
-  "textures": {
-    "all": "buildscape:block/oak_shelf",
-    "particle": "minecraft:block/stripped_oak_log"
-  }
-}

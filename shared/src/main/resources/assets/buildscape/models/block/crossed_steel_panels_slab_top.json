@@ -1,9 +1,0 @@
-{
-  "parent": "minecraft:block/slab_top",
-  "textures": {
-    "bottom": "buildscape:block/crossed_steel_panels",
-    "top": "buildscape:block/crossed_steel_panels",
-    "side": "buildscape:block/crossed_steel_panels",
-    "particle": "#side"
-  }
-}

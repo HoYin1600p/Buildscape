@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "buildscape:block/tinted_thick_cardboard_block"
-  }
-}

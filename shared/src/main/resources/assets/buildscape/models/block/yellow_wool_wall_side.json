@@ -1,7 +1,0 @@
-{
-  "textures": {
-    "wall": "minecraft:block/yellow_wool",
-    "particle": "minecraft:block/yellow_wool"
-  },
-  "parent": "minecraft:block/template_wall_side"
-}

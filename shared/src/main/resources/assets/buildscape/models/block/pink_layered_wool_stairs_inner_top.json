@@ -1,8 +1,0 @@
-{
-  "textures": {
-    "bottom": "buildscape:block/pink_layered_wool",
-    "top": "buildscape:block/pink_layered_wool",
-    "side": "buildscape:block/pink_layered_wool"
-  },
-  "parent": "minecraft:block/inner_stairs"
-}

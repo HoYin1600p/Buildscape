@@ -1,7 +1,0 @@
-{
-  "textures": {
-    "wall": "minecraft:block/cherry_log",
-    "particle": "minecraft:block/cherry_log"
-  },
-  "parent": "minecraft:block/template_wall_side"
-}

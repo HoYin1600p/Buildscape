@@ -12,17 +12,40 @@ on:
 
 permissions:
   contents: write
+  pull-requests: read
 
 concurrency:
-  group: build-${{ github.ref }}
+  group: build-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.ref }}
   cancel-in-progress: true
 
 env:
   JAVA_TOOL_OPTIONS: "-Djava.net.preferIPv4Stack=true -Dsun.net.client.defaultConnectTimeout=60000 -Dsun.net.client.defaultReadTimeout=120000"
 
 jobs:
+  check:
+    name: Check Run Eligibility
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.ref }}" != "refs/heads/main" ]; then
+            OPEN_PRS=$(gh pr list --repo "${{ github.repository }}" --head "${{ github.ref_name }}" --state open --json number --jq 'length' 2>/dev/null || echo "0")
+            if [ "${OPEN_PRS:-0}" -gt 0 ]; then
+              echo "Open PR already exists for branch '${{ github.ref_name }}'; skipping duplicate push build."
+              echo "should_run=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+          echo "should_run=true" >> "$GITHUB_OUTPUT"
+
   build:
     name: "MC ${{ matrix.minecraft }}"
+    needs: check
+    if: needs.check.outputs.should_run == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -113,8 +136,18 @@ jobs:
 
   dev-release:
     name: Publish Dev Pre-release
-    needs: build
-    if: success() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref != 'refs/heads/main'
+    needs: [check, build]
+    if: >
+      success() &&
+      needs.check.outputs.should_run == 'true' &&
+      github.ref != 'refs/heads/main' &&
+      (
+        github.event_name == 'push' ||
+        github.event_name == 'workflow_dispatch' ||
+        (github.event_name == 'pull_request' &&
+         github.event.pull_request.head.repo.full_name == github.repository &&
+         (startsWith(github.head_ref, 'dev/') || startsWith(github.head_ref, 'backport_')))
+      )
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -159,7 +192,7 @@ jobs:
           echo "release_title=$RELEASE_TITLE" >> "$GITHUB_OUTPUT"
 
           TAG_NAME="$TAG_NAME" EFFECTIVE_VER="$EFFECTIVE_VER" JAR_COUNT="$JAR_COUNT" \
-          BRANCH_NAME="${{ github.ref_name }}" COMMIT_SHA="${{ github.sha }}" \
+          BRANCH_NAME="${{ github.head_ref || github.ref_name }}" COMMIT_SHA="${{ github.event.pull_request.head.sha || github.sha }}" \
           REPO_URL="${{ github.server_url }}/${{ github.repository }}" \
           python3 - << 'EOF'
           import os, subprocess, re
@@ -200,7 +233,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.meta.outputs.tag_name }}
-          target_commitish: ${{ github.sha }}
+          target_commitish: ${{ github.event.pull_request.head.sha || github.sha }}
           name: ${{ steps.meta.outputs.release_title }}
           body_path: release_body.md
           files: release-jars/*.jar

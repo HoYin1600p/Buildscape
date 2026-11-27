@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "buildscape:block/sculk",
+    "top": "buildscape:block/sculk",
+    "side": "buildscape:block/sculk",
+    "particle": "#side"
+  }
+}

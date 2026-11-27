@@ -1,0 +1,9 @@
+{
+  "sources": [
+    {
+      "type": "minecraft:single",
+      "resource": "buildscape:textures/block/string_light_string"
+    }
+  ]
+}
+

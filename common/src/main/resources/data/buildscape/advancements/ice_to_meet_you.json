@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:icicle"
+    },
+    "title": {
+      "translate": "advancements.buildscape.ice_to_meet_you.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.ice_to_meet_you.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:root",
+  "criteria": {
+    "has_item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:icicle"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "buildscape:block/bit_weathered_copper_block",
+    "top": "buildscape:block/bit_weathered_copper_block",
+    "side": "buildscape:block/bit_weathered_copper_block",
+    "particle": "#side"
+  }
+}

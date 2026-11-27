@@ -1,0 +1,46 @@
+{
+  "feature": "buildscape:all_colored_spore_blossom",
+  "placement": [
+    {
+      "type": "minecraft:rarity_filter",
+      "chance": 5
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "minecraft:biome"
+    },
+    {
+      "type": "minecraft:count",
+      "count": 10
+    },
+    {
+      "type": "minecraft:random_offset",
+      "xz_spread": {
+        "type": "minecraft:trapezoid",
+        "min": -7,
+        "max": 7,
+        "plateau": 0
+      },
+      "y_spread": {
+        "type": "minecraft:trapezoid",
+        "min": -2,
+        "max": 2,
+        "plateau": 0
+      }
+    },
+    {
+      "type": "buildscape:moss_block_ceiling_placement"
+    },
+    {
+      "type": "minecraft:block_predicate_filter",
+      "predicate": {
+        "type": "minecraft:matching_blocks",
+        "blocks": [
+          "minecraft:air"
+        ]
+      }
+    }
+  ]
+}

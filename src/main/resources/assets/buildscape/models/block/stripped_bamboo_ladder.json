@@ -1,0 +1,7 @@
+{
+    "textures":  {
+                     "particle":  "buildscape:block/stripped_bamboo_ladder",
+                     "texture":  "buildscape:block/stripped_bamboo_ladder"
+                 },
+    "parent":  "minecraft:block/ladder"
+}

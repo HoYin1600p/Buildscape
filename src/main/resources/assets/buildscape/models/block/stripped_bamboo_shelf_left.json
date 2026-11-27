@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/template_shelf_left",
+  "textures": {
+    "all": "buildscape:block/stripped_bamboo_shelf",
+    "particle": "buildscape:block/stripped_bamboo_block"
+  }
+}

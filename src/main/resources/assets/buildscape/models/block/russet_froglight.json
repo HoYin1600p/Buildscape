@@ -1,0 +1,7 @@
+{
+    "textures":  {
+                     "end":  "buildscape:block/russet_froglight_top",
+                     "side":  "buildscape:block/russet_froglight_side"
+                 },
+    "parent":  "minecraft:block/cube_column"
+}

@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/inner_stairs",
+  "textures": {
+    "bottom": "buildscape:block/stripped_poplar_log",
+    "top": "buildscape:block/stripped_poplar_log",
+    "side": "buildscape:block/stripped_poplar_log",
+    "particle": "#side"
+  }
+}

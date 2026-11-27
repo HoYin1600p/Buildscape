@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/template_big_ornament",
+  "textures": {
+    "0": "buildscape:block/red_glass_ornament",
+    "particle": "buildscape:block/red_glass_ornament"
+  }
+}

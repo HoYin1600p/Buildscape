@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "waterlogged=false": {
+      "model": "buildscape:block/bit_copper_grate"
+    },
+    "waterlogged=true": {
+      "model": "buildscape:block/bit_copper_grate"
+    }
+  }
+}

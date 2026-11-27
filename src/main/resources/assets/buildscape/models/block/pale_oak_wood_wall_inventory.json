@@ -1,0 +1,7 @@
+{
+  "textures": {
+    "wall": "buildscape:block/pale_oak_log",
+    "particle": "buildscape:block/pale_oak_log"
+  },
+  "parent": "minecraft:block/wall_inventory"
+}

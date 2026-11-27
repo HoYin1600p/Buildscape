@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "half=lower": {
+      "model": "buildscape:block/snowy_tall_grass_bottom"
+    },
+    "half=upper": {
+      "model": "buildscape:block/snowy_tall_grass_top"
+    }
+  }
+}

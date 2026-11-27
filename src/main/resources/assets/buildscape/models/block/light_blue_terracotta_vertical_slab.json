@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "minecraft:block/light_blue_terracotta",
+    "top": "minecraft:block/light_blue_terracotta",
+    "side": "minecraft:block/light_blue_terracotta",
+    "particle": "#side"
+  }
+}

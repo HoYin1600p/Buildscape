@@ -1,0 +1,16 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#minecraft:buildscape/swamps",
+  "features": [
+    "buildscape:clover_swamp",
+    "buildscape:mangrove_propagule_patch_1",
+    "buildscape:mangrove_propagule_patch_2",
+    "buildscape:mangrove_propagule_patch_3",
+    "buildscape:mangrove_propagule_patch_4",
+    "buildscape:mangrove_propagule_patch_5",
+    "buildscape:mangrove_propagule_patch_6",
+    "buildscape:mangrove_propagule_patch_7",
+    "buildscape:mangrove_propagule_patch_8"
+  ],
+  "step": "vegetal_decoration"
+}

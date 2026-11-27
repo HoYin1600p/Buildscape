@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_wall_side",
+  "textures": {
+    "wall": "minecraft:block/bone_block_side",
+    "particle": "minecraft:block/bone_block_side"
+  }
+}

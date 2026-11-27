@@ -1,0 +1,11 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#minecraft:buildscape/birch_forests",
+  "features": [
+    "buildscape:all_petals",
+    "buildscape:clover",
+    "buildscape:wildflowers",
+    "buildscape:leaf_litter"
+  ],
+  "step": "vegetal_decoration"
+}

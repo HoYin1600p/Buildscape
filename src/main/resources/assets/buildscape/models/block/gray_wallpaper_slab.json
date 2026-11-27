@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "buildscape:block/gray_wallpaper",
+    "top": "buildscape:block/gray_wallpaper",
+    "side": "buildscape:block/gray_wallpaper",
+    "particle": "#side"
+  }
+}

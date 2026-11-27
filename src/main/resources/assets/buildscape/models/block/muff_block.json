@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "buildscape:block/muff_block_top",
+    "side": "buildscape:block/muff_block_side"
+  }
+}

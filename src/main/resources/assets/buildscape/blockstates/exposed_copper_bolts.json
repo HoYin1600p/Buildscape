@@ -1,0 +1,73 @@
+{
+  "variants": {
+    "facing=up,bolts=1": {
+      "model": "buildscape:block/exposed_copper_bolts_1",
+      "x": 270
+    },
+    "facing=up,bolts=2": {
+      "model": "buildscape:block/exposed_copper_bolts_2",
+      "x": 270
+    },
+    "facing=up,bolts=3": {
+      "model": "buildscape:block/exposed_copper_bolts_3",
+      "x": 270
+    },
+    "facing=down,bolts=1": {
+      "model": "buildscape:block/exposed_copper_bolts_1",
+      "x": 90
+    },
+    "facing=down,bolts=2": {
+      "model": "buildscape:block/exposed_copper_bolts_2",
+      "x": 90
+    },
+    "facing=down,bolts=3": {
+      "model": "buildscape:block/exposed_copper_bolts_3",
+      "x": 90
+    },
+    "facing=north,bolts=1": {
+      "model": "buildscape:block/exposed_copper_bolts_1"
+    },
+    "facing=north,bolts=2": {
+      "model": "buildscape:block/exposed_copper_bolts_2"
+    },
+    "facing=north,bolts=3": {
+      "model": "buildscape:block/exposed_copper_bolts_3"
+    },
+    "facing=east,bolts=1": {
+      "model": "buildscape:block/exposed_copper_bolts_1",
+      "y": 90
+    },
+    "facing=east,bolts=2": {
+      "model": "buildscape:block/exposed_copper_bolts_2",
+      "y": 90
+    },
+    "facing=east,bolts=3": {
+      "model": "buildscape:block/exposed_copper_bolts_3",
+      "y": 90
+    },
+    "facing=south,bolts=1": {
+      "model": "buildscape:block/exposed_copper_bolts_1",
+      "y": 180
+    },
+    "facing=south,bolts=2": {
+      "model": "buildscape:block/exposed_copper_bolts_2",
+      "y": 180
+    },
+    "facing=south,bolts=3": {
+      "model": "buildscape:block/exposed_copper_bolts_3",
+      "y": 180
+    },
+    "facing=west,bolts=1": {
+      "model": "buildscape:block/exposed_copper_bolts_1",
+      "y": 270
+    },
+    "facing=west,bolts=2": {
+      "model": "buildscape:block/exposed_copper_bolts_2",
+      "y": 270
+    },
+    "facing=west,bolts=3": {
+      "model": "buildscape:block/exposed_copper_bolts_3",
+      "y": 270
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+    "textures":  {
+                     "layer0":  "buildscape:block/crimson_ladder"
+                 },
+    "parent":  "minecraft:item/generated"
+}

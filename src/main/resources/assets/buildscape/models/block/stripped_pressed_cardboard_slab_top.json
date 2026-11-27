@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "buildscape:block/stripped_pressed_cardboard",
+    "top": "buildscape:block/stripped_pressed_cardboard",
+    "side": "buildscape:block/stripped_pressed_cardboard",
+    "particle": "#side"
+  }
+}

@@ -1,0 +1,448 @@
+plugins {
+    id 'java-library'
+    id 'xyz.wagyourtail.unimined'
+}
+
+// A buildscape.target of a 26.3 loader includes that project without the opt-in property.
+def minecraft263Enabled = providers.gradleProperty('buildscape.minecraft263').getOrElse('false') == 'true' ||
+        rootProject.findProject(':fabric:26.3') != null ||
+        rootProject.findProject(':neoforge:26.3') != null ||
+        rootProject.findProject(':forge:26.3') != null
+
+sourceSets {
+    main {
+        java.srcDirs = []
+        resources.srcDirs = []
+    }
+
+    minecraft1182 {
+        java {
+            srcDirs = ['src/main/java', 'src/1.18.2/java']
+            exclude 'com/kingodogo/buildscape/client/particle/HazeParticle.java'
+            exclude 'com/kingodogo/buildscape/client/particle/HazeBushParticleHandler.java'
+            exclude 'com/kingodogo/buildscape/client/FoliageColors.java'
+            exclude 'com/kingodogo/buildscape/client/particle/ConfettiParticle.java'
+        }
+        // This cluster supplies a complete 1.18.2 resource tree.
+        resources.srcDirs = ['src/1.18.2/resources']
+    }
+
+    minecraft1211 {
+        java {
+            srcDirs = ['src/main/java', 'src/1.21.1/java']
+            exclude 'com/kingodogo/buildscape/client/particle/HazeParticle.java'
+            exclude 'com/kingodogo/buildscape/client/particle/HazeBushParticleHandler.java'
+            exclude 'com/kingodogo/buildscape/client/FoliageColors.java'
+            exclude 'com/kingodogo/buildscape/client/particle/ConfettiParticle.java'
+        }
+        // This cluster supplies a complete 1.21.1 resource tree.
+        resources.srcDirs = ['src/1.21.1/resources']
+    }
+
+    minecraft262 {
+        java {
+            srcDirs = ['src/main/java', 'src/26.2/java']
+        }
+        resources.srcDirs = ['src/main/resources', 'src/26.2/resources']
+    }
+
+    test {
+        compileClasspath += sourceSets.minecraft262.output
+        runtimeClasspath += sourceSets.minecraft262.output
+    }
+
+    minecraft1182Test {
+        java.srcDirs = ['src/1.18.2Test/java']
+        resources.srcDirs = []
+        // Unimined may add the mapped Minecraft jar directly to the compile task.
+        // Use that task's final classpath, including its vanilla libraries.
+        def minecraftClasspath = files(provider { tasks.named('compileMinecraft1182Java', JavaCompile).get().classpath })
+        compileClasspath += sourceSets.minecraft1182.output + minecraftClasspath
+        runtimeClasspath = files(rootProject.file('common/src/1.18.2/resources')) +
+                runtimeClasspath + sourceSets.minecraft1182.output + sourceSets.minecraft1182.runtimeClasspath + minecraftClasspath
+    }
+
+    minecraft1211Test {
+        java.srcDirs = ['src/1.21.1Test/java']
+        resources.srcDirs = ['src/1.21.1Test/resources']
+        def minecraftClasspath = files(provider { tasks.named('compileMinecraft1211Java', JavaCompile).get().classpath })
+        compileClasspath += sourceSets.minecraft1211.output + minecraftClasspath
+        runtimeClasspath += sourceSets.minecraft1211.output + sourceSets.minecraft1211.runtimeClasspath + minecraftClasspath
+    }
+}
+
+// minecraft262 remains 26.2. Only the opt-in graph creates the independent 26.3 cluster.
+if (minecraft263Enabled) {
+    sourceSets {
+        minecraft263 {
+            java {
+                srcDirs = ['src/main/java', 'src/26.3/java']
+                // Only the minecraft1182 adapter uses this helper; 26.3 removed BlockStateProviderType.
+                exclude 'com/kingodogo/buildscape/worldgen/WorldGenTypeHelper.java'
+                // 26.3 changed Block.playerDestroy, BlockItem.updateCustomBlockEntityTag and worldgen;
+                // the minecraft263 cluster supplies its own copies of these shared classes, so drop only the
+                // src/main/java versions (a plain exclude pattern would also drop the src/26.3 copies).
+                exclude { element ->
+                    element.file.toURI().path.contains('/src/main/java/') &&
+                            element.relativePath.pathString in [
+                                    'com/kingodogo/buildscape/block/DecoratedPotBlock.java',
+                                    'com/kingodogo/buildscape/item/FestiveStockingItem.java',
+                                    'com/kingodogo/buildscape/worldgen/ModConfiguredFeatures.java'
+                            ]
+                }
+            }
+            // The 26.3 overlay comes first: with EXCLUDE (below) it wins over same-path main resources.
+            resources.srcDirs = ['src/26.3/resources', 'src/main/resources']
+        }
+    }
+    apply from: rootProject.file('gradle/26.3/resources.gradle')
+    tasks.named('processMinecraft263Resources') {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        exclude minecraft263RetiredMainResources
+    }
+    configurations {
+        minecraft263Elements { canBeResolved = false; canBeConsumed = true }
+    }
+    tasks.named('compileMinecraft263Java', JavaCompile) {
+        options.release.set(25)
+        options.compilerArgs += ['-Xmaxerrs', '100000', '-Xmaxwarns', '100000']
+    }
+    def minecraft263ClusterResourcesDir = layout.buildDirectory.dir('resources/minecraft263Cluster')
+    def minecraft263ClusterResources = tasks.register('minecraft263ClusterResources', Sync) {
+        from 'src/26.3/resources'
+        into minecraft263ClusterResourcesDir
+    }
+    artifacts {
+        add('minecraft263Elements', sourceSets.minecraft263.output.classesDirs.singleFile) {
+            builtBy tasks.named('compileMinecraft263Java')
+        }
+        add('minecraft263Elements', minecraft263ClusterResourcesDir.get().asFile) {
+            builtBy minecraft263ClusterResources
+        }
+    }
+}
+
+// Compile shared 1.18.2 code against vanilla Mojang names, without a loader or ATs.
+// Keep this compile in check so shared API changes are verified for both clusters.
+def minecraft1182Active = rootProject.findProject(':forge:1.18.2') != null ||
+        rootProject.findProject(':fabric:1.18.2') != null ||
+        providers.gradleProperty('buildscape.minecraft1182').getOrElse('false') == 'true' ||
+        gradle.startParameter.projectProperties.get('buildscape.minecraft1182') == 'true' ||
+        gradle.startParameter.taskNames.any { it.toLowerCase().contains('minecraft1182') }
+
+if (minecraft1182Active) {
+    unimined.minecraft(sourceSets.minecraft1182) {
+        version '1.18.2'
+        mappings { mojmap() }
+        defaultRemapJar = false
+    }
+}
+
+// Resolve Mojang-mapped 1.21.1 and its own vanilla library manifest publicly.
+def minecraft1211Active = rootProject.findProject(':neoforge:1.21.1') != null ||
+        rootProject.findProject(':fabric:1.21.1') != null ||
+        rootProject.findProject(':forge:1.21.1') != null ||
+        providers.gradleProperty('buildscape.minecraft1211').getOrElse('false') == 'true' ||
+        gradle.startParameter.projectProperties.get('buildscape.minecraft1211') == 'true' ||
+        gradle.startParameter.taskNames.any { it.toLowerCase().contains('minecraft1211') }
+
+if (minecraft1211Active) {
+    unimined.minecraft(sourceSets.minecraft1211) {
+        version '1.21.1'
+        mappings { mojmap() }
+        defaultRemapJar = false
+    }
+}
+
+configurations {
+    minecraft1182Elements { canBeResolved = false; canBeConsumed = true }
+    minecraft1211Elements { canBeResolved = false; canBeConsumed = true }
+    minecraft262Elements { canBeResolved = false; canBeConsumed = true }
+    testImplementation.extendsFrom minecraft262CompileOnly
+}
+
+dependencies {
+    minecraft1211TestImplementation platform('org.junit:junit-bom:5.12.2')
+    minecraft1211TestImplementation 'org.junit.jupiter:junit-jupiter'
+    minecraft1211TestImplementation 'org.ow2.asm:asm-tree:9.7.1'
+    minecraft1211TestRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.12.2'
+    minecraft1182TestImplementation platform('org.junit:junit-bom:5.12.2')
+    minecraft1182TestImplementation 'org.junit.jupiter:junit-jupiter'
+    minecraft1182TestImplementation 'org.ow2.asm:asm-tree:9.7.1'
+    minecraft1182TestRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.12.2'
+    testImplementation platform('org.junit:junit-bom:5.12.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.12.2'
+    // Vanilla bootstrap and codec dependencies for the 26.2 tests.
+    testRuntimeOnly 'com.mojang:logging:1.7.12'
+    testRuntimeOnly 'com.mojang:authlib:9.0.75'
+    testRuntimeOnly 'org.apache.logging.log4j:log4j-core:2.26.0'
+    testRuntimeOnly 'org.apache.commons:commons-lang3:3.20.0'
+    testRuntimeOnly 'io.netty:netty-codec-base:4.2.15.Final'
+    testRuntimeOnly 'com.google.code.gson:gson:2.14.0'
+    [
+        'org.jspecify:jspecify:1.0.0',
+        'com.mojang:datafixerupper:10.0.21',
+        'com.mojang:brigadier:1.3.10',
+        'org.joml:joml:1.10.8',
+        'org.spongepowered:mixin:0.8.5',
+        'org.ow2.asm:asm:9.7.1',
+        'org.ow2.asm:asm-tree:9.7.1'
+    ].each { dependency ->
+        // Minecraft 1.18.2 supplies its own DFU and Brigadier versions through
+        // Unimined. Newer versions change serialization methods used at bootstrap.
+        if (!dependency.startsWith('com.mojang:')) minecraft1182CompileOnly dependency
+        // 1.21.1 supplies DFU, Brigadier and JOML through its own manifest.
+        if (!dependency.startsWith('com.mojang:') && !dependency.startsWith('org.joml:')) {
+            minecraft1211CompileOnly dependency
+        }
+        minecraft262CompileOnly dependency
+        if (minecraft263Enabled) add('minecraft263CompileOnly', dependency)
+    }
+
+    minecraft262CompileOnly 'com.google.code.gson:gson:2.10.1'
+
+    // Gson and Netty for minecraft1182 also come from Minecraft's library manifest.
+    // Nullable was previously supplied transitively by the newer DFU dependency.
+    minecraft1182CompileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+    minecraft1211CompileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+    // Gson and Netty for minecraft1211 also come from Minecraft's library manifest.
+    minecraft262CompileOnly 'io.netty:netty-buffer:4.2.15.Final'
+    minecraft262CompileOnly 'it.unimi.dsi:fastutil:8.5.18'
+    minecraft262CompileOnly 'org.jetbrains:annotations:26.0.2'
+    minecraft262CompileOnly 'com.google.guava:guava:33.6.0-jre'
+    minecraft262CompileOnly 'org.slf4j:slf4j-api:2.0.17'
+
+    if (minecraft263Enabled) {
+        minecraft263CompileOnly 'com.google.code.gson:gson:2.10.1'
+        minecraft263CompileOnly 'io.netty:netty-buffer:4.2.15.Final'
+        minecraft263CompileOnly 'it.unimi.dsi:fastutil:8.5.18'
+        minecraft263CompileOnly 'org.jetbrains:annotations:26.0.2'
+        minecraft263CompileOnly 'com.google.guava:guava:33.6.0-jre'
+        minecraft263CompileOnly 'org.slf4j:slf4j-api:2.0.17'
+    }
+
+}
+
+tasks.named('compileMinecraft1182Java', JavaCompile) {
+    options.release.set(17)
+    // Preserve the migration baseline beyond javac's default 100-error limit.
+    options.compilerArgs += ['-Xmaxerrs', '10000']
+}
+tasks.named('compileMinecraft1211Java', JavaCompile) {
+    javaCompiler = javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(21) }
+    options.release.set(21)
+    // Capture the migration baseline beyond javac's default 100-error limit.
+    options.compilerArgs += ['-Xmaxerrs', '10000']
+}
+tasks.named('compileMinecraft1182TestJava', JavaCompile) { options.release.set(17) }
+tasks.named('compileMinecraft1211TestJava', JavaCompile) {
+    javaCompiler = javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(21) }
+    options.release.set(21)
+}
+tasks.named('compileMinecraft262Java', JavaCompile) { options.release.set(25) }
+tasks.named('compileTestJava', JavaCompile) { options.release.set(25) }
+tasks.named('test', Test) {
+    useJUnitPlatform()
+    dependsOn tasks.named('minecraft262Classes')
+    // Bootstrap mutates global registries; isolate suites in one JVM.
+    maxParallelForks = 1
+    workingDir = layout.buildDirectory.get().asFile
+    // Lets tests read Buildscape's own resources rather than vanilla files at the same path.
+    systemProperty 'buildscape.mainResources', file('src/main/resources').absolutePath
+}
+
+// Loader modules already copy shared resources directly. Supply only the cluster
+// resources through their common variant, avoiding duplicate shared jar entries.
+def minecraft262ClusterResourcesDir = layout.buildDirectory.dir('resources/minecraft262Cluster')
+def minecraft262ClusterResources = tasks.register('minecraft262ClusterResources', Sync) {
+    from 'src/26.2/resources'
+    into minecraft262ClusterResourcesDir
+}
+
+def minecraft1182ClusterResourcesDir = layout.buildDirectory.dir('resources/minecraft1182Cluster')
+def minecraft1182ClusterResources = tasks.register('minecraft1182ClusterResources', Sync) {
+    from 'src/1.18.2/resources'
+    from('src/main/resources') {
+        include 'assets/buildscape/textures/client/ui/**'
+        include 'data/buildscape/config/default_pillar_properties.json'
+    }
+    into minecraft1182ClusterResourcesDir
+}
+
+def minecraft1211ClusterResourcesDir = layout.buildDirectory.dir('resources/minecraft1211Cluster')
+def minecraft1211ClusterResources = tasks.register('minecraft1211ClusterResources', Sync) {
+    from 'src/1.21.1/resources'
+    from('src/main/resources') {
+        include 'assets/buildscape/textures/client/ui/**'
+        include 'data/buildscape/config/default_pillar_properties.json'
+    }
+    into minecraft1211ClusterResourcesDir
+}
+
+tasks.withType(ProcessResources).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+artifacts {
+    add('minecraft1182Elements', tasks.named('compileMinecraft1182Java').flatMap { it.destinationDirectory })
+    add('minecraft1182Elements', minecraft1182ClusterResourcesDir) {
+        builtBy minecraft1182ClusterResources
+    }
+    add('minecraft1211Elements', tasks.named('compileMinecraft1211Java').flatMap { it.destinationDirectory })
+    add('minecraft1211Elements', minecraft1211ClusterResourcesDir) {
+        builtBy minecraft1211ClusterResources
+    }
+    add('minecraft262Elements', tasks.named('compileMinecraft262Java').flatMap { it.destinationDirectory })
+    add('minecraft262Elements', minecraft262ClusterResourcesDir) {
+        builtBy minecraft262ClusterResources
+    }
+}
+
+tasks.named('processResources') { enabled = false }
+
+apply from: rootProject.file('gradle/minecraft.gradle')
+
+tasks.named('jar', Jar) {
+    from sourceSets.minecraft262.output
+}
+tasks.named('assemble') { dependsOn tasks.named('minecraft262Classes') }
+// Follow the settings inclusion decision so the opt-out skips minecraft1182 verification.
+def minecraft1182Enabled = minecraft1182Active
+def minecraft1211Enabled = minecraft1211Active
+def minecraft1211TestTask = tasks.register('minecraft1211Test', Test) {
+    group = 'verification'
+    description = 'Audits every configured mixin against Minecraft 1.21.1 bytecode'
+    dependsOn tasks.named('minecraft1211TestClasses'), tasks.named('minecraft1211Classes')
+    testClassesDirs = sourceSets.minecraft1211Test.output.classesDirs
+    classpath = sourceSets.minecraft1211Test.runtimeClasspath
+    useJUnitPlatform()
+    inputs.file(file('src/1.21.1/resources/buildscape.mixins.json'))
+    systemProperty 'buildscape.minecraft1211MixinConfig', file('src/1.21.1/resources/buildscape.mixins.json').absolutePath
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+    maxParallelForks = 1
+    workingDir = layout.buildDirectory.get().asFile
+    doFirst { workingDir.mkdirs() }
+}
+tasks.named('check') {
+    if (minecraft1182Enabled) dependsOn tasks.named('compileMinecraft1182Java')
+    if (minecraft1211Enabled) dependsOn tasks.named('compileMinecraft1211Java'), minecraft1211TestTask
+}
+
+def minecraft1182StandaloneTests = [
+        minecraft1182RunPipeSpillTests: 'com.kingodogo.buildscape.client.renderer.PipeSpillTest',
+        minecraft1182RunPipeOutletTests: 'com.kingodogo.buildscape.pipe.transport.PipeOutletWaterTest',
+        minecraft1182RunTreeChopTraversalTests: 'com.kingodogo.buildscape.util.TreeChopTraversalTest',
+        minecraft1182RunBeaconBeamScanTests: 'com.kingodogo.buildscape.util.BeaconBeamScanStateTest',
+        minecraft1182RunGoldenDandelionGrowthTests: 'com.kingodogo.buildscape.util.GoldenDandelionGrowthTest',
+        minecraft1182RunMangroveLeafSupportTests: 'com.kingodogo.buildscape.worldgen.MangroveLeafSupportTest',
+        minecraft1182RunEyeblossomTransitionTests: 'com.kingodogo.buildscape.block.EyeblossomTransitionTest',
+        minecraft1182RunCopperRodLogicTests: 'com.kingodogo.buildscape.adapter.CopperRodLogicTest',
+        minecraft1182RunHazeBushResourcesTests: 'com.kingodogo.buildscape.block.HazeBushResourcesTest',
+        minecraft1182RunStairModelTests: 'com.kingodogo.buildscape.client.model.StairModelTest',
+        minecraft1182RunPatternBoundsTests: 'com.kingodogo.buildscape.recipe.framework.util.PatternBoundsTest',
+        minecraft1182RunRecipePackFormatterTests: 'com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatterTest',
+        minecraft1182RunRecipeManagerInjectorTests: 'com.kingodogo.buildscape.recipe.framework.integration.RecipeManagerInjectorTest',
+        minecraft1182RunBinaryRecipeCacheTests: 'com.kingodogo.buildscape.recipe.framework.cache.BinaryRecipeCacheTest'
+]
+minecraft1182StandaloneTests.each { taskName, testClass ->
+    def runner = tasks.register(taskName, JavaExec) {
+        group = 'verification'
+        description = "Runs ${testClass.tokenize('.').last()} against shared Minecraft 1.18.2 classes"
+        dependsOn tasks.named('minecraft1182TestClasses'), tasks.named('minecraft1182Classes')
+        classpath = sourceSets.minecraft1182Test.runtimeClasspath
+        mainClass = testClass
+        javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }
+        workingDir = layout.buildDirectory.get().asFile
+        systemProperty 'buildscape.mainResources', rootProject.file('common/src/1.18.2/resources').absolutePath
+        systemProperty 'java.io.tmpdir', layout.buildDirectory.dir('tmp/minecraft1182Tests').get().asFile.absolutePath
+        doFirst {
+            workingDir.mkdirs()
+            layout.buildDirectory.dir('tmp/minecraft1182Tests').get().asFile.mkdirs()
+        }
+    }
+    tasks.named('check') {
+        if (minecraft1182Enabled) dependsOn runner
+    }
+}
+
+def minecraft1182TestTask = tasks.register('minecraft1182Test', Test) {
+    group = 'verification'
+    description = 'Runs the reference recipe regression suite against shared 1.18.2 code'
+    dependsOn tasks.named('minecraft1182TestClasses'), tasks.named('minecraft1182Classes')
+    testClassesDirs = sourceSets.minecraft1182Test.output.classesDirs
+    classpath = sourceSets.minecraft1182Test.runtimeClasspath
+    useJUnitPlatform()
+    inputs.file(file('src/1.18.2/resources/buildscape.mixins.json'))
+    systemProperty 'buildscape.minecraft1182MixinConfig', file('src/1.18.2/resources/buildscape.mixins.json').absolutePath
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }
+    // Bootstrap and stderr capture mutate JVM globals.
+    maxParallelForks = 1
+    workingDir = layout.buildDirectory.get().asFile
+    systemProperty 'java.io.tmpdir', layout.buildDirectory.dir('tmp/minecraft1182Tests').get().asFile.absolutePath
+    doFirst {
+        workingDir.mkdirs()
+        layout.buildDirectory.dir('tmp/minecraft1182Tests').get().asFile.mkdirs()
+    }
+}
+tasks.named('check') {
+    if (minecraft1182Enabled) dependsOn minecraft1182TestTask
+}
+
+def minecraft1182RecipePack = rootProject.file('common/src/1.18.2/resources/data/buildscape/recipes_pack')
+def minecraft1182RecipeToolClasspath = sourceSets.minecraft1182.output +
+        files(provider { tasks.named('compileMinecraft1182Java', JavaCompile).get().classpath })
+def minecraft1182VerifyBundledRecipeCache = tasks.register('minecraft1182VerifyBundledRecipeCache', JavaExec) {
+    group = 'verification'
+    description = 'Verifies the frozen 1.18.2 bundled cache byte for byte against shared tooling'
+    dependsOn tasks.named('minecraft1182Classes')
+    classpath = minecraft1182RecipeToolClasspath
+    mainClass = 'com.kingodogo.buildscape.recipe.framework.compiler.BundledRecipeCacheVerify'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }
+    args minecraft1182RecipePack.absolutePath, new File(minecraft1182RecipePack, 'recipes.bscb').absolutePath
+}
+def minecraft1182CheckRecipePackFormat = tasks.register('minecraft1182CheckRecipePackFormat', JavaExec) {
+    group = 'verification'
+    description = 'Checks canonical formatting and duplicate keys in the frozen 1.18.2 recipe pack'
+    dependsOn tasks.named('minecraft1182Classes')
+    classpath = minecraft1182RecipeToolClasspath
+    mainClass = 'com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatter'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }
+    args '--check', minecraft1182RecipePack.absolutePath
+}
+tasks.named('check') {
+    if (minecraft1182Enabled) dependsOn minecraft1182VerifyBundledRecipeCache, minecraft1182CheckRecipePackFormat
+}
+
+// Explicit synchronization writes build output; the frozen reference remains an input.
+tasks.register('minecraft1182SyncBundledRecipeCache', JavaExec) {
+    group = 'buildscape'
+    description = 'Generates the 1.18.2 cache under common/build without changing reference inputs'
+    dependsOn tasks.named('minecraft1182Classes')
+    classpath = minecraft1182RecipeToolClasspath
+    mainClass = 'com.kingodogo.buildscape.recipe.framework.compiler.RecipeCacheGenerator'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }
+    inputs.files(fileTree(minecraft1182RecipePack) { include '*.json' })
+    def generatedCache = layout.buildDirectory.file('generated/minecraft1182RecipeCache/recipes.bscb')
+    outputs.file generatedCache
+    args minecraft1182RecipePack.absolutePath, generatedCache.get().asFile.absolutePath
+    mustRunAfter minecraft1182VerifyBundledRecipeCache, minecraft1182CheckRecipePackFormat
+}
+
+// Explicit tooling only: no dependency from test, check, assemble or build.
+tasks.register('dumpBlockStates', JavaExec) {
+    group = 'showcase'
+    description = 'Dumps every Buildscape block state against Minecraft 26.2'
+    dependsOn tasks.named('testClasses'), tasks.named('minecraft262Classes')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.kingodogo.buildscape.showcase.DumpBlockStates'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(25) }
+    workingDir = layout.buildDirectory.get().asFile
+    systemProperty 'buildscape.mainResources', file('src/main/resources').absolutePath
+    doFirst {
+        workingDir.mkdirs()
+        args = [providers.gradleProperty('showcaseOutput')
+                .map { file(it).absolutePath }
+                .getOrElse(layout.buildDirectory.file('showcase/blockstates.json').get().asFile.absolutePath)]
+    }
+}

@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "buildscape:potted_bush",
+    "buildscape:potted_dry_grass",
+    "buildscape:potted_tall_dry_grass",
+    "buildscape:potted_firefly_bush",
+    "buildscape:potted_wildflowers",
+    "buildscape:potted_leaf_litter",
+    "buildscape:potted_cactus_flower"
+  ]
+}

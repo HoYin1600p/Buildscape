@@ -659,12 +659,13 @@ public final class ClientPlatformHooks {
         for (var source : client.getBlockColors().getTintSources(state)) {
             tints.add(level != null && pos != null ? source.colorInWorld(state, view, pos) : source.color(state));
         }
-        var rawParts = model.setupModel(new org.joml.Matrix4f(), false);
-        if (rawParts == null || rawParts.isEmpty()) return;
-        final var parts = java.util.List.copyOf(rawParts);
+        final var parts = new java.util.ArrayList<net.minecraft.client.renderer.block.dispatch.BlockStateModelPart>();
+        modelManager.getBlockStateModelSet().get(state).collectParts(
+                level != null ? level.getRandom() : net.minecraft.util.RandomSource.create(), parts);
+        if (parts.isEmpty()) return;
         final int alphaByte = Math.max(1, Math.min(255, Math.round(alpha * 255.0f)));
         final int[] tintCopy = tints.isEmpty() ? new int[0] : tints.toIntArray();
-        collector.submitCustomGeometry(poseStack, net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucent(net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS), (transform, consumer) -> {
+        collector.submitCustomGeometry(poseStack, net.minecraft.client.renderer.Sheets.translucentBlockItemSheet(), (transform, consumer) -> {
             CACHED_QUAD_INSTANCE.setLightCoords(light);
             CACHED_QUAD_INSTANCE.setOverlayCoords(overlay);
             for (var part : parts) {

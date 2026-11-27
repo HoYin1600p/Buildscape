@@ -61,7 +61,8 @@ buildscript {
             url = 'https://maven.neoforged.net/releases/'
             content { includeGroupByRegex 'net\\.neoforged.*' }
         }
-        mavenCentral {
+        maven {
+            url = 'https://maven-central.storage-download.googleapis.com/maven2/'
             content {
                 excludeGroupByRegex 'xyz\\.wagyourtail.*'
                 excludeGroupByRegex 'net\\.fabricmc.*'
@@ -69,8 +70,7 @@ buildscript {
                 excludeGroupByRegex 'net\\.minecraftforge.*'
             }
         }
-        maven {
-            url = 'https://maven-central.storage-download.googleapis.com/maven2/'
+        mavenCentral {
             content {
                 excludeGroupByRegex 'xyz\\.wagyourtail.*'
                 excludeGroupByRegex 'net\\.fabricmc.*'

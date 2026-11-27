@@ -598,15 +598,26 @@ public final class ClientPlatformHooks {
         renderBlockModelWithTint(blockState, null, null, poseStack, bufferSource, light, overlay);
     }
 
+    private static net.minecraft.client.renderer.block.BlockModelResolver cachedModelResolver;
+    private static net.minecraft.client.resources.model.ModelManager cachedModelManager;
+    private static final net.minecraft.client.renderer.block.BlockModelRenderState CACHED_BLOCK_MODEL_STATE =
+            new net.minecraft.client.renderer.block.BlockModelRenderState();
+    private static final net.minecraft.client.renderer.block.MovingBlockRenderState CACHED_MOVING_STATE =
+            new net.minecraft.client.renderer.block.MovingBlockRenderState();
+
     public static void renderBlockModelWithTint(net.minecraft.world.level.block.state.BlockState state, net.minecraft.core.BlockPos pos, net.minecraft.world.level.Level level, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int light, int overlay) {
         if (!(bufferSource instanceof net.minecraft.client.renderer.SubmitNodeCollector collector) || state.isAir()) return;
         var client = net.minecraft.client.Minecraft.getInstance();
-        var model = new net.minecraft.client.renderer.block.BlockModelRenderState();
-        new net.minecraft.client.renderer.block.BlockModelResolver(client.getModelManager()).update(
-                model, state, net.minecraft.client.renderer.block.model.BlockDisplayContext.create());
+        var modelManager = client.getModelManager();
+        if (cachedModelResolver == null || cachedModelManager != modelManager) {
+            cachedModelManager = modelManager;
+            cachedModelResolver = new net.minecraft.client.renderer.block.BlockModelResolver(modelManager);
+        }
+        var model = CACHED_BLOCK_MODEL_STATE;
+        cachedModelResolver.update(model, state, net.minecraft.client.renderer.block.model.BlockDisplayContext.create());
         var tints = model.tintLayers();
         tints.clear();
-        var view = new net.minecraft.client.renderer.block.MovingBlockRenderState();
+        var view = CACHED_MOVING_STATE;
         if (level != null && pos != null) {
             view.blockState = state;
             view.blockPos = pos;

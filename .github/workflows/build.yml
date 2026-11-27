@@ -26,6 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      max-parallel: 4
       matrix:
         include:
           - minecraft: '1.18.2'
@@ -97,7 +98,8 @@ jobs:
 
       - name: Build Targets
         run: |
-          ./gradlew ${{ matrix.tasks }} --parallel --no-daemon --console=plain
+          ./gradlew ${{ matrix.tasks }} --parallel --no-daemon --console=plain || \
+          (sleep 10 && ./gradlew ${{ matrix.tasks }} --parallel --no-daemon --console=plain)
 
       - name: Upload Target Artifacts
         uses: actions/upload-artifact@v4
@@ -112,7 +114,7 @@ jobs:
   dev-release:
     name: Publish Dev Pre-release
     needs: build
-    if: always() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref != 'refs/heads/main'
+    if: success() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -136,7 +138,7 @@ jobs:
           MOD_VER=$(grep '^mod\.version=' properties/mod.properties | cut -d'=' -f2 | tr -d '\r\n[:space:]')
           EFFECTIVE_VER="${MOD_VER}-dev.${{ github.run_number }}"
           TAG_NAME="v${MOD_VER}-Dev"
-          RELEASE_TITLE="[ Dev Builds ${MOD_VER} ] (Latest: ${EFFECTIVE_VER})"
+          RELEASE_TITLE="[ Dev Build ${MOD_VER} ] (Latest: ${EFFECTIVE_VER})"
 
           mkdir -p release-jars
           find raw-jars -type f -name "*.jar" | while read -r f; do

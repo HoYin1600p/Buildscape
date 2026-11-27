@@ -2,6 +2,8 @@ name: release
 
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v*'
   workflow_dispatch:
@@ -25,7 +27,33 @@ jobs:
           fetch-depth: 0
           submodules: false
 
+      - name: Determine Release Tag
+        id: vars
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -n "${{ github.event.inputs.tag_name }}" ]; then
+            TAG="${{ github.event.inputs.tag_name }}"
+          elif [ "${{ github.ref_type }}" = "tag" ]; then
+            TAG="${{ github.ref_name }}"
+          else
+            MOD_VER=$(grep '^mod\.version=' properties/mod.properties | cut -d'=' -f2 | tr -d ' \r\n')
+            TAG="v${MOD_VER}"
+          fi
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "Target tag: ${TAG}"
+
+          if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            if gh release view "$TAG" >/dev/null 2>&1; then
+              echo "Release '$TAG' already exists on GitHub; skipping duplicate release on main push."
+              echo "should_release=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+          echo "should_release=true" >> "$GITHUB_OUTPUT"
+
       - name: Initialize Submodules
+        if: steps.vars.outputs.should_release == 'true'
         run: |
           if [ -f .gitmodules ]; then
             git submodule sync --recursive
@@ -42,21 +70,8 @@ jobs:
             }
           fi
 
-      - name: Determine Release Tag
-        id: vars
-        run: |
-          if [ -n "${{ github.event.inputs.tag_name }}" ]; then
-            TAG="${{ github.event.inputs.tag_name }}"
-          elif [ "${{ github.ref_type }}" = "tag" ]; then
-            TAG="${{ github.ref_name }}"
-          else
-            MOD_VER=$(grep '^mod\.version=' properties/mod.properties | cut -d'=' -f2 | tr -d ' \r\n')
-            TAG="v${MOD_VER}"
-          fi
-          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-          echo "Target tag: ${TAG}"
-
       - name: Set up Java 17, 21, 25
+        if: steps.vars.outputs.should_release == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
@@ -66,24 +81,30 @@ jobs:
             25
 
       - name: Setup Gradle
+        if: steps.vars.outputs.should_release == 'true'
         uses: gradle/actions/setup-gradle@v4
 
       - name: Make Gradle Wrapper Executable
+        if: steps.vars.outputs.should_release == 'true'
         run: chmod +x ./gradlew
 
       - name: Assemble All Targets
+        if: steps.vars.outputs.should_release == 'true'
         run: |
-          ./gradlew assembleAll --console=plain || ./gradlew assemble --console=plain || true
+          ./gradlew buildAll --parallel --no-daemon --console=plain || \
+          (sleep 10 && ./gradlew buildAll --parallel --no-daemon --console=plain)
 
       - name: Collect Jars
+        if: steps.vars.outputs.should_release == 'true'
         id: collect
         run: |
           mkdir -p release-jars
-          find build -type f -name "*.jar" ! -name "*-dev.jar" ! -name "*-sources.jar" -exec cp {} release-jars/ \; || true
+          find build/libs -maxdepth 1 -type f -name "*.jar" ! -name "*-dev.jar" ! -name "*-sources.jar" -exec cp {} release-jars/ \;
           echo "Collected jars:"
           ls -la release-jars/
 
       - name: Publish GitHub Release
+        if: steps.vars.outputs.should_release == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

@@ -1,0 +1,157 @@
+name: build
+
+on:
+  pull_request:
+    branches: [ main, dev/** ]
+  push:
+    branches: [ main, dev/** ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  JAVA_TOOL_OPTIONS: "-Djava.net.preferIPv4Stack=true -Dsun.net.client.defaultConnectTimeout=60000 -Dsun.net.client.defaultReadTimeout=120000"
+
+jobs:
+  build:
+    name: "${{ matrix.minecraft }} (${{ matrix.loader }})"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # 1.18.2 (Java 17)
+          - minecraft: '1.18.2'
+            loader: 'fabric'
+            java: 17
+          - minecraft: '1.18.2'
+            loader: 'forge'
+            java: 17
+          # 1.19.2 (Java 17)
+          - minecraft: '1.19.2'
+            loader: 'fabric'
+            java: 17
+          - minecraft: '1.19.2'
+            loader: 'forge'
+            java: 17
+          # 1.20.1 (Java 17)
+          - minecraft: '1.20.1'
+            loader: 'fabric'
+            java: 17
+          - minecraft: '1.20.1'
+            loader: 'forge'
+            java: 17
+          - minecraft: '1.20.1'
+            loader: 'neoforge'
+            java: 17
+          # 1.20.4 (Java 17)
+          - minecraft: '1.20.4'
+            loader: 'fabric'
+            java: 17
+          - minecraft: '1.20.4'
+            loader: 'forge'
+            java: 17
+          - minecraft: '1.20.4'
+            loader: 'neoforge'
+            java: 17
+          # 1.20.6 (Java 21)
+          - minecraft: '1.20.6'
+            loader: 'fabric'
+            java: 21
+          - minecraft: '1.20.6'
+            loader: 'forge'
+            java: 21
+          - minecraft: '1.20.6'
+            loader: 'neoforge'
+            java: 21
+          # 1.21.1 (Java 21)
+          - minecraft: '1.21.1'
+            loader: 'fabric'
+            java: 21
+          - minecraft: '1.21.1'
+            loader: 'forge'
+            java: 21
+          - minecraft: '1.21.1'
+            loader: 'neoforge'
+            java: 21
+          # 1.21.4 (Java 21)
+          - minecraft: '1.21.4'
+            loader: 'fabric'
+            java: 21
+          - minecraft: '1.21.4'
+            loader: 'forge'
+            java: 21
+          - minecraft: '1.21.4'
+            loader: 'neoforge'
+            java: 21
+          # 26.2 (Java 25)
+          - minecraft: '26.2'
+            loader: 'fabric'
+            java: 25
+          - minecraft: '26.2'
+            loader: 'forge'
+            java: 25
+          - minecraft: '26.2'
+            loader: 'neoforge'
+            java: 25
+          # 26.3 (Java 25)
+          - minecraft: '26.3'
+            loader: 'fabric'
+            java: 25
+          - minecraft: '26.3'
+            loader: 'forge'
+            java: 25
+          - minecraft: '26.3'
+            loader: 'neoforge'
+            java: 25
+          # 26.4 (Java 25)
+          - minecraft: '26.4'
+            loader: 'fabric'
+            java: 25
+          - minecraft: '26.4'
+            loader: 'neoforge'
+            java: 25
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          submodules: false
+
+      - name: Initialize Target Submodules
+        run: |
+          if [ -f .gitmodules ]; then
+            git submodule update --init --depth 1 shared "versions/${{ matrix.minecraft }}"
+          fi
+
+      - name: Set up Java ${{ matrix.java }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: ${{ matrix.java == 25 && 'zulu' || 'temurin' }}
+          java-version: ${{ matrix.java }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make Gradle Wrapper Executable
+        run: chmod +x ./gradlew
+
+      - name: Build Target
+        run: |
+          ./gradlew -Pmc=${{ matrix.minecraft }} -Ploader=${{ matrix.loader }} build --console=plain
+
+      - name: Upload Target Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: "buildscape-${{ matrix.minecraft }}-${{ matrix.loader }}"
+          path: |
+            build/${{ matrix.minecraft }}/${{ matrix.loader }}/libs/*.jar
+            !build/${{ matrix.minecraft }}/${{ matrix.loader }}/libs/*-dev.jar
+            !build/${{ matrix.minecraft }}/${{ matrix.loader }}/libs/*-sources.jar
+          if-no-files-found: ignore

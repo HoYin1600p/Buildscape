@@ -26,6 +26,7 @@ public class BuildscapeClientConfig {
     public static final String KEY_LAST_ACTIVE_TAB = "LastActiveTab";
     public static final String KEY_LAST_PRESET = "LastPreset";
     public static final String KEY_MAX_CUSTOM_PRESETS = "MaxCustomPresets";
+    public static final String KEY_PLACEMENT_PREVIEW_OPACITY = "PlacementPreviewOpacity";
     public static final int DEFAULT_CUSTOM_PRESETS = 4;
     public static final int MIN_CUSTOM_PRESETS = 1;
     public static final int MAX_CUSTOM_PRESETS = 32;
@@ -49,9 +50,11 @@ public class BuildscapeClientConfig {
         DEFAULTS.put(KEY_LAST_ACTIVE_TAB, "0");
         DEFAULTS.put(KEY_LAST_PRESET, "");
         DEFAULTS.put(KEY_MAX_CUSTOM_PRESETS, String.valueOf(DEFAULT_CUSTOM_PRESETS));
+        DEFAULTS.put(KEY_PLACEMENT_PREVIEW_OPACITY, "60");
     }
 
     private final Map<String, String> values;
+    private volatile int cachedPlacementPreviewOpacity = -1;
     private final Path configDirectory;
     private final boolean client;
     private final Map<String, String> uiValues = new LinkedHashMap<>();
@@ -327,6 +330,21 @@ public class BuildscapeClientConfig {
 
     public void setAnimationSpeedIndex(int index) {
         values.put(KEY_ANIMATION_SPEED, String.valueOf(index));
+        save();
+    }
+
+    public int getPlacementPreviewOpacity() {
+        int cached = cachedPlacementPreviewOpacity;
+        if (cached >= 0) return cached;
+        int val = Math.max(0, Math.min(100, getInt(KEY_PLACEMENT_PREVIEW_OPACITY, 60)));
+        cachedPlacementPreviewOpacity = val;
+        return val;
+    }
+
+    public void setPlacementPreviewOpacity(int opacity) {
+        int clamped = Math.max(0, Math.min(100, opacity));
+        cachedPlacementPreviewOpacity = clamped;
+        values.put(KEY_PLACEMENT_PREVIEW_OPACITY, String.valueOf(clamped));
         save();
     }
 

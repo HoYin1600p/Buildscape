@@ -196,7 +196,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     }
 
     static int getSystemSettingRowCount() {
-        return 4;
+        return 5;
     }
 
     static int calculateCycleDescriptionWidth(int rowWidth, int controlWidth) {
@@ -562,6 +562,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private float pickerBri = 1.0f;       // 0.0 to 1.0
     private boolean draggingGradient = false;
     private boolean draggingHue = false;
+    private boolean draggingPreviewOpacity = false;
+    private int previewOpacitySliderX = 0;
+    private int previewOpacitySliderY = 0;
+    private int previewOpacitySliderW = 100;
+    private int previewOpacitySliderH = 14;
     private boolean hexColorFocused = false;
     private boolean hexColorSelected = false;
     private String hexColorInput = "";
@@ -2987,6 +2992,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         PillarParticleConfig.EditPermissionMode policy = PillarParticleConfig.get().edit_permission_mode;
         renderConfigRowCycleDetailed(poseStackOrGraphics, font, x, curY, w, systemRowH, clipY, clipH, "Edit Permissions",
                 "Choose Strict (level 4), Standard (limited level 2), or Open access", capitalize(policy.name().toLowerCase(Locale.ROOT)), mouseX, mouseY, alpha);
+        curY += systemRowH + gap;
+
+        int opacity = BuildscapeClientConfig.get().getPlacementPreviewOpacity();
+        renderConfigRowSlider(poseStackOrGraphics, font, x, curY, w, systemRowH, clipY, clipH, "Preview Opacity",
+                "Opacity of vertical stair and slab placement previews (0% - 100%)", opacity, mouseX, mouseY, alpha);
     }
 
     // Draggable saturation, brightness, and hue picker.
@@ -4215,6 +4225,29 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         drawCenteredText(poseStackOrGraphics, font, "+", plusX + stepBtnW / 2, counterY + 4, applyAlpha(hoverPlus ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
     }
 
+    private void renderConfigRowSlider(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, int percent, int mouseX, int mouseY, float alpha) {
+        if (y < clipY || y + h > clipY + clipH) return;
+        renderRowCardBase(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, desc, mouseX, mouseY, alpha);
+
+        int sliderW = 100;
+        int sliderH = 14;
+        int sliderX = x + w - sliderW - 8;
+        int sliderY = y + (h - sliderH) / 2;
+        previewOpacitySliderX = sliderX;
+        previewOpacitySliderY = sliderY;
+        previewOpacitySliderW = sliderW;
+        previewOpacitySliderH = sliderH;
+
+        boolean hover = mouseX >= sliderX && mouseX <= sliderX + sliderW && mouseY >= sliderY && mouseY <= sliderY + sliderH;
+        Services.PLATFORM.fill(poseStackOrGraphics, sliderX, sliderY, sliderX + sliderW, sliderY + sliderH, applyAlpha(COLOR_SLOT_BG, alpha));
+        int fillW = (int) Math.round(sliderW * (Math.max(0, Math.min(100, percent)) / 100.0));
+        if (fillW > 0) {
+            Services.PLATFORM.fill(poseStackOrGraphics, sliderX, sliderY, sliderX + fillW, sliderY + sliderH, applyAlpha(hover ? COLOR_ACCENT : 0xFF3A7CA5, alpha));
+        }
+        drawBorder(poseStackOrGraphics, sliderX, sliderY, sliderW, sliderH, applyAlpha(hover ? COLOR_TEXT_WHITE : COLOR_SLOT_BORDER, alpha));
+        drawCenteredText(poseStackOrGraphics, font, percent + "%", sliderX + sliderW / 2, sliderY + 3, applyAlpha(COLOR_TEXT_WHITE, alpha));
+    }
+
     private void renderConfigRowButton(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String btnText, int mouseX, int mouseY, float alpha) {
         if (y < clipY || y + h > clipY + clipH) return;
         renderRowCardBase(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, desc, mouseX, mouseY, alpha);
@@ -5083,6 +5116,24 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                     int next = Math.floorMod(cfg.edit_permission_mode.ordinal() + permissionStep, modes.length);
                     cfg.edit_permission_mode = modes[next];
                     persistServerConfig(cfg);
+                    return true;
+                }
+                curY += systemRowH + gap;
+
+                // Row 4: Preview Opacity Slider
+                int sliderW = 100;
+                int sliderH = 14;
+                int sliderX = x + w - sliderW - 8;
+                int sliderY = curY + (systemRowH - sliderH) / 2;
+                if (curY >= clipY && curY + systemRowH <= clipY + clipH
+                        && mouseX >= sliderX && mouseX <= sliderX + sliderW && mouseY >= sliderY && mouseY <= sliderY + sliderH) {
+                    draggingPreviewOpacity = true;
+                    previewOpacitySliderX = sliderX;
+                    previewOpacitySliderY = sliderY;
+                    previewOpacitySliderW = sliderW;
+                    previewOpacitySliderH = sliderH;
+                    int pct = Math.max(0, Math.min(100, (int) Math.round(((mouseX - sliderX) / (double) sliderW) * 100.0)));
+                    BuildscapeClientConfig.get().setPlacementPreviewOpacity(pct);
                     return true;
                 }
             }
@@ -6175,6 +6226,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         isDraggingScrollbar = false;
         draggingGradient = false;
         draggingHue = false;
+        draggingPreviewOpacity = false;
         if (activeTab != null && activeTab.mouseReleased(mouseX, mouseY, button)) {
             return true;
         }
@@ -6189,6 +6241,12 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             mouseY /= uiScale;
             dragX /= uiScale;
             dragY /= uiScale;
+        }
+
+        if (draggingPreviewOpacity && previewOpacitySliderW > 0) {
+            int pct = Math.max(0, Math.min(100, (int) Math.round(((mouseX - previewOpacitySliderX) / (double) previewOpacitySliderW) * 100.0)));
+            BuildscapeClientConfig.get().setPlacementPreviewOpacity(pct);
+            return true;
         }
 
         if (isDraggingScrollbar && maxScroll > 0) {

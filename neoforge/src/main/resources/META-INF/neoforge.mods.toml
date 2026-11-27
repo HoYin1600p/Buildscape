@@ -12,13 +12,13 @@ description = '''Welcome to Buildscape the ultimate expansion for builders, arch
 [[dependencies.buildscape]]
     modId="neoforge"
     type="required"
-    versionRange="[26.3.0.57-beta,26.4)"
+    versionRange="[26.4,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.buildscape]]
     modId="minecraft"
     type="required"
-    versionRange="[26.3,26.4)"
+    versionRange="[26.4,26.5)"
     ordering="AFTER"
     side = "BOTH"
 

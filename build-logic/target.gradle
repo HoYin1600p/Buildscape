@@ -1,3 +1,7 @@
+import java.nio.file.Files
+import java.nio.file.LinkOption
+import java.nio.file.attribute.BasicFileAttributes
+
 buildscript {
     def template = project.hasProperty('templateRoot') ? file(project.property('templateRoot')) : (new File(rootProject.projectDir, "properties").isDirectory() ? rootProject.projectDir : rootProject.file('../../..'))
     project.ext.templateRoot = template
@@ -79,3 +83,38 @@ buildscript {
 apply plugin: 'java'
 apply from: new File(templateRoot, 'build-logic/common.gradle')
 apply from: new File(templateRoot, "build-logic/${targetLoader}.gradle")
+
+afterEvaluate {
+    def sharedSaves = new File(templateRoot, 'run/saves')
+    def clientRun = new File(templateRoot, "run/${targetMinecraft}/${targetLoader}/client")
+    def clientSaves = new File(clientRun, 'saves')
+    tasks.matching { it.name.toLowerCase().contains('client') && it.name.toLowerCase().contains('run') }.configureEach {
+        doFirst {
+            sharedSaves.mkdirs()
+            clientRun.mkdirs()
+            def savesPath = clientSaves.toPath()
+            def targetPath = sharedSaves.toPath()
+            if (Files.exists(savesPath, LinkOption.NOFOLLOW_LINKS)) {
+                def attrs = Files.readAttributes(savesPath, BasicFileAttributes, LinkOption.NOFOLLOW_LINKS)
+                if (!attrs.isSymbolicLink() && !(System.getProperty('os.name').toLowerCase().contains('windows') && attrs.isOther())) {
+                    clientSaves.listFiles()?.each { f ->
+                        def dest = new File(sharedSaves, f.name)
+                        if (!dest.exists()) {
+                            Files.move(f.toPath(), dest.toPath())
+                        }
+                    }
+                    if ((clientSaves.list()?.length ?: 0) == 0) {
+                        clientSaves.delete()
+                    }
+                }
+            }
+            if (!Files.exists(savesPath, LinkOption.NOFOLLOW_LINKS)) {
+                if (System.getProperty('os.name').toLowerCase().contains('windows')) {
+                    new ProcessBuilder('cmd', '/c', 'mklink', '/J', clientSaves.absolutePath, sharedSaves.absolutePath).start().waitFor()
+                } else {
+                    Files.createSymbolicLink(savesPath, targetPath)
+                }
+            }
+        }
+    }
+}

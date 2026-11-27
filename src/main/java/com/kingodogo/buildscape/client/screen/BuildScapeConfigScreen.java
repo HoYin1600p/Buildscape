@@ -2112,7 +2112,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         } else if ("items".equals(current.id)) {
             int presetBtnW = 32;
             int presetBtnH = 24;
-            int presetBtnX = (x + w + 3) - presetBtnW;
+            int presetBtnX = (x + w + 4) - presetBtnW;
             int presetBtnY = y + (catHeaderH - presetBtnH) / 2;
             boolean presetOpen = sidePanelProgress > 0.05f && sidePanelType == SidePanelType.PRESETS && !isSidePanelClosing;
             boolean hoverPresetBtn = mouseX >= presetBtnX && mouseX <= presetBtnX + presetBtnW && mouseY >= presetBtnY && mouseY <= presetBtnY + presetBtnH;
@@ -2360,30 +2360,21 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                             mouseY >= viewportY && mouseY <= viewportY + viewportH;
 
                     int bg = isSelected ? COLOR_TOGGLE_ON_BG : (hover ? COLOR_SLOT_BG_HOVER : COLOR_SLOT_BG);
-                    Services.PLATFORM.fill(poseStackOrGraphics, slotX + 1, slotY + 1, slotX + slotSize - 1, slotY + slotSize - 1, applyAlpha(bg, alpha));
-
+                    int topLeft;
+                    int bottomRight;
                     if (isSelected) {
-                        int emTopLeft = applyAlpha(hover ? 0xFF86EFAC : 0xFF4ADE80, alpha);
-                        int emBottomRight = applyAlpha(0xFF14532D, alpha);
-                        Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY, slotX + slotSize, slotY + 1, emTopLeft);
-                        Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY + 1, slotX + 1, slotY + slotSize - 1, emTopLeft);
-                        Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY + slotSize - 1, slotX + slotSize, slotY + slotSize, emBottomRight);
-                        Services.PLATFORM.fill(poseStackOrGraphics, slotX + slotSize - 1, slotY + 1, slotX + slotSize, slotY + slotSize - 1, emBottomRight);
+                        topLeft = applyAlpha(hover ? 0xFF86EFAC : 0xFF4ADE80, alpha);
+                        bottomRight = applyAlpha(0xFF14532D, alpha);
                     } else if (hover) {
-                        int hTopLeft = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
-                        int hBottomRight = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
-                        Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY, slotX + slotSize, slotY + 1, hTopLeft);
-                        Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY + 1, slotX + 1, slotY + slotSize - 1, hTopLeft);
-                        Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY + slotSize - 1, slotX + slotSize, slotY + slotSize, hBottomRight);
-                        Services.PLATFORM.fill(poseStackOrGraphics, slotX + slotSize - 1, slotY + 1, slotX + slotSize, slotY + slotSize - 1, hBottomRight);
+                        topLeft = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
+                        bottomRight = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
                     } else {
-                        int dark = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
-                        int light = applyAlpha(COLOR_SLOT_BORDER, alpha);
-                        Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY, slotX + slotSize, slotY + 1, dark);
-                        Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY + 1, slotX + 1, slotY + slotSize, dark);
-                        Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY + slotSize - 1, slotX + slotSize, slotY + slotSize, light);
-                        Services.PLATFORM.fill(poseStackOrGraphics, slotX + slotSize - 1, slotY, slotX + slotSize, slotY + slotSize, light);
+                        topLeft = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
+                        bottomRight = applyAlpha(COLOR_SLOT_BORDER, alpha);
                     }
+                    Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY, slotX + slotSize, slotY + slotSize, bottomRight);
+                    Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY, slotX + slotSize - 1, slotY + slotSize - 1, topLeft);
+                    Services.PLATFORM.fill(poseStackOrGraphics, slotX + 1, slotY + 1, slotX + slotSize - 1, slotY + slotSize - 1, applyAlpha(bg, alpha));
 
                     ItemStack stack = itemStackCache.computeIfAbsent(item, ItemStack::new);
                     Services.PLATFORM.renderScaledGuiItem(poseStackOrGraphics, stack, slotX + 2, slotY + 2, getGuiUiScale());
@@ -4633,7 +4624,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             case "items" -> {
                 int presetBtnW = 32;
                 int presetBtnH = 24;
-                int presetBtnX = (contentX + contentW + 3) - presetBtnW;
+                int presetBtnX = (contentX + contentW + 4) - presetBtnW;
                 int presetBtnY = contentY + (catHeaderH - presetBtnH) / 2;
                 if (mouseX >= presetBtnX && mouseX <= presetBtnX + presetBtnW
                         && mouseY >= presetBtnY && mouseY <= presetBtnY + presetBtnH) {

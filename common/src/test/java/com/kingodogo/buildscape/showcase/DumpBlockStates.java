@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 
 /** Standalone test-runtime tool; the recording Services shadows the loader service. */
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public final class DumpBlockStates {
     private DumpBlockStates() {}
 

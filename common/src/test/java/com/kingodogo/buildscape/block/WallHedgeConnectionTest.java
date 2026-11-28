@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class WallHedgeConnectionTest {
 
     private static Method connectsToMethod;

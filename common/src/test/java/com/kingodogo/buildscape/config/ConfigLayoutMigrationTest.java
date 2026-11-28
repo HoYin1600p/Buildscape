@@ -17,6 +17,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 class ConfigLayoutMigrationTest {
     @TempDir Path directory;
 

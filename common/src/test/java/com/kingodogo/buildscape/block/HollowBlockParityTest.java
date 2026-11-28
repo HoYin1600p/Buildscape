@@ -27,6 +27,7 @@ import java.util.IdentityHashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 class HollowBlockParityTest {
     private static HollowLogBlock log;
     private static HollowPipeBlock pipe;

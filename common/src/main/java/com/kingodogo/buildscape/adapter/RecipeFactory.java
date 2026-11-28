@@ -40,6 +40,7 @@ import java.util.Map;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public final class RecipeFactory {
     private static final RegistrySupplier<RecipeSerializer<HazeBushDyeRecipe>> HAZE_BUSH_DYE =
             Services.REGISTRY.registerRecipeSerializer("haze_bush_dye",
@@ -156,18 +157,19 @@ public final class RecipeFactory {
             ItemStack result = super.assemble(input);
             for (int i = 0; i < input.size(); i++) {
                 ItemStack bush = input.getItem(i);
-                if (!recipeIngredients.get(0).test(bush)) continue;
-                var state = bush.get(DataComponents.BLOCK_STATE);
-                if (state != null) result.set(DataComponents.BLOCK_STATE, state);
-                var custom = bush.get(DataComponents.CUSTOM_DATA);
-                if (custom != null) {
-                    CompoundTag data = custom.copyTag();
-                    CompoundTag preserved = new CompoundTag();
-                    if (data.contains("BlockStateTag")) preserved.put("BlockStateTag", data.get("BlockStateTag").copy());
-                    if (data.contains("HasHaze")) preserved.put("HasHaze", data.get("HasHaze").copy());
-                    if (!preserved.isEmpty()) result.set(DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(preserved));
+                if (recipeIngredients.get(0).test(bush)) {
+                    var state = bush.get(DataComponents.BLOCK_STATE);
+                    if (state != null) result.set(DataComponents.BLOCK_STATE, state);
+                    var custom = bush.get(DataComponents.CUSTOM_DATA);
+                    if (custom != null) {
+                        CompoundTag data = custom.copyTag();
+                        CompoundTag preserved = new CompoundTag();
+                        if (data.contains("BlockStateTag")) preserved.put("BlockStateTag", data.get("BlockStateTag").copy());
+                        if (data.contains("HasHaze")) preserved.put("HasHaze", data.get("HasHaze").copy());
+                        if (!preserved.isEmpty()) result.set(DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(preserved));
+                    }
+                    return result;
                 }
-                break;
             }
             return result;
         }

@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 class BlockFactoryCodecTest {
     @BeforeAll
     static void bootstrap() throws Exception {

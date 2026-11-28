@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 class FoliageColorsTintTest {
     @BeforeAll
     static void bootstrap() { com.kingodogo.buildscape.TestBootstrap.initialize(); }

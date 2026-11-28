@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /** Every property a wallpaper_flat blockstate JSON names must exist on the block the 26.x factory builds. */
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 class WallpaperFlatStateTest {
     private static final String[] COLORS = {"white", "orange", "magenta", "light_blue", "yellow", "lime", "pink",
             "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black"};

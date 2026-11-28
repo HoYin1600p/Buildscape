@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 class ClassPresenceTest {
     private static final String FIXTURE_NAME = ClassPresenceTest.class.getName() + "$PresenceFixture";
     private static boolean fixtureInitialized;

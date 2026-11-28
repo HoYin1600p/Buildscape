@@ -41,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * items (the block items use the block.* key, as vanilla's do), entity types, the creative tab and the subtitle
  * keys of the mod's sounds. The mod registers no enchantments and no mob effects, so those have nothing to check.
  */
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 class TranslationKeysTest {
     private static final Path MAIN_RESOURCES = Path.of(System.getProperty("buildscape.mainResources"));
     private static final Path LANG = MAIN_RESOURCES.resolve("assets/buildscape/lang/en_us.json");

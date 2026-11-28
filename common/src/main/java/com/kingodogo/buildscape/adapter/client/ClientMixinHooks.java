@@ -57,6 +57,7 @@ import java.util.function.Consumer;
 
 
 /** Client implementation of the mixin facade. */
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public final class ClientMixinHooks {
     private ClientMixinHooks() {}
 

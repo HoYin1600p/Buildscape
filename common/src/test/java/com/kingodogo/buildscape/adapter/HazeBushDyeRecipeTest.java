@@ -26,6 +26,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 class HazeBushDyeRecipeTest {
     @BeforeAll
     static void bootstrap() { TestBootstrap.initialize(); }

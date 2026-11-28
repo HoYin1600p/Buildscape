@@ -31,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * only names properties (and values) that the built block really has. The registration helper in ModBlocks needs
  * the test-only Services stand-in that records the registrations.
  */
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 class BlockstatePropertiesTest {
     private static final Path MAIN_RESOURCES = Path.of(System.getProperty("buildscape.mainResources"));
     private static final Path BLOCKSTATES = MAIN_RESOURCES.resolve("assets/buildscape/blockstates");

@@ -217,20 +217,25 @@ public class UpdatePillarDataPacket implements CommonPacket {
         if (server == null || !server.isRunning()) return;
 
         for (ServerLevel level : server.getAllLevels()) {
-            if (level == null) continue;
+            if (level != null && updateLevelBlockEntity(level, data)) {
+                return;
+            }
+        }
+    }
 
-            String dimensionKey = PillarIdManager.getDimensionKey(level);
-            if (!dimensionKey.equals(data.dimension)) continue;
+    private boolean updateLevelBlockEntity(ServerLevel level, PillarIdManager.PillarData data) {
+        String dimensionKey = PillarIdManager.getDimensionKey(level);
+        if (!dimensionKey.equals(data.dimension)) return false;
 
-            BlockPos pos = new BlockPos(data.x, data.y, data.z);
-            if (!level.isLoaded(pos)) continue;
+        BlockPos pos = new BlockPos(data.x, data.y, data.z);
+        if (!level.isLoaded(pos)) return false;
 
-            BlockEntity be = level.getBlockEntity(pos);
-            if (!(be instanceof PillarBlockEntity pillarBE)) continue;
+        BlockEntity be = level.getBlockEntity(pos);
+        if (!(be instanceof PillarBlockEntity pillarBE)) return false;
 
-            BlockPos bottomPos = pillarBE.findStackBottom();
-            BlockEntity bottomBE = level.getBlockEntity(bottomPos);
-            if (!(bottomBE instanceof PillarBlockEntity bottomPillarBE)) continue;
+        BlockPos bottomPos = pillarBE.findStackBottom();
+        BlockEntity bottomBE = level.getBlockEntity(bottomPos);
+        if (!(bottomBE instanceof PillarBlockEntity bottomPillarBE)) return false;
 
             boolean needsUpdate = false;
 
@@ -295,9 +300,7 @@ public class UpdatePillarDataPacket implements CommonPacket {
                         level.getBlockState(bottomPos),
                         3
                 );
-                return;
             }
-            return;
-        }
+            return true;
     }
 }

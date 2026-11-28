@@ -853,15 +853,16 @@ public class PillarIdManager {
         MinecraftServer server = getCurrentServer();
         if (server == null) return;
         for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
-            if (!Objects.equals(getDimensionKey(level), data.dimension) || !level.hasChunkAt(data.getBlockPos())) continue;
-            if (!(level.getBlockEntity(data.getBlockPos()) instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillar)) return;
-            BlockPos pos = pillar.findStackBottom();
-            for (int i = 0; i < 256 && level.getBlockState(pos).getBlock() instanceof com.kingodogo.buildscape.block.PillarBlock; i++, pos = pos.above()) {
-                if (level.getBlockEntity(pos) instanceof com.kingodogo.buildscape.block.PillarBlockEntity part) part.resetParticleSettings();
+            if (Objects.equals(getDimensionKey(level), data.dimension) && level.hasChunkAt(data.getBlockPos())) {
+                if (!(level.getBlockEntity(data.getBlockPos()) instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillar)) return;
+                BlockPos pos = pillar.findStackBottom();
+                for (int i = 0; i < 256 && level.getBlockState(pos).getBlock() instanceof com.kingodogo.buildscape.block.PillarBlock; i++, pos = pos.above()) {
+                    if (level.getBlockEntity(pos) instanceof com.kingodogo.buildscape.block.PillarBlockEntity part) part.resetParticleSettings();
+                }
+                data.pillarResetPending = null;
+                requestSave();
+                return;
             }
-            data.pillarResetPending = null;
-            requestSave();
-            return;
         }
     }
 

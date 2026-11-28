@@ -20,6 +20,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 /** Client-only menu, particle and image access for the platform adapter. */
 @Mod.EventBusSubscriber(modid = "buildscape", bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public final class ForgeClientAccess {
     private static RegisterParticleProvidersEvent particleEvent;
     private ForgeClientAccess() {}

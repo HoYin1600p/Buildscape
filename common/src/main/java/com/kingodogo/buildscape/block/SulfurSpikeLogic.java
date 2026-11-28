@@ -476,53 +476,34 @@ public abstract class SulfurSpikeLogic extends PointedDripstoneBlock {
             net.minecraft.world.level.redstone.Orientation orientation,
             boolean isMoving
     ) {
-        if (!level.isClientSide) {
-            Direction direction = state.getValue(
-                    BlockStateProperties.VERTICAL_DIRECTION
-            );
-            BlockPos supportPos = direction == Direction.DOWN
-                    ? pos.above()
-                    : pos.below();
-
-            if (neighborPos.equals(supportPos)) {
-                if (!canSurvive(state, level, pos)) {
-                    if (level instanceof ServerLevel) {
-                        ((ServerLevel) level).scheduleTick(pos, this, 2);
-                    }
-                } else if (level instanceof ServerLevel) {
-                    ((ServerLevel) level).scheduleTick(pos, this, 2);
-                }
-            } else if (level instanceof ServerLevel) {
-                ((ServerLevel) level).scheduleTick(pos, this, 2);
-            }
+        if (!level.isClientSide && level instanceof ServerLevel serverLevel) {
+            serverLevel.scheduleTick(pos, this, 2);
         }
 
-        if (neighborPos.equals(pos.above()) || neighborPos.equals(pos.below())) {
-            BlockState currentState = level.getBlockState(pos);
-            if (currentState.is(this)) {
-                BlockState updatedState = calculateCustomThickness(
-                        level,
-                        pos,
-                        currentState
-                );
+        BlockState currentState = level.getBlockState(pos);
+        if (currentState.is(this)) {
+            BlockState updatedState = calculateCustomThickness(
+                    level,
+                    pos,
+                    currentState
+            );
 
-                DripstoneThickness mergeThickness = checkForMerge(
-                        level,
-                        pos,
-                        updatedState
-                );
-                if (mergeThickness != updatedState.getValue(THICKNESS)) {
-                    updatedState = updatedState.setValue(THICKNESS, mergeThickness);
-                }
-
-                if (updatedState != currentState) {
-                    level.setBlock(pos, updatedState, 2);
-                }
-
-                updateNeighborThickness(level, pos.above());
-                updateNeighborThickness(level, pos.below());
-                updateDripstoneNeighbors(level, pos);
+            DripstoneThickness mergeThickness = checkForMerge(
+                    level,
+                    pos,
+                    updatedState
+            );
+            if (mergeThickness != updatedState.getValue(THICKNESS)) {
+                updatedState = updatedState.setValue(THICKNESS, mergeThickness);
             }
+
+            if (updatedState != currentState) {
+                level.setBlock(pos, updatedState, 2);
+            }
+
+            updateNeighborThickness(level, pos.above());
+            updateNeighborThickness(level, pos.below());
+            updateDripstoneNeighbors(level, pos);
         }
     }
 

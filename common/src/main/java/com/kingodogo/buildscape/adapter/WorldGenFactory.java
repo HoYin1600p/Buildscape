@@ -30,6 +30,7 @@ import net.minecraft.world.level.levelgen.feature.SimpleBlockFeature;
 import java.util.List;
 import java.util.stream.Stream;
 
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public final class WorldGenFactory {
     private static MapCodec<? extends BlockStateProvider> randomStateType;
     private static MapCodec<? extends PlacementModifier> mossCeilingType;

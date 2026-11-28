@@ -116,8 +116,9 @@ public final class HazeBushParticleHandler {
             var start = new Vec3(bushPos.getX() + .5D, bushPos.getY() + .4D, bushPos.getZ() + .5D);
             var hit = level.clip(new ClipContext(start, new Vec3(px, py + .05D, pz), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,
                     net.minecraft.world.phys.shapes.CollisionContext.empty()));
-            if (hit.getType() != HitResult.Type.MISS && (hit.getBlockPos().getX() != blockX || hit.getBlockPos().getZ() != blockZ)) continue;
-            return new Vec3(px, py, pz);
+            if (hit.getType() == HitResult.Type.MISS || (hit.getBlockPos().getX() == blockX && hit.getBlockPos().getZ() == blockZ)) {
+                return new Vec3(px, py, pz);
+            }
         }
         return null;
     }

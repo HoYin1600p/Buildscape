@@ -9,6 +9,7 @@ import net.minecraft.util.ExtraCodecs;
 import java.util.function.BiConsumer;
 
 /** Invoked exclusively from loader client entrypoints, before item definitions are decoded. */
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public final class SpecialItemRenderers {
     private SpecialItemRenderers() {}
 

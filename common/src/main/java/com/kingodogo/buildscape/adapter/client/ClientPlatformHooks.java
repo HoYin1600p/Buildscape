@@ -87,6 +87,7 @@ import com.kingodogo.buildscape.adapter.*;
 import com.kingodogo.buildscape.platform.IPlatformAdapter.BlockColorSample;
 
 /** Client implementations; the common platform facade contains only forwarding calls. */
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public final class ClientPlatformHooks {
     private ClientPlatformHooks() {}
     private static final int COLOR_MAX_SAMPLES = 32;

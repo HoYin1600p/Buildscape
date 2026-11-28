@@ -38,6 +38,7 @@ import java.util.Random;
 import java.util.Set;
 
 public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, SimpleWaterloggedBlock {
+    private static final java.security.SecureRandom RANDOM = new java.security.SecureRandom();
     private static final ThreadLocal<Boolean> CASCADE_ACTIVE = new ThreadLocal<>();
 
 
@@ -794,12 +795,12 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
             BlockState searchState = level.getBlockState(searchPos);
             if (searchState.isAir()) {
                 searchPos = searchPos.above();
-                continue;
+            } else {
+                if (searchState.is(this) && searchState.getValue(VERTICAL_DIRECTION) == Direction.DOWN) {
+                    stalactiteTipPos = searchPos;
+                }
+                break;
             }
-            if (searchState.is(this) && searchState.getValue(VERTICAL_DIRECTION) == Direction.DOWN) {
-                stalactiteTipPos = searchPos;
-            }
-            break;
         }
 
         if (stalactiteTipPos == null) return;
@@ -866,7 +867,7 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
                 double tipY = pos.getY() + 0.1D;
                 double tipZ = pos.getZ() + 0.5D;
 
-                if (new Random().nextInt(3) == 0) {
+                if (RANDOM.nextInt(3) == 0) {
                     level.addParticle(ParticleTypes.DRIPPING_WATER, tipX, tipY, tipZ, 0.0D, 0.0D, 0.0D);
                 }
             }

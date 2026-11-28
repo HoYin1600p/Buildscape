@@ -16,6 +16,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 
 /** Reference foliage and water colours for resource-defined tinted block and item models. */
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public final class FoliageColors {
     private FoliageColors() {}
 

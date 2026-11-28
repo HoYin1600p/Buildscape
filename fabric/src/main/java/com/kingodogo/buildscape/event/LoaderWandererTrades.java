@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 /** Extend the 26.3 data-driven pools while retaining vanilla selection and predicates. */
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public final class LoaderWandererTrades {
     private static final Set<TradeSet> EXTENDED = Collections.newSetFromMap(new WeakHashMap<>());
     private LoaderWandererTrades() {}

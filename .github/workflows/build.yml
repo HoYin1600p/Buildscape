@@ -113,7 +113,7 @@ jobs:
           java-version: ${{ matrix.java }}
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3 # v4.4.2
+        uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3 # nosemgrep
 
       - name: Make Gradle Wrapper Executable
         run: chmod +x ./gradlew
@@ -240,7 +240,7 @@ jobs:
 
       - name: Publish Dev Pre-release
         if: steps.meta.outputs.has_jars == 'true'
-        uses: softprops/action-gh-release@c062e49c855a9e144a1eb6fef889d1469e38f170 # v2.0.4
+        uses: softprops/action-gh-release@c062e49c855a9e144a1eb6fef889d1469e38f170 # nosemgrep
         with:
           tag_name: ${{ steps.meta.outputs.tag_name }}
           target_commitish: ${{ github.event.pull_request.head.sha || github.sha }}

@@ -1,7 +1,0 @@
-{
-  "parent": "buildscape:block/pillar_top",
-  "textures": {
-    "2": "buildscape:block/dripstone_pillar_top",
-    "particle": "minecraft:block/dripstone_block"
-  }
-}

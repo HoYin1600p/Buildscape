@@ -1,161 +1,115 @@
 pluginManagement {
     repositories {
-        gradlePluginPortal()
-        mavenCentral()
-        maven { url = 'https://maven.wagyourtail.xyz/releases' }
-        maven { url = 'https://maven.outlands.top/releases' }
-        maven { url = 'https://maven.wagyourtail.xyz/snapshots' }
-        maven { url = 'https://maven.architectury.dev/' }
+        maven {
+            url = 'https://maven.wagyourtail.xyz/releases'
+            content { includeGroupByRegex 'xyz\\.wagyourtail.*' }
+        }
         maven { url = 'https://maven.fabricmc.net/' }
         maven { url = 'https://maven.neoforged.net/releases/' }
         maven { url = 'https://maven.minecraftforge.net/' }
         maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+        gradlePluginPortal()
+        maven {
+            url = 'https://maven-central.storage-download.googleapis.com/maven2/'
+            content {
+                excludeGroupByRegex 'xyz\\.wagyourtail.*'
+                excludeGroupByRegex 'net\\.fabricmc.*'
+                excludeGroupByRegex 'net\\.neoforged.*'
+                excludeGroupByRegex 'net\\.minecraftforge.*'
+            }
+        }
+        mavenCentral {
+            content {
+                excludeGroupByRegex 'xyz\\.wagyourtail.*'
+                excludeGroupByRegex 'net\\.fabricmc.*'
+                excludeGroupByRegex 'net\\.neoforged.*'
+                excludeGroupByRegex 'net\\.minecraftforge.*'
+            }
+        }
     }
 }
 
 rootProject.name = 'Buildscape'
 
-def resolveBuildscapeTarget() {
-    def targetProp = gradle.startParameter.projectProperties.get('buildscape.target') ?:
-            providers.gradleProperty('buildscape.target').orNull
-    if (targetProp != null && !targetProp.trim().isEmpty()) {
-        def normalized = targetProp.trim().toLowerCase().replaceAll('^:', '')
-        if (normalized == 'neoforge' || normalized == 'neoforge262') return 'neoforge:26.2'
-        if (normalized == 'fabric' || normalized == 'fabric262') return 'fabric:26.2'
-        if (normalized == 'forge' || normalized == 'forge118' || normalized == 'forge1182') return 'forge:1.18.2'
-        if (normalized == 'fabric118' || normalized == 'fabric1182') return 'fabric:1.18.2'
-        if (normalized == 'neoforge263') return 'neoforge:26.3'
-        if (normalized == 'fabric263') return 'fabric:26.3'
-        if (normalized == 'forge263') return 'forge:26.3'
-        return normalized
-    }
-
-    def tasks = gradle.startParameter.taskNames
-    if (tasks.isEmpty()) {
-        return 'all'
-    }
-
-    def rootAggregateTasks = ['build', 'check', 'assemble', 'collectModJars', 'clean', 'tasks', 'help', 'projects', 'properties']
-    if (tasks.any { rootAggregateTasks.contains(it) }) {
-        return 'all'
-    }
-
-    def targetChecks = [
-        'fabric:1.18.2': tasks.any { it.contains('fabric:1.18.2') },
-        'forge:1.18.2': tasks.any { it.contains('forge:1.18.2') },
-        'fabric:1.21.1': tasks.any { it.contains('fabric:1.21.1') },
-        'forge:1.21.1': tasks.any { it.contains('forge:1.21.1') },
-        'neoforge:1.21.1': tasks.any { it.contains('neoforge:1.21.1') },
-        'fabric:26.2': tasks.any { it.contains('fabric:26.2') },
-        'forge:26.2': tasks.any { it.contains('forge:26.2') },
-        'neoforge:26.2': tasks.any { it.contains('neoforge:26.2') },
-        'fabric:26.3': tasks.any { it.contains('fabric:26.3') },
-        'forge:26.3': tasks.any { it.contains('forge:26.3') },
-        'neoforge:26.3': tasks.any { it.contains('neoforge:26.3') }
-    ]
-    def matches = targetChecks.findAll { it.value }.collect { it.key }
-    if (matches.size() == 1) {
-        return matches[0]
-    }
-
-    return 'all'
+if (System.getenv('CI') == null && file('.githooks').isDirectory() && file('.git').exists()) {
+    try {
+        def p = new ProcessBuilder('git', 'config', '--get', 'core.hooksPath').directory(rootDir).start()
+        def out = p.inputStream.text.trim()
+        if (p.waitFor() != 0 || out != '.githooks') {
+            new ProcessBuilder('git', 'config', 'core.hooksPath', '.githooks').directory(rootDir).start().waitFor()
+        }
+    } catch (Exception ignored) {}
 }
 
-def activeTarget = resolveBuildscapeTarget()
+def prepareTargetRoot(File rootDir, String mc, String loader) {
+    def targetDir = new File(rootDir, ".gradle/build-roots/${mc}/${loader}")
+    targetDir.mkdirs()
+    new File(targetDir, 'settings.gradle').text = "rootProject.name = 'buildscape-${mc}-${loader}'\n"
+    new File(targetDir, 'build.gradle').text = new File(rootDir, 'shared/build-logic/target.gradle').text
+    def props = new File(rootDir, 'gradle.properties').text
+    props += "\nmc=${mc}\nloader=${loader}\n"
+    new File(targetDir, 'gradle.properties').text = props
+    def localProps = new File(rootDir, 'local.properties')
+    if (localProps.isFile()) {
+        new File(targetDir, 'local.properties').text = localProps.text
+    }
+    return targetDir
+}
 
-include 'common'
+def inventoryFile = file('targets.json')
+def targetsData = []
+if (inventoryFile.isFile()) {
+    targetsData = new groovy.json.JsonSlurper().parse(inventoryFile)['targets']
+}
 
-if (activeTarget == 'neoforge:26.2') {
-    include 'neoforge:26.2'
-    project(':neoforge:26.2').projectDir = file('neoforge/26.2')
-} else if (activeTarget == 'fabric:26.2') {
-    include 'fabric:26.2'
-    project(':fabric:26.2').projectDir = file('fabric/26.2')
-} else if (activeTarget == 'forge:26.2') {
-    include ':forge', ':forge:26.2'
-    project(':forge').projectDir = file('forge')
-    project(':forge:26.2').projectDir = file('forge/26.2')
-} else if (activeTarget == 'forge:1.18.2') {
-    include ':forge', ':forge:1.18.2'
-    project(':forge').projectDir = file('forge')
-    project(':forge:1.18.2').projectDir = file('forge/1.18.2')
-} else if (activeTarget == 'fabric:1.18.2') {
-    include ':fabric:1.18.2'
-    project(':fabric:1.18.2').projectDir = file('fabric/1.18.2')
-} else if (activeTarget == 'neoforge:1.21.1') {
-    include ':neoforge:1.21.1'
-    project(':neoforge:1.21.1').projectDir = file('neoforge/1.21.1')
-} else if (activeTarget == 'fabric:1.21.1') {
-    include ':fabric:1.21.1'
-    project(':fabric:1.21.1').projectDir = file('fabric/1.21.1')
-} else if (activeTarget == 'forge:1.21.1') {
-    include ':forge', ':forge:1.21.1'
-    project(':forge').projectDir = file('forge')
-    project(':forge:1.21.1').projectDir = file('forge/1.21.1')
-} else if (activeTarget == 'neoforge:26.3') {
-    include ':neoforge:26.3'
-    project(':neoforge:26.3').projectDir = file('neoforge/26.3')
-} else if (activeTarget == 'fabric:26.3') {
-    include ':fabric:26.3'
-    project(':fabric:26.3').projectDir = file('fabric/26.3')
-} else if (activeTarget == 'forge:26.3') {
-    include ':forge', ':forge:26.3'
-    project(':forge').projectDir = file('forge')
-    project(':forge:26.3').projectDir = file('forge/26.3')
-} else {
-    // Default / 'all' mode: all versions and loaders registered
-    def isEnabled = { String prop, boolean defVal = true ->
-        def val = gradle.startParameter.projectProperties.get(prop) ?:
-                providers.gradleProperty(prop).orNull
-        return val != null ? val.trim().toLowerCase() == 'true' : defVal
+def ensureLoaderProject(String loader) {
+    def projPath = ":${loader}"
+    if (findProject(projPath) == null) {
+        def dir = file(".gradle/build-roots/${loader}")
+        dir.mkdirs()
+        include projPath
+        project(projPath).projectDir = dir
     }
+}
 
-    // 26.2 targets
-    include ':fabric:26.2'
-    project(':fabric:26.2').projectDir = file('fabric/26.2')
-    include ':neoforge:26.2'
-    project(':neoforge:26.2').projectDir = file('neoforge/26.2')
-    if (isEnabled('buildscape.forge262')) {
-        include ':forge', ':forge:26.2'
-        project(':forge').projectDir = file('forge')
-        project(':forge:26.2').projectDir = file('forge/26.2')
-    }
+['fabric', 'forge', 'neoforge'].each { ensureLoaderProject(it) }
 
-    // 1.18.2 targets
-    if (isEnabled('buildscape.fabric118x')) {
-        include ':fabric:1.18.2'
-        project(':fabric:1.18.2').projectDir = file('fabric/1.18.2')
-    }
-    if (isEnabled('buildscape.v118x') || isEnabled('buildscape.forge118')) {
-        include ':forge', ':forge:1.18.2'
-        project(':forge').projectDir = file('forge')
-        project(':forge:1.18.2').projectDir = file('forge/1.18.2')
-    }
+def tasks = gradle.startParameter.taskNames
+def activeTargets = [] as Set
 
-    // 1.21.1 targets
-    if (isEnabled('buildscape.fabric121')) {
-        include ':fabric:1.21.1'
-        project(':fabric:1.21.1').projectDir = file('fabric/1.21.1')
+if (!tasks.isEmpty()) {
+    def taskStr = tasks.join(' ')
+    for (target in targetsData) {
+        def mc = target['minecraft']
+        target['loaders'].keySet().each { loader ->
+            if (taskStr.contains(":${loader}:${mc}") || taskStr.contains("${loader}:${mc}")) {
+                activeTargets << [mc: mc, loader: loader]
+            }
+        }
     }
-    if (isEnabled('buildscape.neoforge121')) {
-        include ':neoforge:1.21.1'
-        project(':neoforge:1.21.1').projectDir = file('neoforge/1.21.1')
-    }
-    if (isEnabled('buildscape.forge121')) {
-        include ':forge', ':forge:1.21.1'
-        project(':forge').projectDir = file('forge')
-        project(':forge:1.21.1').projectDir = file('forge/1.21.1')
-    }
+}
 
-    // 26.3 targets (experimental / migration, opt-in via -Pbuildscape.v263=true)
-    if (isEnabled('buildscape.v263', false)) {
-        include ':fabric:26.3', ':neoforge:26.3'
-        project(':fabric:26.3').projectDir = file('fabric/26.3')
-        project(':neoforge:26.3').projectDir = file('neoforge/26.3')
-        if (isEnabled('buildscape.forge263', false)) {
-            include ':forge', ':forge:26.3'
-            project(':forge').projectDir = file('forge')
-            project(':forge:26.3').projectDir = file('forge/26.3')
+def rootOnlyTasks = ['collectModJars', 'buildTarget', 'cleanTarget', 'runClient', 'runServer'] as Set
+if (!activeTargets.isEmpty()) {
+    activeTargets.each { t ->
+        ensureLoaderProject(t.loader)
+        def projPath = ":${t.loader}:${t.mc}"
+        include projPath
+        def targetDir = prepareTargetRoot(rootDir, t.mc, t.loader)
+        project(projPath).projectDir = targetDir
+    }
+} else if (tasks.isEmpty() || !tasks.every { it in rootOnlyTasks || it.startsWith('-') }) {
+    targetsData.each { target ->
+        def mc = target['minecraft']
+        target['loaders'].each { loader, info ->
+            if (info instanceof Map && info['status'] == 'upcoming') {
+                return
+            }
+            ensureLoaderProject(loader)
+            def projPath = ":${loader}:${mc}"
+            include projPath
+            def targetDir = prepareTargetRoot(rootDir, mc, loader)
+            project(projPath).projectDir = targetDir
         }
     }
 }

@@ -1,7 +1,0 @@
-{
-  "parent": "buildscape:block/pillar_middle",
-  "textures": {
-    "1": "buildscape:block/weathered_copper_pillar_middle",
-    "particle": "minecraft:block/weathered_copper"
-  }
-}

@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/hollow_log",
-  "textures": {
-    "logs": "buildscape:block/ashpen_log",
-    "stripped_logs": "buildscape:block/stripped_ashpen_log",
-    "end": "buildscape:block/ashpen_log_top"
-  }
-}

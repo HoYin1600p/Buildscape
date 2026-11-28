@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:block/template_wall_post",
-  "textures": {
-    "wall": "buildscape:block/black_flaming_polished_steel",
-    "particle": "buildscape:block/black_flaming_polished_steel"
-  }
-}

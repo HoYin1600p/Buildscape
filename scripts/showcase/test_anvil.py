@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 import shutil
 import struct
-import subprocess
+import subprocess  # nosec B404
 import sys
 import tempfile
 import unittest
@@ -368,7 +368,7 @@ class WorldTests(unittest.TestCase):
             layout_file = Path(directory) / "layout.json"
             layout_file.write_text(json.dumps(showcase_fixture((0, 0))), encoding="utf-8")
             with apply.closed_world(world):
-                result = subprocess.run([sys.executable, "-B", str(Path(apply.__file__)),
+                result = subprocess.run([sys.executable, "-B", str(Path(apply.__file__)),  # nosec B603 # nosemgrep
                                          str(world), str(layout_file), "--dry-run"], capture_output=True, text=True)
             self.assertEqual(result.returncode, 2)
             self.assertIn("close the game" if os.name == "nt" and "Cannot open" in result.stderr
@@ -382,9 +382,7 @@ class WorldTests(unittest.TestCase):
                     apply.ensure_backup(region_dir, destination, True)
 
     def test_pristine_real_world_copy_cli_dry_run(self):
-        workspace = os.environ.get("WORKSPACES")
-        if not workspace:
-            repos = os.environ.get("REPOS")
+        workspace = os.environ.get("WORKSPACES") or os.environ.get("REPOS")
         if not workspace:
             self.skipTest("REPOS/WORKSPACES are not set; pristine world unavailable")
         pristine = Path(workspace) / "Buildscape-26/artifacts/showcase-world-pristine/Buildscape Showcase"
@@ -400,7 +398,7 @@ class WorldTests(unittest.TestCase):
             def fingerprints():
                 return {file.name: hashlib.sha256(file.read_bytes()).hexdigest() for file in regions.iterdir()}
             before = fingerprints()
-            result = subprocess.run([sys.executable, "-B", str(Path(apply.__file__)), str(copied),
+            result = subprocess.run([sys.executable, "-B", str(Path(apply.__file__)), str(copied),  # nosec B603 # nosemgrep
                                      str(path), "--dry-run"], capture_output=True, text=True, timeout=120)
             self.assertEqual(result.returncode, 0, result.stderr)
             report = json.loads(result.stdout)

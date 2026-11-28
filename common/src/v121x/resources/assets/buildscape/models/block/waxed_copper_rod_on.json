@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:block/lightning_rod_on",
-  "textures": {
-    "texture": "minecraft:block/lightning_rod_on",
-    "particle": "minecraft:block/lightning_rod_on"
-  }
-}

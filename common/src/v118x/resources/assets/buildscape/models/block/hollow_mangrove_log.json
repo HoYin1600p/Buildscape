@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/hollow_log",
-  "textures": {
-    "logs": "buildscape:block/mangrove_log",
-    "stripped_logs": "buildscape:block/stripped_mangrove_log",
-    "end": "buildscape:block/mangrove_log_top"
-  }
-}

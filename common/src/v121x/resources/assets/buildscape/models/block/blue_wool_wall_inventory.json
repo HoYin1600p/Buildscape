@@ -1,7 +1,0 @@
-{
-  "textures": {
-    "wall": "minecraft:block/blue_wool",
-    "particle": "minecraft:block/blue_wool"
-  },
-  "parent": "minecraft:block/wall_inventory"
-}

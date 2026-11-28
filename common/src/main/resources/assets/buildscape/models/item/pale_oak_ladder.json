@@ -1,6 +1,0 @@
-{
-    "textures":  {
-                     "layer0":  "buildscape:block/pale_oak_ladder"
-                 },
-    "parent":  "minecraft:item/generated"
-}

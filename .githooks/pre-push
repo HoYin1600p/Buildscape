@@ -1,0 +1,23 @@
+#!/usr/bin/env sh
+# Auto-push all initialized submodules to their configured .gitmodules branches before root push.
+set -e
+
+remote="${1:-origin}"
+[ -f .gitmodules ] || exit 0
+[ "${BUILDSCAPE_SKIP_SUBMODULE_AUTOPUSH:-0}" = "1" ] && exit 0
+
+unset GIT_DIR GIT_INDEX_FILE GIT_WORK_TREE GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_COMMON_DIR
+
+for mod in $(git config -f .gitmodules --get-regexp '^submodule\..*\.path$' | awk '{print $2}'); do
+    [ -d "$mod/.git" ] || [ -f "$mod/.git" ] || continue
+    branch=$(git config -f .gitmodules "submodule.${mod}.branch" || true)
+    [ -n "$branch" ] || continue
+    sha=$(git -C "$mod" rev-parse HEAD 2>/dev/null || true)
+    [ -n "$sha" ] || continue
+    remote_sha=$(git -C "$mod" rev-parse "refs/remotes/${remote}/${branch}" 2>/dev/null || true)
+    if [ "$sha" = "$remote_sha" ]; then
+        continue
+    fi
+    echo "[pre-push] Syncing submodule $mod ($sha) -> $remote refs/heads/$branch"
+    git -C "$mod" push "$remote" "HEAD:refs/heads/$branch"
+done

@@ -1,7 +1,0 @@
-{
-    "textures":  {
-                     "edge":  "buildscape:block/gold_bars",
-                     "bars":  "buildscape:block/gold_bars"
-                 },
-    "parent":  "buildscape:block/template_bars_post_ends"
-}

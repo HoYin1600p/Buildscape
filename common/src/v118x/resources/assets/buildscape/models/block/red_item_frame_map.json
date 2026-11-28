@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/item_frame_map",
-  "textures": {
-    "particle": "buildscape:block/red_item_frame",
-    "wood": "buildscape:block/red_item_frame",
-    "back": "buildscape:block/red_item_frame"
-  }
-}

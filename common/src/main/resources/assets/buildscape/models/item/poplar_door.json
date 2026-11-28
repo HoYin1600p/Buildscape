@@ -1,6 +1,0 @@
-{
-  "textures": {
-    "layer0": "buildscape:item/poplar_door"
-  },
-  "parent": "minecraft:item/generated"
-}

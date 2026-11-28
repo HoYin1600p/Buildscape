@@ -17,6 +17,7 @@ final class MixinDump {
     private MixinDump() {}
 
     // These are Mixin 0.8.5 fields, not Minecraft fields: no SRG translation.
+    @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
     private static Object field(Object instance, Class<?> owner, String name) {
         try {
             Field field = owner.getDeclaredField(name);

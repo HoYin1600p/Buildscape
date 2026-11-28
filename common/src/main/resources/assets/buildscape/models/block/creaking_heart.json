@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:block/cube_column",
-  "textures": {
-    "end": "buildscape:block/creaking_heart_top_dormant",
-    "side": "buildscape:block/creaking_heart_dormant"
-  }
-}

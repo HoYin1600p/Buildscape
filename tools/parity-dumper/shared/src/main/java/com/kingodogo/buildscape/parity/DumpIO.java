@@ -42,6 +42,7 @@ final class DumpIO {
         return lambda < 0 ? name : name.substring(0, lambda) + "::lambda";
     }
 
+    @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
     static Object field(Class<?> owner, Object instance, String mojmap, String searge) {
         try {
             Field field;
@@ -59,14 +60,16 @@ final class DumpIO {
 
     // Forge-added fields can retain SRG names even on a Mojang-named dev classpath.
     // Do not remap the SRG spelling before trying it literally.
+    @SuppressWarnings({"PMD.AvoidAccessibilityAlteration", "PMD.BrokenNullCheck"})
     static Map<?, ?> table(Class<?> owner, Object instance, Class<?> keyType, Class<?> valueType,
                             String... names) {
         try {
             for (String name : names) {
                 try {
                     Field field = owner.getDeclaredField(name);
+                    boolean isStatic = Modifier.isStatic(field.getModifiers());
                     if (!Map.class.isAssignableFrom(field.getType())
-                            || Modifier.isStatic(field.getModifiers()) != (instance == null)) continue;
+                            || (isStatic ? instance != null : instance == null)) continue;
                     field.setAccessible(true);
                     return (Map<?, ?>) field.get(instance);
                 } catch (NoSuchFieldException ignored) {
@@ -75,8 +78,9 @@ final class DumpIO {
             }
             Field candidate = null;
             for (Field field : owner.getDeclaredFields()) {
+                boolean isStatic = Modifier.isStatic(field.getModifiers());
                 if (!Map.class.isAssignableFrom(field.getType())
-                        || Modifier.isStatic(field.getModifiers()) != (instance == null)
+                        || (isStatic ? instance != null : instance == null)
                         || !(field.getGenericType() instanceof ParameterizedType mapType)) continue;
                 Type[] arguments = mapType.getActualTypeArguments();
                 if (arguments.length != 2 || (valueType != null && rawType(arguments[1]) != valueType)

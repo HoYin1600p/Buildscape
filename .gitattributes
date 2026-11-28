@@ -1,3 +1,5 @@
-# The 1.18.2 recipe pack is checked byte for byte (v118xCheckRecipePackFormat, bundled recipe cache), so it must keep LF
+# The recipe packs are checked byte for byte (bundled recipe cache), so they must keep LF
 # line endings on every OS, including Windows checkouts with core.autocrlf=true.
-common/src/v118x/resources/data/buildscape/recipes_pack/*.json text eol=lf
+common/src/1.18.2/resources/data/buildscape/recipes_pack/*.json text eol=lf
+common/src/1.21.1/resources/data/buildscape/recipes_pack/*.json text eol=lf
+common/src/main/resources/data/buildscape/recipes_pack/*.json text eol=lf

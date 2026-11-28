@@ -1,7 +1,0 @@
-{
-  "textures": {
-    "wall": "buildscape:block/poplar_log",
-    "particle": "buildscape:block/poplar_log"
-  },
-  "parent": "minecraft:block/wall_inventory"
-}

@@ -1,6 +1,0 @@
-{
-  "textures": {
-    "layer0": "buildscape:block/ashpen_cyan_ladder"
-  },
-  "parent": "minecraft:item/generated"
-}

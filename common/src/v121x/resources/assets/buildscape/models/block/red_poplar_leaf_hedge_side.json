@@ -1,8 +1,0 @@
-{
-  "parent": "buildscape:block/template_wall_side_tinted",
-  "textures": {
-    "wall": "buildscape:block/red_poplar_leaves",
-    "tint": "buildscape:block/red_poplar_leaves",
-    "particle": "buildscape:block/red_poplar_leaves"
-  }
-}

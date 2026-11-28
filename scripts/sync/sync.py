@@ -6,7 +6,7 @@ import json
 import os
 from pathlib import Path, PurePosixPath
 import re
-import subprocess
+import subprocess  # nosec B404
 import sys
 import tempfile
 
@@ -19,7 +19,7 @@ class SyncError(RuntimeError):
 
 def run(args, cwd, check=True):
     env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1", GIT_TERMINAL_PROMPT="0")
-    result = subprocess.run([str(a) for a in args], cwd=cwd, env=env,
+    result = subprocess.run([str(a) for a in args], cwd=cwd, env=env,  # nosec B603 # nosemgrep
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if check and result.returncode:
         raise SyncError("Command failed: {}\n{}\n{}".format(
@@ -101,8 +101,9 @@ def foreign_clusters(config, target):
 
 
 def cluster_tag(path):
-    match = re.search(r"/(?:src|adapter)/(v\w+)/", path)
-    return match[1] if match else ""
+    match = re.search(r"/src/(1\.18\.2|1\.21\.1|26\.2|26\.3)/", path)
+    return {"1.18.2": "minecraft1182", "1.21.1": "minecraft1211",
+            "26.2": "minecraft262", "26.3": "minecraft263"}.get(match[1], "") if match else ""
 
 
 def source_revision(repo, config, source_repo=None, fetch=False):
@@ -162,7 +163,7 @@ def metadata(path):
 
 
 # mc26.2 predates the registry key; every other target must declare removal_policy explicitly.
-LEGACY_REMOVAL_POLICIES = {"mc26.2": {"file": "sync/removals26x.json", "inherits": "mc26.2"}}
+LEGACY_REMOVAL_POLICIES = {"mc26.2": {"file": "sync/26.2/removals.json", "inherits": "mc26.2"}}
 
 
 def inherited_policy(policy, spec, target):
@@ -252,14 +253,14 @@ def affected_clusters(paths, target, source_path=""):
     clusters = target.get("version_clusters", [target.get("version_cluster", "")])
     result = set()
     for path in paths:
-        match = re.search(r"/(?:src|adapter)/(v\w+)/", path)
-        if match:
-            result.add(match[1])
+        cluster = cluster_tag(path)
+        if cluster:
+            result.add(cluster)
         elif path.startswith(target["java_root"] + "/"):
             result.update(clusters)
     # The reference snapshot (resources and metadata included) feeds Forge 1.18.2.
-    if source_path and "v118x" in clusters:
-        result.add("v118x")
+    if source_path and "minecraft1182" in clusters:
+        result.add("minecraft1182")
     if "/resources/" in source_path:
         result.add(target.get("version_cluster", ""))
     return sorted(result - {""})
@@ -409,7 +410,7 @@ def files_at(repo, rev, paths):
         hashes.append(sha)
     if not hashes:
         return {}
-    batch = subprocess.run(["git", "cat-file", "--batch"], cwd=repo,
+    batch = subprocess.run(["git", "cat-file", "--batch"], cwd=repo,  # nosec B603
                            input=b"\n".join(hashes) + b"\n", stdout=subprocess.PIPE,
                            stderr=subprocess.PIPE)
     if batch.returncode:
@@ -436,7 +437,7 @@ def command(template, values, cwd, log):
     with log.open("ab") as stream:
         stream.write((repr(args) + "\n").encode("utf-8"))
         stream.flush()
-        code = subprocess.run(args, cwd=cwd, env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"),
+        code = subprocess.run(args, cwd=cwd, env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"),  # nosec B603 # nosemgrep
                               stdout=stream, stderr=subprocess.STDOUT).returncode
     if code:
         raise SyncError(f"Validation/conversion failed ({code}); see {log}")
@@ -461,7 +462,7 @@ def validate(target, values, worktree, log):
                                    r"Cannot [^\n]+ in offline mode)", output, re.IGNORECASE)
             if not check.get("skip_on_offline_cache_miss") or not cache_miss:
                 raise
-            note = "Forge 1.18.2 validation skipped: offline cache lacks required artifacts; -Pbuildscape.v118x=true needs network."
+            note = "Forge 1.18.2 validation skipped: offline cache lacks required artifacts; -Pbuildscape.minecraft1182=true needs network."
             with log.open("a", encoding="utf-8") as stream:
                 stream.write(note + "\n")
             print(note)
@@ -528,7 +529,7 @@ def update_ledger(worktree, plan, target, fields, rows, conflicts=()):
             continue
         if c["classification"] == "retired":
             row["active_paths"] = "n/a"
-            row["verification"] = "Retired by sync/removals26x.json; source " + plan["source_commit"]
+            row["verification"] = "Retired by sync/26.2/removals.json; source " + plan["source_commit"]
         elif c["classification"] == "automatic":
             row["reference_path"] = c["path"]
             if c["kind"] == "java":

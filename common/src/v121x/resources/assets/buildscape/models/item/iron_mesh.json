@@ -1,6 +1,0 @@
-{
-  "textures": {
-    "layer0": "buildscape:block/iron_mesh"
-  },
-  "parent": "item/generated"
-}

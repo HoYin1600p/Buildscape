@@ -1,7 +1,0 @@
-{
-  "textures": {
-    "edge": "buildscape:block/steel_mesh",
-    "bars": "buildscape:block/steel_mesh"
-  },
-  "parent": "buildscape:block/template_bars_post"
-}

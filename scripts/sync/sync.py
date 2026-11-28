@@ -6,7 +6,7 @@ import json
 import os
 from pathlib import Path, PurePosixPath
 import re
-import subprocess
+import subprocess  # nosec B404
 import sys
 import tempfile
 
@@ -19,7 +19,7 @@ class SyncError(RuntimeError):
 
 def run(args, cwd, check=True):
     env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1", GIT_TERMINAL_PROMPT="0")
-    result = subprocess.run([str(a) for a in args], cwd=cwd, env=env,
+    result = subprocess.run([str(a) for a in args], cwd=cwd, env=env,  # nosec B603 # nosemgrep
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if check and result.returncode:
         raise SyncError("Command failed: {}\n{}\n{}".format(
@@ -410,7 +410,7 @@ def files_at(repo, rev, paths):
         hashes.append(sha)
     if not hashes:
         return {}
-    batch = subprocess.run(["git", "cat-file", "--batch"], cwd=repo,
+    batch = subprocess.run(["git", "cat-file", "--batch"], cwd=repo,  # nosec B603
                            input=b"\n".join(hashes) + b"\n", stdout=subprocess.PIPE,
                            stderr=subprocess.PIPE)
     if batch.returncode:
@@ -437,7 +437,7 @@ def command(template, values, cwd, log):
     with log.open("ab") as stream:
         stream.write((repr(args) + "\n").encode("utf-8"))
         stream.flush()
-        code = subprocess.run(args, cwd=cwd, env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"),
+        code = subprocess.run(args, cwd=cwd, env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"),  # nosec B603 # nosemgrep
                               stdout=stream, stderr=subprocess.STDOUT).returncode
     if code:
         raise SyncError(f"Validation/conversion failed ({code}); see {log}")

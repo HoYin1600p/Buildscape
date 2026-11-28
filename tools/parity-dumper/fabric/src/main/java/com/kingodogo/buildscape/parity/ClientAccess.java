@@ -48,6 +48,7 @@ final class ClientAccess {
         return handlers;
     }
 
+    @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
     static Map<?, ?> particleProviders(Minecraft minecraft) {
         // Vanilla uses numeric registry IDs, unlike Forge's ResourceLocation map.
         // Match the unique generic field so dev and intermediary names both work.

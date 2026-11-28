@@ -17,6 +17,7 @@ final class LoaderAccess {
         manifest.addProperty("fabric", "0.16.14");
     }
 
+    @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
     static Field findField(Class<?> owner, String name) throws NoSuchFieldException {
         Field field = owner.getDeclaredField(name);
         field.setAccessible(true);

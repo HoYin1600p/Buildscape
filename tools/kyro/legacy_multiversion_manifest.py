@@ -13,7 +13,7 @@ import argparse
 import hashlib
 import io
 import json
-import subprocess
+import subprocess  # nosec B404
 import tarfile
 from pathlib import Path
 
@@ -27,12 +27,12 @@ SOURCE_ROOTS = (
 
 
 def git(repo: Path, *arguments: str) -> str:
-    return subprocess.check_output(["git", *arguments], cwd=repo, text=True)
+    return subprocess.check_output(["git", *arguments], cwd=repo, text=True)  # nosec B603
 
 
 def archived_sources(repo: Path, revision: str) -> dict[str, bytes]:
     roots = [root for root, _, _ in SOURCE_ROOTS]
-    archive = subprocess.check_output(
+    archive = subprocess.check_output(  # nosec B603
         ["git", "archive", "--format=tar", revision, "--", *roots], cwd=repo
     )
     with tarfile.open(fileobj=io.BytesIO(archive)) as contents:

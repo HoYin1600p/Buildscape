@@ -32,11 +32,16 @@ jobs:
         id: vars
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_TAG_NAME: ${{ github.event.inputs.tag_name }}
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+          EVENT_NAME: ${{ github.event_name }}
+          REF: ${{ github.ref }}
         run: |
-          if [ -n "${{ github.event.inputs.tag_name }}" ]; then
-            TAG="${{ github.event.inputs.tag_name }}"
-          elif [ "${{ github.ref_type }}" = "tag" ]; then
-            TAG="${{ github.ref_name }}"
+          if [ -n "$INPUT_TAG_NAME" ]; then
+            TAG="$INPUT_TAG_NAME"
+          elif [ "$REF_TYPE" = "tag" ]; then
+            TAG="$REF_NAME"
           else
             git submodule sync --recursive
             git submodule update --init --depth 1 shared || {
@@ -54,7 +59,7 @@ jobs:
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
           echo "Target tag: ${TAG}"
 
-          if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.ref }}" = "refs/heads/main" ]; then
+          if [ "$EVENT_NAME" = "push" ] && [ "$REF" = "refs/heads/main" ]; then
             if gh release view "$TAG" >/dev/null 2>&1; then
               echo "Release '$TAG' already exists on GitHub; skipping duplicate release on main push."
               echo "should_release=false" >> "$GITHUB_OUTPUT"
@@ -93,7 +98,7 @@ jobs:
 
       - name: Setup Gradle
         if: steps.vars.outputs.should_release == 'true'
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3 # v4.4.2
 
       - name: Make Gradle Wrapper Executable
         if: steps.vars.outputs.should_release == 'true'

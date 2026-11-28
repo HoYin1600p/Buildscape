@@ -1,6 +1,5 @@
 """Generate ModVerticalStairs.java and template-based blockstate/model/item/loot/lang resources."""
 import json
-import os
 import re
 from pathlib import Path
 
@@ -32,8 +31,8 @@ def extract_textures(stair_id: str, base_hint: str) -> dict[str, str]:
                     top = tex.get("top") or tex.get("end") or side
                     bottom = tex.get("bottom") or tex.get("end") or top
                     return {"bottom": bottom, "top": top, "side": side, "particle": "#side"}
-            except Exception:
-                pass
+            except (json.JSONDecodeError, OSError, KeyError):
+                continue
 
     fallback = f"buildscape:block/{base_slug}"
     return {"bottom": fallback, "top": fallback, "side": fallback, "particle": "#side"}

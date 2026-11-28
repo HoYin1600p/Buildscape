@@ -157,8 +157,9 @@ class Validator(shared.Validator):
             for event, definition in data.items():
                 if not isinstance(definition, dict):
                     self.error(path, event + ": sound event must be an object")
-                elif "subtitle" in definition:
-                    subtitle = definition["subtitle"]
+                    continue
+                subtitle = definition.get("subtitle")
+                if subtitle is not None:
                     if not isinstance(subtitle, str) or subtitle not in keys:
                         self.error(path, event + ": unknown subtitle " + repr(subtitle))
 

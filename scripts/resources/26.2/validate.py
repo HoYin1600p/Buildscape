@@ -12,7 +12,7 @@ from pathlib import Path
 import re
 import zipfile
 
-from convert import FOLDERS, TAG_FOLDERS, PACK, SPECIAL_ITEMS
+from convert import FOLDERS, TAG_FOLDERS, SPECIAL_ITEMS
 
 
 def normalize_config_json(text):

@@ -314,21 +314,18 @@ public class PotentSulfurBlockEntity extends DataBlockEntity {
       CollisionContext geyserPositionContext = CollisionContext.empty();
       BlockPos.MutableBlockPos pos = origin.above(1).mutable();
 
-      while (true) {
-         if (pos.getY() <= maxY) {
-            BlockState state = level.getBlockState(pos);
-            boolean isWaterLogged = level.getFluidState(pos).isSourceOfType(Fluids.WATER);
-            if (isWaterLogged && (state.is(Blocks.WATER) || isGeyserPassableBlock(state, level, pos, geyserPositionContext))) {
-               pos.move(Direction.UP);
-               continue;
-            }
-
-            if (state.isAir() || isGeyserPassableBlock(state, level, pos, geyserPositionContext)) {
-               return pos.immutable();
-            }
+      while (pos.getY() <= maxY) {
+         BlockState state = level.getBlockState(pos);
+         boolean isWaterLogged = level.getFluidState(pos).isSourceOfType(Fluids.WATER);
+         if (isWaterLogged && (state.is(Blocks.WATER) || isGeyserPassableBlock(state, level, pos, geyserPositionContext))) {
+            pos.move(Direction.UP);
+         } else if (state.isAir() || isGeyserPassableBlock(state, level, pos, geyserPositionContext)) {
+            return pos.immutable();
+         } else {
+            return null;
          }
-         return null;
       }
+      return null;
    }
 
    public static boolean canBeReachedByNoxiousGas(final Level level, final BlockPos sourceBlock, final Vec3 pos) {

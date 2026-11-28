@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** Sculk blocks break, resist and glow like vanilla 1.19. */
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 class SculkBlockPropertiesTest {
     @BeforeAll
     static void bootstrap() {

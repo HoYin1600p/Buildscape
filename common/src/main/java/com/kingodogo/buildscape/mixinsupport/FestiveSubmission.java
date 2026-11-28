@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 /** Carries stack identity through deferred extraction, submission and glint preparation. */
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public final class FestiveSubmission {
     private static final ReferenceQueue<Object> QUEUE = new ReferenceQueue<>();
     private static final Map<IdentityReference, ItemStack> STACKS = new HashMap<>();

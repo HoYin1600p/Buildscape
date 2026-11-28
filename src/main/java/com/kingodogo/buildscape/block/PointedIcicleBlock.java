@@ -794,12 +794,12 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
             BlockState searchState = level.getBlockState(searchPos);
             if (searchState.isAir()) {
                 searchPos = searchPos.above();
-                continue;
+            } else {
+                if (searchState.is(this) && searchState.getValue(VERTICAL_DIRECTION) == Direction.DOWN) {
+                    stalactiteTipPos = searchPos;
+                }
+                break;
             }
-            if (searchState.is(this) && searchState.getValue(VERTICAL_DIRECTION) == Direction.DOWN) {
-                stalactiteTipPos = searchPos;
-            }
-            break;
         }
 
         if (stalactiteTipPos == null) return;
@@ -854,6 +854,8 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
         return true;
     }
 
+    private static final java.security.SecureRandom RANDOM = new java.security.SecureRandom();
+
     public void onAnimateTick(BlockState state, Level level, BlockPos pos) {
         if (!level.isClientSide()) return;
 
@@ -866,7 +868,7 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
                 double tipY = pos.getY() + 0.1D;
                 double tipZ = pos.getZ() + 0.5D;
 
-                if (new Random().nextInt(3) == 0) {
+                if (RANDOM.nextInt(3) == 0) {
                     level.addParticle(ParticleTypes.DRIPPING_WATER, tipX, tipY, tipZ, 0.0D, 0.0D, 0.0D);
                 }
             }

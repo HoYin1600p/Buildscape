@@ -112,7 +112,7 @@
     "the_vault:santa_egg",
     "the_vault:grinch_egg",
     "the_vault:yeti_egg"
-  ],
+  ]
 
   // MOB SPAWN EGGS:
   // Spawn eggs (e.g., creeper_spawn_egg, zombie_spawn_egg) render the actual entity/mob on the pillar

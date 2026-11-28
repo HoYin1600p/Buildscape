@@ -3,9 +3,12 @@ package com.kingodogo.buildscape.recipe;
 import com.kingodogo.buildscape.platform.Services;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.Random;
+import java.security.SecureRandom;
+
 public final class DurabilityRecipeLogic {
     private DurabilityRecipeLogic() {}
+
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     public static ItemStack getRemainingItem(ItemStack stack, int damageAmount) {
         if (stack == null || stack.isEmpty()) return ItemStack.EMPTY;
@@ -15,7 +18,7 @@ public final class DurabilityRecipeLogic {
             ItemStack damagedStack = stack.copy();
             int unbreakingLevel = Services.PLATFORM.getUnbreakingLevel(damagedStack);
             if (unbreakingLevel > 0
-                    && new Random().nextFloat() >= 1.0f / (unbreakingLevel + 1.0f)) {
+                    && RANDOM.nextFloat() >= 1.0f / (unbreakingLevel + 1.0f)) {
                 return damagedStack;
             }
 

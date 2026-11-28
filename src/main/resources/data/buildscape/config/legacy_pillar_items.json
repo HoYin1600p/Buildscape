@@ -160,7 +160,7 @@
     "buildscape:stringlight_frame_pattern",
     "buildscape:infinite_phoenix_firework_star",
     "buildscape:bone_dice"
-  ],
+  ]
 
   // MOB SPAWN EGGS:
   // Spawn eggs (e.g., creeper_spawn_egg, zombie_spawn_egg) render the actual entity/mob on the pillar

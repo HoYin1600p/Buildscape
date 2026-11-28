@@ -24,7 +24,7 @@ public final class BiomeTintCache<T> {
             if (index < 0 || index >= 256) throw new IllegalArgumentException("Invalid tint column");
         }
         State<T> previous = state;
-        Map<Long, Map<Integer, T>> chunks = new HashMap<>(previous.world == world ? previous.chunks : Map.of());
+        Map<Long, Map<Integer, T>> chunks = new HashMap<>(Objects.equals(previous.world, world) ? previous.chunks : Map.of());
         Map<Integer, T> old = chunks.remove(chunk);
         if (!copy.isEmpty()) chunks.put(chunk, copy);
         state = new State<>(world, Map.copyOf(chunks));
@@ -33,7 +33,7 @@ public final class BiomeTintCache<T> {
 
     public synchronized boolean remove(Object world, long chunk) {
         State<T> current = state;
-        if (current.world != world || !current.chunks.containsKey(chunk)) return false;
+        if (!Objects.equals(current.world, world) || !current.chunks.containsKey(chunk)) return false;
         Map<Long, Map<Integer, T>> chunks = new HashMap<>(current.chunks);
         chunks.remove(chunk);
         state = new State<>(world, Map.copyOf(chunks));
@@ -46,14 +46,14 @@ public final class BiomeTintCache<T> {
 
     public T get(Object world, int x, int z) {
         State<T> current = state;
-        return current.world == world ? lookup(current, x, z) : null;
+        return Objects.equals(current.world, world) ? lookup(current, x, z) : null;
     }
 
     /** Returns null when the sampled area has no overrides and vanilla should render it. */
     public Integer blendedColor(Object world, int x, int z, int radius,
             BiFunction<Integer, Integer, T> fallback, ColorSample<T> sample) {
         State<T> current = state;
-        if (current.world != world || current.chunks.isEmpty()) return null;
+        if (!Objects.equals(current.world, world) || current.chunks.isEmpty()) return null;
         boolean nearby = false;
         for (int chunkX = (x - radius) >> 4; chunkX <= (x + radius) >> 4; chunkX++) {
             for (int chunkZ = (z - radius) >> 4; chunkZ <= (z + radius) >> 4; chunkZ++) {

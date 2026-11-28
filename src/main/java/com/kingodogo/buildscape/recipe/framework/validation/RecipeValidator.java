@@ -18,6 +18,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.kingodogo.buildscape.BuildscapeCommon;
 
+@SuppressWarnings("PMD.CompareObjectsWithEquals")
 public class RecipeValidator {
 
     private final Set<CommonId> registeredIds = new HashSet<>();
@@ -97,7 +98,7 @@ public class RecipeValidator {
             try {
                 com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatter.validateJson(value);
                 var object = JsonParser.parseString(value).getAsJsonObject();
-                if (object.has("item") == object.has("tag")) return false;
+                if (!(object.has("item") ^ object.has("tag"))) return false;
                 String member = object.has("item") ? "item" : "tag";
                 JsonElement id = object.get(member);
                 if (!id.isJsonPrimitive() || !id.getAsJsonPrimitive().isString()) return false;

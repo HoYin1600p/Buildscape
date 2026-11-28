@@ -589,16 +589,18 @@ public class PillarIdManager {
                 if (entity instanceof net.minecraft.world.entity.decoration.ItemFrame frame) facing = frame.getDirection();
                 else if (entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity frame) facing = frame.getFrameDirection();
                 else continue;
-                if (!isSameFrameLocation(data, data.dimension, entity.blockPosition(), facing)) continue;
-                CompoundTag tag = Services.PLATFORM.getEntityData(entity);
-                String storedId = Services.PLATFORM.getTagString(tag, "BuildScapeFrameId", "");
-                if (storedId != null && !storedId.isEmpty() && !storedId.equals(data.id)) continue;
-                applyPendingFrameEdit(data, tag, false);
-                if (entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity frame) {
-                    frame.setParticlePattern(framePattern(data.pattern));
-                    frame.setParticleColorsRaw(String.join(";", frameColors(data.dyeColors)));
+                if (isSameFrameLocation(data, data.dimension, entity.blockPosition(), facing)) {
+                    CompoundTag tag = Services.PLATFORM.getEntityData(entity);
+                    String storedId = Services.PLATFORM.getTagString(tag, "BuildScapeFrameId", "");
+                    if (storedId == null || storedId.isEmpty() || storedId.equals(data.id)) {
+                        applyPendingFrameEdit(data, tag, false);
+                        if (entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity frame) {
+                            frame.setParticlePattern(framePattern(data.pattern));
+                            frame.setParticleColorsRaw(String.join(";", frameColors(data.dyeColors)));
+                        }
+                        return;
+                    }
                 }
-                return;
             }
         }
     }

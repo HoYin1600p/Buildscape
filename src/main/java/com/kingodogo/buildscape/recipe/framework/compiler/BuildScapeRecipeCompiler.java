@@ -117,13 +117,14 @@ public class BuildScapeRecipeCompiler {
                     if (!json.has("recipes") || !json.get("recipes").isJsonArray()) return null;
                     for (JsonElement element : json.getAsJsonArray("recipes")) {
                         JsonObject entry = element.getAsJsonObject();
-                        if (!conditionsMet(entry.get("conditions"), modLoaded)) continue;
-                        if (!entry.has("recipe") || !entry.get("recipe").isJsonObject()) return null;
-                        JsonObject recipe = entry.getAsJsonObject("recipe").deepCopy();
-                        if (!recipe.has("id") && spec.id() != null) recipe.addProperty("id", spec.id());
-                        String categoryJson = "{\"recipes\":[" + recipe + "]}";
-                        var parsed = StreamingRecipeParser.parseCategory(category, new java.io.StringReader(categoryJson));
-                        return compileSingleRecipe(category, parsed.recipes().get(0));
+                        if (conditionsMet(entry.get("conditions"), modLoaded)) {
+                            if (!entry.has("recipe") || !entry.get("recipe").isJsonObject()) return null;
+                            JsonObject recipe = entry.getAsJsonObject("recipe").deepCopy();
+                            if (!recipe.has("id") && spec.id() != null) recipe.addProperty("id", spec.id());
+                            String categoryJson = "{\"recipes\":[" + recipe + "]}";
+                            var parsed = StreamingRecipeParser.parseCategory(category, new java.io.StringReader(categoryJson));
+                            return compileSingleRecipe(category, parsed.recipes().get(0));
+                        }
                     }
                     return null;
                 }

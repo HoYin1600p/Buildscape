@@ -295,8 +295,9 @@ public class UpdatePillarDataPacket implements CommonPacket {
                         level.getBlockState(bottomPos),
                         3
                 );
+                return;
             }
-            break;
+            return;
         }
     }
 }

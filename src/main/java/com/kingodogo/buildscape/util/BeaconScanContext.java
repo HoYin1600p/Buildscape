@@ -94,12 +94,11 @@ public final class BeaconScanContext {
                     || (bigTintedOrnament != null && state.is(bigTintedOrnament))) {
                 return y - beaconPos.getY();
             }
-            if (Services.PLATFORM.isGlassBlock(state.getBlock())
-                    || state.isAir()
-                    || beamColor(state, level, scanPos, beaconPos) != null) {
-                continue;
+            if (!Services.PLATFORM.isGlassBlock(state.getBlock())
+                    && !state.isAir()
+                    && beamColor(state, level, scanPos, beaconPos) == null) {
+                return BeaconBeamScanState.UNLIMITED;
             }
-            return BeaconBeamScanState.UNLIMITED;
         }
         return BeaconBeamScanState.UNLIMITED;
     }

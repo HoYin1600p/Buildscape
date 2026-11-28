@@ -7,6 +7,7 @@ import net.minecraft.client.gui.components.EditBox;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class WidgetLayoutHelper {
 
     private static Field xField;

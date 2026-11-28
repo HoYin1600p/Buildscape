@@ -10,6 +10,7 @@ import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacerType;
 
 import java.lang.reflect.Constructor;
 
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class WorldGenTypeHelper {
 
     public static <T> Codec<T> unitCodec(T instance) {

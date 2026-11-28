@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+@SuppressWarnings("PMD.CompareObjectsWithEquals")
 public class PillarParticleConfig {
 
     public static boolean isValidItemId(String item) {

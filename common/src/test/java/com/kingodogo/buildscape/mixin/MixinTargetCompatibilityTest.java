@@ -192,6 +192,8 @@ class MixinTargetCompatibilityTest {
 
         ClassNode read(String name) throws IOException {
             if (classes.containsKey(name)) return classes.get(name);
+            if (name.contains("..") || name.startsWith("/")) return null;
+            // nosemgrep: java_inject_rule-SpotbugsPathTraversalAbsolute
             try (InputStream stream = getClass().getClassLoader().getResourceAsStream(name + ".class")) {
                 ClassNode node = null;
                 if (stream != null) {

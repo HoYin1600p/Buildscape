@@ -967,21 +967,15 @@ public abstract class SulfurSpikeLogic extends PointedDripstoneBlock {
         BlockPos stalactiteTipPos = null;
 
         for (int i = 0; i < 10; i++) {
-            BlockState searchState = level.getBlockState(searchPos);
-
-            if (searchState.isAir()) {
+            BlockState searchState = level.getBlockState(searchPos);            if (searchState.isAir()) {
                 searchPos = searchPos.above();
-                continue;
+            } else {
+                if (searchState.is(this)
+                        && searchState.getValue(BlockStateProperties.VERTICAL_DIRECTION) == Direction.DOWN) {
+                    stalactiteTipPos = searchPos;
+                }
+                break;
             }
-
-            if (
-                    searchState.is(this) &&
-                            searchState.getValue(BlockStateProperties.VERTICAL_DIRECTION) ==
-                                    Direction.DOWN
-            ) {
-                stalactiteTipPos = searchPos;
-            }
-            break;
         }
 
         if (stalactiteTipPos == null) {

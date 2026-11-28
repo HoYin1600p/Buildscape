@@ -116,19 +116,18 @@ public class CopperRodHandler {
     private static Optional<BlockPos> randomStepCleanCopper(Level level, BlockPos pos) {
         for (BlockPos testPos : BlockPos.randomInCube(level.random, 10, pos, 1)) {
             BlockState testState = level.getBlockState(testPos);
-            if (!com.kingodogo.buildscape.adapter.RestoredCopperOxidation.isWeatheringCopper(testState.getBlock())) {
-                continue;
-            }
-            if (testState.getBlock() instanceof WeatheringCopper) {
-                WeatheringCopper.getPrevious(testState).ifPresent(s -> level.setBlockAndUpdate(testPos, s));
-            } else {
-                Block prev = com.kingodogo.buildscape.adapter.RestoredCopperOxidation.getPrevStage(testState.getBlock());
-                if (prev != null) {
-                    com.kingodogo.buildscape.adapter.RestoredCopperOxidation.setBlockStateOrDoor(level, testPos, testState, prev);
+            if (com.kingodogo.buildscape.adapter.RestoredCopperOxidation.isWeatheringCopper(testState.getBlock())) {
+                if (testState.getBlock() instanceof WeatheringCopper) {
+                    WeatheringCopper.getPrevious(testState).ifPresent(s -> level.setBlockAndUpdate(testPos, s));
+                } else {
+                    Block prev = com.kingodogo.buildscape.adapter.RestoredCopperOxidation.getPrevStage(testState.getBlock());
+                    if (prev != null) {
+                        com.kingodogo.buildscape.adapter.RestoredCopperOxidation.setBlockStateOrDoor(level, testPos, testState, prev);
+                    }
                 }
+                level.levelEvent(3002, testPos, -1);
+                return Optional.of(testPos);
             }
-            level.levelEvent(3002, testPos, -1);
-            return Optional.of(testPos);
         }
         return Optional.empty();
     }

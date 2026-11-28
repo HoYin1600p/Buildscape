@@ -10,6 +10,7 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 
 /** Loaded only from client entrypoints or guarded platform hooks. */
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public final class FabricClientAccess {
     private FabricClientAccess() {}
     public static com.mojang.blaze3d.platform.NativeImage spriteImage(net.minecraft.client.renderer.texture.SpriteContents contents) {

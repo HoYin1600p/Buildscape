@@ -484,7 +484,7 @@ public abstract class SulfurSpikeLogic extends PointedDripstoneBlock {
                     ? pos.above()
                     : pos.below();
 
-            if (true) {
+            if (neighborPos.equals(supportPos)) {
                 if (!canSurvive(state, level, pos)) {
                     if (level instanceof ServerLevel) {
                         ((ServerLevel) level).scheduleTick(pos, this, 2);
@@ -497,7 +497,7 @@ public abstract class SulfurSpikeLogic extends PointedDripstoneBlock {
             }
         }
 
-        if (true) {
+        if (neighborPos.equals(pos.above()) || neighborPos.equals(pos.below())) {
             BlockState currentState = level.getBlockState(pos);
             if (currentState.is(this)) {
                 BlockState updatedState = calculateCustomThickness(
@@ -955,21 +955,15 @@ public abstract class SulfurSpikeLogic extends PointedDripstoneBlock {
         BlockPos stalactiteTipPos = null;
 
         for (int i = 0; i < 10; i++) {
-            BlockState searchState = level.getBlockState(searchPos);
-
-            if (searchState.isAir()) {
+            BlockState searchState = level.getBlockState(searchPos);            if (searchState.isAir()) {
                 searchPos = searchPos.above();
-                continue;
+            } else {
+                if (searchState.is(this)
+                        && searchState.getValue(BlockStateProperties.VERTICAL_DIRECTION) == Direction.DOWN) {
+                    stalactiteTipPos = searchPos;
+                }
+                break;
             }
-
-            if (
-                    searchState.is(this) &&
-                            searchState.getValue(BlockStateProperties.VERTICAL_DIRECTION) ==
-                                    Direction.DOWN
-            ) {
-                stalactiteTipPos = searchPos;
-            }
-            break;
         }
 
         if (stalactiteTipPos == null) {

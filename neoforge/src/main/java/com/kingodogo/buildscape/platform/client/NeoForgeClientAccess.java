@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.SpriteContents;
 
 /** Loader access to client sprite internals, isolated from the server service provider. */
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public final class NeoForgeClientAccess {
     private NeoForgeClientAccess() {}
 

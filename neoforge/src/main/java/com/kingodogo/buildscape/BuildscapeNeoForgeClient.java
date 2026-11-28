@@ -8,6 +8,7 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 
 /** Client-only event bindings; never loaded by the dedicated server. */
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public final class BuildscapeNeoForgeClient {
     private static RegisterMenuScreensEvent menuEvent;
     private static RegisterParticleProvidersEvent particleEvent;

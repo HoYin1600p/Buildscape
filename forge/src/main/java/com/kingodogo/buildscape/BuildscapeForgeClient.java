@@ -5,6 +5,7 @@ import com.kingodogo.buildscape.platform.Services;
 import net.minecraftforge.eventbus.api.IEventBus;
 
 /** Client-only event bindings; never loaded by the dedicated server. */
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public final class BuildscapeForgeClient {
     private static final java.util.Map<net.minecraft.client.gui.screens.Screen,
             java.util.List<net.minecraft.client.gui.components.AbstractWidget>> pendingWidgets = new java.util.IdentityHashMap<>();

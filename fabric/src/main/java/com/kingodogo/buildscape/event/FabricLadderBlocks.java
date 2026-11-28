@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
  * Buildscape blocks (and the vanilla chain through ChainBlockMixin) declare Forge's
  * isLadder(state, level, pos, entity); Fabric never calls it, so it is looked up by name here.
  */
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public final class FabricLadderBlocks {
     private static final Method NONE;
 

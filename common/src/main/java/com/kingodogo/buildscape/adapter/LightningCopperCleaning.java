@@ -66,16 +66,17 @@ public final class LightningCopperCleaning {
     private static BlockPos cleanStep(Level level, BlockPos pos) {
         for (BlockPos candidate : BlockPos.randomInCube(level.random, 10, pos, 1)) {
             BlockState state = level.getBlockState(candidate);
-            if (!isWeathering(state)) continue;
-            if (state.getBlock() instanceof WeatheringCopper) {
-                var previous = WeatheringCopper.getPrevious(state);
-                if (previous.isPresent()) level.setBlockAndUpdate(candidate, previous.get());
-            } else {
-                Block previous = customStage(state, false);
-                if (previous != null) replace(level, candidate, state, previous);
+            if (isWeathering(state)) {
+                if (state.getBlock() instanceof WeatheringCopper) {
+                    var previous = WeatheringCopper.getPrevious(state);
+                    if (previous.isPresent()) level.setBlockAndUpdate(candidate, previous.get());
+                } else {
+                    Block previous = customStage(state, false);
+                    if (previous != null) replace(level, candidate, state, previous);
+                }
+                level.levelEvent(3002, candidate, -1);
+                return candidate.immutable();
             }
-            level.levelEvent(3002, candidate, -1);
-            return candidate.immutable();
         }
         return null;
     }

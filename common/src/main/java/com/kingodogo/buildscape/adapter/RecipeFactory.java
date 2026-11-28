@@ -99,17 +99,18 @@ public final class RecipeFactory {
             ItemStack result = super.assemble(input, registries);
             for (int i = 0; i < input.getContainerSize(); i++) {
                 ItemStack bush = input.getItem(i);
-                if (!getIngredients().get(0).test(bush)) continue;
-                CompoundTag data = bush.getTag();
-                if (data != null) {
-                    if (data.contains("BlockStateTag", Tag.TAG_COMPOUND)) {
-                        result.addTagElement("BlockStateTag", data.getCompound("BlockStateTag").copy());
+                if (getIngredients().get(0).test(bush)) {
+                    CompoundTag data = bush.getTag();
+                    if (data != null) {
+                        if (data.contains("BlockStateTag", Tag.TAG_COMPOUND)) {
+                            result.addTagElement("BlockStateTag", data.getCompound("BlockStateTag").copy());
+                        }
+                        if (data.contains("HasHaze")) {
+                            result.addTagElement("HasHaze", data.get("HasHaze").copy());
+                        }
                     }
-                    if (data.contains("HasHaze")) {
-                        result.addTagElement("HasHaze", data.get("HasHaze").copy());
-                    }
+                    return result;
                 }
-                break;
             }
             return result;
         }

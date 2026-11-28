@@ -151,7 +151,7 @@ final class RestoredBlockFactory {
         // vanilla replacement's sound/hardness. These unregistered bases are internal
         // constructor references only; removed content stays out of the registry.
         for (var removal : com.kingodogo.buildscape.registry.ContentRemovalPolicy.MINECRAFT_1211) {
-            if (!removal.block() || !removal.id().equals("buildscape:" + id)) continue;
+            if (removal.block() && removal.id().equals("buildscape:" + id)) {
             Block cached = REFERENCE_BASES.get(id);
             if (cached != null) return cached;
             Services.PLATFORM.wrapRegistryAction(() -> {
@@ -178,6 +178,7 @@ final class RestoredBlockFactory {
                 }
             });
             return REFERENCE_BASES.get(id);
+            }
         }
         Block block = Services.PLATFORM.getBlock(new CommonId("buildscape", id));
         if (block == null || block == net.minecraft.world.level.block.Blocks.AIR) {
